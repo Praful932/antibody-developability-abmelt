@@ -1,0 +1,12 @@
+- `brew install gromacs`
+- check if in path `gmx --version`
+- use poetry & conda
+- `conda create -n abmelt-3-11-env python=3.11 -y`
+- `conda activate abmelt-3-11-env`
+- `conda install -c conda-forge openmm pdbfixer -y`
+- `conda install -c bioconda anarci -y` 
+- `poetry install`
+- `python quick_test.py`
+- `python infer.py --pdb AbMelt/public_tm/train_pdbs/alemtuzumab.pdb --name alemtuzumab.pdb`
+
+- `import gromacs; gromacs.config.setup()` - optional

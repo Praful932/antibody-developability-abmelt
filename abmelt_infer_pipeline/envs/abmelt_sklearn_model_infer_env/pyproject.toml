@@ -1,0 +1,21 @@
+[project]
+name = "abmelt-sklearn-infer"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Praful932",email = "praful.mohanan@gmail.com"}
+]
+requires-python = ">=3.9"
+dependencies = [
+    "scikit-learn (==1.2.0)",
+    "pandas (==1.5.2)",
+    "numpy (==1.23.5)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false

@@ -1,0 +1,25 @@
+[project]
+name = "abmelt-infer-pipeline"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Praful932",email = "praful.mohanan@gmail.com"}
+]
+requires-python = ">=3.11,<3.14"
+dependencies = [
+    "torch (>=2.8.0,<3.0.0)",
+    "immunebuilder (>=1.2,<2.0)",
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "gromacswrapper (>=0.9.2,<0.10.0)",
+    "propka (>=3.5.1,<4.0.0)",
+    "pandas (>=2.3.2,<3.0.0)",
+    "joblib (>=1.5.2,<2.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
