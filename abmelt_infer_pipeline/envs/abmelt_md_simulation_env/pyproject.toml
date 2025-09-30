@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Praful932",email = "praful.mohanan@gmail.com"}
 ]
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11,<3.13"
 dependencies = [
     "torch (>=2.8.0,<3.0.0)",
     "immunebuilder (>=1.2,<2.0)",
@@ -14,6 +14,7 @@ dependencies = [
     "propka (>=3.5.1,<4.0.0)",
     "pandas (>=2.3.2,<3.0.0)",
     "joblib (>=1.5.2,<2.0.0)",
+    "numpy (==1.26.0)",
 ]
 
 

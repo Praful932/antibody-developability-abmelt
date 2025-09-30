@@ -8,7 +8,7 @@ simulation:
   force_field: "charmm27"        # or "charmm36-jul2022"
   water_model: "tip3p"
   salt_concentration: 150        # mM (PBS-like)
-  gpu_enabled: false             # Set to true if using GPU acceleration
+  gpu_enabled: true             # Set to true if using GPU acceleration
   pH: 7.4                        # pH for protonation state calculation
   p_salt: "NA"                   # Positive ion (NA+, K+, MG2+, CA2+)
   n_salt: "CL"                   # Negative ion (CL-)
