@@ -4,7 +4,7 @@
 # assumes conda and poetry are already installed
 # https://gist.github.com/Praful932/246173142223a0495565dcb7b163ab5d
 
-set -e  # Exit on any error
+# set -e  # Exit on any error
 
 CUDA_TARGET_COMPUTE=89
 
@@ -64,13 +64,19 @@ conda install -c conda-forge openmm pdbfixer -y
 conda install -c bioconda anarci -y
 conda install -c conda-forge libgcc-ng libstdcxx-ng -y
 
+echo "Changing directory"
+cd ../
+echo "Working in: $(pwd)"
+
+echo "Configuring Poetry to use conda environment..."
+poetry config virtualenvs.create false
+poetry env use $(which python)
+
 echo "Installing dependencies via poetry..."
 poetry install
 
 echo "Testing installation..."
-echo "Changing directory to repo root/abmelt_infer_pipeline..."
-cd ../../
-echo "Working in: $(pwd)"
+
 ls -la
 echo "Working in: $(pwd)"
 echo "Testing installation..."
