@@ -6,6 +6,8 @@
 
 # set -e  # Exit on any error
 
+export POETRY_REQUESTS_TIMEOUT=600
+
 echo "Configuring Poetry to use conda environment..."
 poetry config virtualenvs.create false
 echo "Currently used python env: $(which python)"
@@ -15,7 +17,7 @@ poetry install
 
 echo "Testing installation..."
 
-cd ../
+cd ../../
 
 ls -la
 echo "Working in: $(pwd)"

@@ -25,12 +25,16 @@ cmake .. \
   -DGMX_BUILD_OWN_FFTW=ON \
   -DGMX_GPU=CUDA \
   -DCUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda \
-  -DGMX_CUDA_TARGET_COMPUTE=${CUDA_TARGET_COMPUTE} \
+  -DCMAKE_CUDA_ARCHITECTURES=${CUDA_TARGET_COMPUTE} \
+  -DGMX_GPU_PME=ON \
+  -DGMX_GPU_UPDATE=ON \
   -DCMAKE_INSTALL_PREFIX=/usr/local/gromacs \
   -DCMAKE_C_COMPILER=gcc \
   -DCMAKE_CXX_COMPILER=g++ \
   -DGMX_HWLOC=ON \
-  -DGMX_OPENMP=ON
+  -DGMX_OPENMP=ON \
+  -DCMAKE_CUDA_FLAGS="-use_fast_math"
+
 
 echo "Installing GROMACS..."
 make -j$(nproc)
@@ -57,5 +61,3 @@ conda install -c bioconda anarci -y
 conda install -c conda-forge libgcc-ng libstdcxx-ng -y
 
 echo "Current directory: $(pwd)"
-
-export PATH="$PATH:$HOME/.local/share/pypoetry/venv/bin/"
