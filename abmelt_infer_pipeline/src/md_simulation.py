@@ -50,11 +50,15 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
     
     # Get the PDB filename (not full path) for GROMACS commands
     pdb_filename = Path(pdb_file).name
+
     
     try:
         # Setup GROMACS environment with MDP template path
         gromacs_config = config.get("gromacs", {})
         mdp_dir = gromacs_config.get("mdp_dir", "mdp")
+        print(f"mdp_dir: {mdp_dir}")
+
+        
         if not Path(mdp_dir).is_absolute():
             mdp_dir = str(Path(__file__).parent.parent / mdp_dir)
         
@@ -68,6 +72,9 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
                 mdp_file = f"{mdp_type}_{temp_str}.mdp"
                 src_file = Path(mdp_dir) / f"{mdp_type}.mdp"
                 dst_file = Path(mdp_dir) / mdp_file
+
+                print(f"src_file: {src_file} , {src_file.exists()}")
+                print(f"dst_file: {dst_file} , {dst_file.exists()}")
                 
                 if src_file.exists() and not dst_file.exists():
                     # Copy base MDP file and modify temperature in template directory
@@ -411,9 +418,14 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     else:
         # Custom simulation time
         new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
-        edit_mdp('md_' + temp + '.mdp', new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
-        new_md = gromacs.config.get_templates(new_mdp)
+        edit_mdp(gromacs.config.get_templates('md_' + temp + '.mdp')[0], new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
+        # add new mdp to gromacs.config.templates so gromacs can find it
+        # new_md = gromacs.config.get_templates(new_mdp)
+
+        # TODO force for now
+        new_md = ['/root/.gromacswrapper/templates/' + new_mdp]
         
+        print('filepath : ', new_md[0])
         gromacs.grompp(
             f=new_md[0],
             o='md_' + temp + '_' + str(simulation_time) + '.tpr',
@@ -428,7 +440,8 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
                 ntomp=str(n_threads),
                 nb='gpu',
                 pme='gpu',
-                update='gpu',
+                update='cpu',
+                # update='gpu',
                 bonded='cpu',
                 pin='on'
             )
@@ -727,11 +740,17 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
     gromacs.config.get_configuration()
     gromacs.tools.registry
     gromacs.config.check_setup()
+    gromacs.config.setup()
     
     # Set MDP template directory path AFTER GROMACS initialization
     if mdp_dir:
         gromacs.config.path = [mdp_dir]
         logger.info(f"Set GROMACS template path to: {mdp_dir}")
+        for f in Path(mdp_dir).glob("*.mdp"):
+            name = f.name
+            if f.name not in gromacs.config.templates:
+                gromacs.config.templates[name] = str(f)
+        print(f"gromacs.config.templates: {gromacs.config.templates}")
         logger.info(f"Current gromacs.config.path: {gromacs.config.path}")
         
         # Check if template files exist

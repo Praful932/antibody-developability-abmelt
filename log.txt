@@ -1,0 +1,24 @@
+changes
+- installed poetry using pipx
+- changes while doing poetry install (added this as was not sure if some nvidia pkgs were being isntalled or not)
+    - export POETRY_REQUESTS_TIMEOUT=300
+    - poetry cache clear --all . && rm -rf $(poetry config cache-dir)/artifacts && poetry config installer.max-workers 1
+    - poetry config installer.max-workers 1
+    - poetry install -vvv
+- now getting issue related to this
+    - Executable:   /usr/local/gromacs/bin/gmx
+Data prefix:  /usr/local/gromacs
+Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/temp/md_runs/alemtuzumab.pdb
+Command line:
+  gmx mdrun -deffnm nvt_300 -ntomp 8 -nb gpu -pme gpu -update gpu -bonded cpu -pin on
+
+
+WARNING: An error occurred while sanity checking device #0. An unhandled error from a previous CUDA operation was detected. CUDA error #222 (cudaErrorUnsupportedPtxVersion): the provided PTX was compiled with an unsupported toolchain..
+
+Reading file nvt_300.tpr, VERSION 2024 (single precision)
+Changing nstlist from 20 to 100, rlist from 1.22 to 1.348
+
+curl -s https://gist.githubusercontent.com/Praful932/1a663cb14c6d56aaf5e7ee6daefa1e8b/raw | bash -s -- praful932 antibody-developability-abmelt GITHUB_PAT .
+
+
+conda install -c conda-forge openmm pdbfixer -y && conda install -c bioconda anarci -y && conda install -c conda-forge libgcc-ng libstdcxx-ng -y

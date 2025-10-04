@@ -299,7 +299,7 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
     else: 
         extend_parameters = list(asiterable(extend_parameters))
     
-    mdp = base + mdp
+    # mdp = base + mdp
     new_mdp = base + new_mdp
 
     def asiterable(v):
