@@ -11,6 +11,10 @@ from structure_prep import prepare_structure
 from md_simulation import run_md_simulation
 
 def main():
+    """
+    python infer.py --config config.yaml --pdb "/workspace/antibody-developability-abmelt/AbMelt/public_tm/train_pdbs/alemtuzumab.pdb" --name "alemtuzumab"
+        
+    """
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='AbMelt Inference Pipeline')
     
@@ -25,7 +29,7 @@ def main():
                        help='Light chain amino acid sequence (use with --h)')
     parser.add_argument('--name', type=str, default='antibody',
                        help='Antibody name/identifier')
-    parser.add_argument('--config', type=str, default='config.yaml',
+    parser.add_argument('--config', type=str,
                        help='Configuration file path')
     parser.add_argument('--output', type=str, default='results',
                        help='Output directory')
@@ -89,12 +93,8 @@ def load_config(config_path: str) -> dict:
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
         return config
-    except FileNotFoundError:
-        # Return default config if file doesn't exist
-        return get_default_config()
     except Exception as e:
-        logging.error(f"Failed to load config: {e}")
-        return get_default_config()
+        raise Exception(f"Failed to load config: {e}")
 
 
 def get_default_config() -> dict:

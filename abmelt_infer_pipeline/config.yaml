@@ -15,7 +15,7 @@ simulation:
 
 # Input/Output paths
 paths:
-  input_dir: "data/input"
+  # TODO : not used
   output_dir: "results"
   temp_dir: "temp"
   log_dir: "logs"
