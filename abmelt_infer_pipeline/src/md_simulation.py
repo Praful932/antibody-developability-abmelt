@@ -63,9 +63,11 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
             mdp_dir = str(Path(__file__).parent.parent / mdp_dir)
         
         setup_gromacs_environment(mdp_dir=mdp_dir)
+
+        # TODO : start here
         
         # Create temperature-specific MDP files in template directory
-        temperatures = config.get("simulation", {}).get("temperatures", [300, 350, 400])
+        temperatures = config.get("simulation")['temperatures']
         for temp in temperatures:
             temp_str = str(temp)
             for mdp_type in ["nvt", "npt", "md"]:
@@ -744,8 +746,8 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
     
     # Set MDP template directory path AFTER GROMACS initialization
     if mdp_dir:
-        gromacs.config.path = [mdp_dir]
-        logger.info(f"Set GROMACS template path to: {mdp_dir}")
+        gromacs.config.path.append(mdp_dir)
+        logger.info(f"Added GROMACS template path : {mdp_dir}")
         for f in Path(mdp_dir).glob("*.mdp"):
             name = f.name
             if f.name not in gromacs.config.templates:
@@ -761,6 +763,8 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
             logger.info(f"Template file {template_file}: {'EXISTS' if exists else 'NOT FOUND'} at {template_path}")
     
     logger.info(f"GROMACS version: {gromacs.release()}")
+
+    raise Exception('ruk jaa')
 
 
 def validate_simulation_setup(config: Dict) -> bool:

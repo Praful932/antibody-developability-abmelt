@@ -45,9 +45,6 @@ def main():
     setup_logging(config)
     create_directories(config)
 
-    print(config)
-    raise Exception('stop bro')
-    
     # 3. Create antibody input based on input type
     if args.pdb:
         # Input from PDB file
@@ -95,40 +92,6 @@ def load_config(config_path: str) -> dict:
     except Exception as e:
         raise Exception(f"Failed to load config: {e}")
 
-
-def get_default_config() -> dict:
-    """Return default configuration."""
-    return {
-        "simulation": {
-            "temperatures": [300, 350, 400],
-            "simulation_time": 100,
-            "equilibration_time": 20,
-            "force_field": "charmm27",
-            "water_model": "tip3p",
-            "salt_concentration": 150,
-            "gpu_enabled": False
-        },
-        "paths": {
-            "input_dir": "data/input",
-            "output_dir": "results",
-            "temp_dir": "temp",
-            "log_dir": "logs"
-        },
-        "gromacs": {
-            "executable": "gmx",
-            "config_dir": "config/gromacs",
-            "n_threads": 16,
-            "gpu_id": 0
-        },
-        "logging": {
-            "level": "INFO",
-            "file": "logs/inference.log",
-            "max_size": "10MB",
-            "backup_count": 5
-        }
-    }
-
-
 def setup_logging(config: dict):
     """Setup logging configuration."""
     log_level = getattr(logging, config["logging"]["level"].upper())
@@ -149,6 +112,10 @@ def setup_logging(config: dict):
 
 def create_directories(config: dict):
     """Create necessary directories."""
+    config['paths']['output_dir'] = config["paths"]["run_dir"] + config['paths']['output_dir']
+    config['paths']['temp_dir'] = config["paths"]["run_dir"] + config['paths']['temp_dir']
+    config['paths']['log_dir'] = config["paths"]["run_dir"] + config['paths']['log_dir']
+
     directories = [
         config["paths"]["output_dir"],
         config["paths"]["temp_dir"],
@@ -156,7 +123,7 @@ def create_directories(config: dict):
     ]
     
     for directory in directories:
-        Path(config["paths"]["run_dir"] + directory).mkdir(parents=True, exist_ok=True)
+        Path(directory).mkdir(parents=True, exist_ok=True)
 
 
 def run_inference_pipeline(antibody, config):
@@ -174,6 +141,7 @@ def run_inference_pipeline(antibody, config):
         for key, path in structure_files.items():
             if key != "chains":
                 logging.info(f"  {key}: {path}")
+
         
         if "chains" in structure_files:
             logging.info(f"  chains: {list(structure_files['chains'].keys())}")

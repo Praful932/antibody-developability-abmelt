@@ -97,7 +97,8 @@ def _preprocess_structure(pdb_file: str, antibody_name: str, work_dir: Path, con
     
     # Validate the PDB structure
     if not validate_structure(pdb_file):
-        logger.warning("Structure validation failed, but continuing...")
+        logger.error("Structure validation failed")
+        raise Exception("Structure validation failed")
     
     # Extract chain sequences for reference
     chains = get_chain_sequences(pdb_file)
