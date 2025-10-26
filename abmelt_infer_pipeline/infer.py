@@ -11,10 +11,6 @@ from structure_prep import prepare_structure
 from md_simulation import run_md_simulation
 
 def main():
-    """
-    python infer.py --config config.yaml --pdb "/workspace/antibody-developability-abmelt/AbMelt/public_tm/train_pdbs/alemtuzumab.pdb" --name "alemtuzumab"
-        
-    """
     # Parse command line arguments
     parser = argparse.ArgumentParser(description='AbMelt Inference Pipeline')
     
@@ -48,6 +44,9 @@ def main():
     # 2. Setup logging and directories
     setup_logging(config)
     create_directories(config)
+
+    print(config)
+    raise Exception('stop bro')
     
     # 3. Create antibody input based on input type
     if args.pdb:
@@ -157,7 +156,7 @@ def create_directories(config: dict):
     ]
     
     for directory in directories:
-        Path(directory).mkdir(parents=True, exist_ok=True)
+        Path(config["paths"]["run_dir"] + directory).mkdir(parents=True, exist_ok=True)
 
 
 def run_inference_pipeline(antibody, config):

@@ -1,10 +1,9 @@
 # AbMelt Inference Pipeline Configuration
-
 # Simulation parameters (for future use)
 simulation:
-  temperatures: [300]  # Kelvin
-  simulation_time: 1           # nanoseconds
-  equilibration_time: 0.01         # nanoseconds to remove from analysis
+  temperatures: [300, 350, 400]  # Kelvin
+  simulation_time: 100           # nanoseconds
+  equilibration_time: 20         # nanoseconds to remove from analysis
   force_field: "charmm27"        # or "charmm36-jul2022"
   water_model: "tip3p"
   salt_concentration: 150        # mM (PBS-like)
@@ -15,7 +14,7 @@ simulation:
 
 # Input/Output paths
 paths:
-  # TODO : not used
+  run_dir: run_data/run_1/
   output_dir: "results"
   temp_dir: "temp"
   log_dir: "logs"
