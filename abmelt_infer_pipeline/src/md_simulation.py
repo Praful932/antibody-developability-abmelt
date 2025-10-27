@@ -73,7 +73,7 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
             for mdp_type in ["nvt", "npt", "md"]:
                 mdp_file = f"{mdp_type}_{temp_str}.mdp"
                 src_file = Path(mdp_dir) / f"{mdp_type}.mdp"
-                dst_file = Path(mdp_dir) / mdp_file
+                dst_file = config['temp_dir'] / mdp_file
 
                 print(f"src_file: {src_file} , {src_file.exists()}")
                 print(f"dst_file: {dst_file} , {dst_file.exists()}")
@@ -137,10 +137,10 @@ def _preprocess_for_gromacs(pdb_filename: str, config: Dict) -> Dict[str, str]:
     logger.info("Preprocessing structure for GROMACS...")
     
     # Get simulation parameters
-    sim_config = config.get("simulation", {})
-    pH = sim_config.get("pH", 7.4)
-    force_field = sim_config.get("force_field", "charmm27")
-    water_model = sim_config.get("water_model", "tip3p")
+    sim_config = config["simulation"]
+    pH = sim_config["pH"]
+    force_field = sim_config["force_field"]
+    water_model = sim_config["water_model"]
     
     # Step 1: Calculate protonation states
     logger.info("Calculating protonation states...")
