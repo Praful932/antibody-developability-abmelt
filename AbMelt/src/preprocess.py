@@ -77,15 +77,16 @@ def convert_pkas(pkas, pH):
     HIS_protonsB = [('2' if float(HIS_B[res][3].strip("*")) >= pH else '0') for res in range(len(HIS_B))]
     return  HIS_protonsA + HIS_protonsB
 
-def protonation_state (pdb, path, pH = 7.4):
+def protonation_state(pdb_filename, pdb_path, pH = 7.4):
     #Run Propka3 on pdb and return pKa summary
-    pk.single(pdb, optargs=['--pH=%s'%(pH)],  stream=path, write_pka=True)
-    pkas = parse_propka(os.path.splitext(pdb)[0]+'.pka')
+    pk.single(pdb_filename, optargs=['--pH=%s'%(pH)],  stream=pdb_path, write_pka=True)
+    pkas = parse_propka(os.path.splitext(pdb_filename)[0]+'.pka')
+
 
     # remove NME because gromacs will add chain termini for CHARMM36m
     cli_cmd = 'grep -v " NME " '
     cli_cmd2 = ' > tmpfile && mv tmpfile '
-    grep_cmd = cli_cmd + pdb + cli_cmd2 +pdb
+    grep_cmd = cli_cmd + pdb_filename + cli_cmd2 + pdb_filename
     os.system(grep_cmd)
 
     # string of protonation states for residue types (lys, arg, asp, glu, his)

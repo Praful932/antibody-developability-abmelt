@@ -112,9 +112,10 @@ def setup_logging(config: dict):
 
 def create_directories(config: dict):
     """Create necessary directories."""
-    config['paths']['output_dir'] = config["paths"]["run_dir"] + config['paths']['output_dir']
-    config['paths']['temp_dir'] = config["paths"]["run_dir"] + config['paths']['temp_dir']
-    config['paths']['log_dir'] = config["paths"]["run_dir"] + config['paths']['log_dir']
+    script_directory = Path(__file__).parent.resolve()
+    config['paths']['output_dir'] = script_directory / config["paths"]["run_dir"] / config['paths']['output_dir']
+    config['paths']['temp_dir'] = script_directory / config["paths"]["run_dir"] / config['paths']['temp_dir']
+    config['paths']['log_dir'] = script_directory / config["paths"]["run_dir"] / config['paths']['log_dir']
 
     directories = [
         config["paths"]["output_dir"],

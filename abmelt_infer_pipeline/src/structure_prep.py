@@ -53,7 +53,7 @@ def _prepare_from_pdb(antibody: Dict, config: Dict) -> Dict[str, str]:
     antibody_name = antibody["name"]
     
     # Create working directory
-    work_dir = Path(config["paths"]["temp_dir"]) / "md_runs" / antibody_name
+    work_dir = Path(config["paths"]["temp_dir"])
     work_dir.mkdir(parents=True, exist_ok=True)
     
     # Copy PDB to working directory
@@ -72,7 +72,7 @@ def _prepare_from_sequences(antibody: Dict, config: Dict) -> Dict[str, str]:
     antibody_name = antibody["name"]
     
     # Create working directory
-    work_dir = Path(config["paths"]["temp_dir"]) / "md_runs" / antibody_name
+    work_dir = Path(config["paths"]["temp_dir"])
     work_dir.mkdir(parents=True, exist_ok=True)
     
     # Generate structure using ImmuneBuilder

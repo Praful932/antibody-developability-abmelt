@@ -1,0 +1,47 @@
+# AbMelt Inference Pipeline Configuration
+# Simulation parameters (for future use)
+simulation:
+  temperatures: [300]  # Kelvin
+  simulation_time: 2           # nanoseconds
+  equilibration_time: 1         # nanoseconds to remove from analysis
+  force_field: "charmm27"        # or "charmm36-jul2022"
+  water_model: "tip3p"
+  salt_concentration: 150        # mM (PBS-like)
+  gpu_enabled: true             # Set to true if using GPU acceleration
+  pH: 7.4                        # pH for protonation state calculation
+  p_salt: "NA"                   # Positive ion (NA+, K+, MG2+, CA2+)
+  n_salt: "CL"                   # Negative ion (CL-)
+
+# Input/Output paths
+paths:
+  run_dir: run_data/run_2/
+  output_dir: "results"
+  temp_dir: "temp"
+  log_dir: "logs"
+
+# Structure preparation settings
+structure:
+  validate_structure: true       # Validate PDB structure
+  extract_sequences: true        # Extract chain sequences
+  create_work_dir: true          # Create working directory
+
+# GROMACS settings (for future preprocessing step)
+gromacs:
+  executable: "gmx"              # or "gmx_mpi" for MPI version
+  config_dir: "config/gromacs"
+  mdp_dir: "mdp"                 # Directory containing MDP template files
+  n_threads: 8
+  gpu_id: 0                      # GPU device ID (if using GPU)
+
+# Logging
+logging:
+  level: "INFO"                  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/inference.log"
+  max_size: "10MB"
+  backup_count: 5
+
+# Performance
+performance:
+  parallel_jobs: 4               # Number of parallel jobs (future use)
+  cleanup_temp: true             # Clean up temporary files after completion
+  save_trajectories: false       # Save MD trajectories (large files)

@@ -49,7 +49,8 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
     os.chdir(work_dir)
     
     # Get the PDB filename (not full path) for GROMACS commands
-    pdb_filename = Path(pdb_file).name
+    pdb_filepath = Path(pdb_file)
+    pdb_filename = pdb_filepath.name
 
     
     try:
@@ -64,16 +65,14 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
         
         setup_gromacs_environment(mdp_dir=mdp_dir)
 
-        # TODO : start here
-        
         # Create temperature-specific MDP files in template directory
         temperatures = config.get("simulation")['temperatures']
         for temp in temperatures:
             temp_str = str(temp)
             for mdp_type in ["nvt", "npt", "md"]:
-                mdp_file = f"{mdp_type}_{temp_str}.mdp"
+                mdp_file = Path(f"{mdp_type}_{temp_str}.mdp")
                 src_file = Path(mdp_dir) / f"{mdp_type}.mdp"
-                dst_file = config['temp_dir'] / mdp_file
+                dst_file = mdp_file
 
                 print(f"src_file: {src_file} , {src_file.exists()}")
                 print(f"dst_file: {dst_file} , {dst_file.exists()}")
@@ -88,10 +87,11 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
                     logger.info(f"Temperature-specific MDP file already exists: {mdp_file}")
                 else:
                     logger.warning(f"Base MDP file not found: {src_file}")
+
         
         # Step 1: GROMACS preprocessing
         logger.info("Step 1: GROMACS preprocessing...")
-        gromacs_files = _preprocess_for_gromacs(pdb_filename, config)
+        gromacs_files = _preprocess_for_gromacs(pdb_filename, pdb_filepath, config)
         
         # Step 2: System setup
         logger.info("Step 2: Setting up simulation system...")
@@ -123,7 +123,7 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
         os.chdir(original_cwd)
 
 
-def _preprocess_for_gromacs(pdb_filename: str, config: Dict) -> Dict[str, str]:
+def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: Dict) -> Dict[str, str]:
     """
     Preprocess PDB file for GROMACS: pKa calculation, conversion, and indexing.
     
@@ -145,15 +145,16 @@ def _preprocess_for_gromacs(pdb_filename: str, config: Dict) -> Dict[str, str]:
     # Step 1: Calculate protonation states
     logger.info("Calculating protonation states...")
     gromacs_input = protonation_state(
-        pdb=pdb_filename,
-        path=pdb_filename,
+        pdb_filename=pdb_filename,
+        pdb_path=pdb_filepath,
         pH=pH
     )
+
     
     # Step 2: Convert PDB to GROMACS format
     logger.info("Converting PDB to GROMACS format...")
     gromacs.pdb2gmx(
-        f=pdb_filename,
+        f=pdb_filepath,
         o="processed.pdb",
         p="topol.top",
         ff=force_field,
@@ -163,6 +164,7 @@ def _preprocess_for_gromacs(pdb_filename: str, config: Dict) -> Dict[str, str]:
         renum=True,
         input=gromacs_input
     )
+
     
     gromacs.pdb2gmx(
         f="processed.pdb",
@@ -175,17 +177,18 @@ def _preprocess_for_gromacs(pdb_filename: str, config: Dict) -> Dict[str, str]:
         renum=True,
         input=gromacs_input
     )
-    
+
     # Step 3: Create index groups for CDRs
     logger.info("Creating index groups for CDRs...")
-    annotation = canonical_index(pdb='processed.pdb')
-    gromacs.make_ndx(f="processed.gro", o="index.ndx", input=annotation)
+    annotation = canonical_index(pdb=config['paths']['temp_dir'] / "processed.pdb")
+    gromacs.make_ndx(f= config['paths']['temp_dir'] / "processed.gro", o=config['paths']['temp_dir'] / "index.ndx", input=annotation)
+
     
     return {
-        "processed_pdb": "processed.pdb",
-        "processed_gro": "processed.gro",
-        "topology": "topol.top",
-        "index": "index.ndx"
+        "processed_pdb": config['paths']['temp_dir'] / "processed.pdb",
+        "processed_gro": config['paths']['temp_dir'] / "processed.gro",
+        "topology": config['paths']['temp_dir'] / "topol.top",
+        "index": config['paths']['temp_dir'] / "index.ndx"
     }
 
 
@@ -204,10 +207,10 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
     logger.info("Setting up simulation system...")
     
     # Get simulation parameters
-    sim_config = config.get("simulation", {})
-    salt_concentration = sim_config.get("salt_concentration", 150)  # mM
-    p_salt = sim_config.get("p_salt", "NA")
-    n_salt = sim_config.get("n_salt", "CL")
+    sim_config = config["simulation"]
+    salt_concentration = sim_config["salt_concentration"]  # mM
+    p_salt = sim_config["p_salt"]
+    n_salt = sim_config["n_salt"]
     
     # Step 1: Create simulation box
     logger.info("Creating simulation box...")
@@ -217,7 +220,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
         c=True,
         d='1.0',
         bt='triclinic'
-    )
+    )   
     
     # Step 2: Add water
     logger.info("Adding water molecules...")
@@ -233,6 +236,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
     logger.info(f"Current working directory: {os.getcwd()}")
     logger.info(f"GROMACS config.path: {gromacs.config.path}")
     logger.info(f"Looking for ions.mdp in: {[os.path.join(p, 'ions.mdp') for p in gromacs.config.path]}")
+
     
     try:
         ions = gromacs.config.get_templates('ions.mdp')
@@ -246,6 +250,8 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
                 logger.info(f"Found ions.mdp manually at: {ions_path}")
                 break
         raise
+
+
     
     gromacs.grompp(
         f=ions[0],
@@ -275,12 +281,13 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
         o="em.tpr"
     )
     gromacs.mdrun(v=True, deffnm="em")
+
     
     return {
-        "solvated_gro": "solv_ions.gro",
+        "solvated_gro": config['paths']['temp_dir'] / "solv_ions.gro",
         "topology": gromacs_files["topology"],
         "index": gromacs_files["index"],
-        "em_gro": "em.gro"
+        "em_gro": config['paths']['temp_dir'] / "em.gro"
     }
 
 
@@ -298,15 +305,15 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     logger.info("Running multi-temperature MD simulations...")
     
     # Get simulation parameters
-    sim_config = config.get("simulation", {})
-    temperatures = sim_config.get("temperatures", [300, 350, 400])
-    simulation_time = sim_config.get("simulation_time", 100)  # ns
-    gpu_enabled = sim_config.get("gpu_enabled", False)
+    sim_config = config["simulation"]
+    temperatures = sim_config["temperatures"]
+    simulation_time = sim_config["simulation_time"]  # ns
+    gpu_enabled = sim_config["gpu_enabled"]
     
     # Get GROMACS settings
-    gromacs_config = config.get("gromacs", {})
-    n_threads = gromacs_config.get("n_threads", 16)
-    gpu_id = gromacs_config.get("gpu_id", 0)
+    gromacs_config = config["gromacs"]
+    n_threads = gromacs_config["n_threads"]
+    gpu_id = gromacs_config["gpu_id"]
     
     # Available pre-installed temperatures
     avail_temps = ['300', '310', '350', '373', '400']
@@ -314,6 +321,7 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     
     trajectory_files = {}
     
+    # TODO : start here
     for temp in temps:
         logger.info(f"Running simulation at {temp}K...")
         
@@ -764,7 +772,6 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
     
     logger.info(f"GROMACS version: {gromacs.release()}")
 
-    raise Exception('ruk jaa')
 
 
 def validate_simulation_setup(config: Dict) -> bool:
