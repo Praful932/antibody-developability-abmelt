@@ -320,22 +320,24 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     temps = [str(temp) for temp in temperatures]
     
     trajectory_files = {}
-    
-    # TODO : start here
+
     for temp in temps:
         logger.info(f"Running simulation at {temp}K...")
         
         try:
-            if temp in avail_temps:
-                # Use pre-installed temperature files
-                trajectory_files[temp] = _run_preinstalled_temp_simulation(
-                    temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
-                )
-            else:
-                # Create custom temperature files
-                trajectory_files[temp] = _run_custom_temp_simulation(
-                    temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
-                )
+            # Required temp files are already created
+            # Use pre-installed temperature files
+            trajectory_files[temp] = _run_preinstalled_temp_simulation(
+                temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
+            )
+
+            # if temp in avail_temps:
+            
+            # else:
+            #     # Create custom temperature files
+            #     trajectory_files[temp] = _run_custom_temp_simulation(
+            #         temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
+            #     )
                 
         except Exception as e:
             logger.error(f"Simulation failed at {temp}K: {e}")
@@ -348,6 +350,16 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
                                     simulation_time: int, gpu_enabled: bool,
                                     n_threads: int, gpu_id: int) -> Dict[str, str]:
     """Run simulation using pre-installed temperature files."""
+
+    print(f'simulation time - {simulation_time}')
+    print(f"original mdp - {'md_' + temp + '.mdp'}")
+    print(f"new mdp - {'md_' + temp + '_' + str(simulation_time) + '.mdp'}")
+    new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
+    edit_mdp(gromacs.config.get_templates('md_' + temp + '.mdp')[0], new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
+    new_md = gromacs.config.get_templates(new_mdp)
+
+    print(f"new mdp - {new_md}")
+    raise Exception('ruk jaa')
     
     # Get MDP templates
     nvt = gromacs.config.get_templates('nvt_' + temp + '.mdp')
@@ -469,7 +481,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
 def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
                               simulation_time: int, gpu_enabled: bool,
                               n_threads: int, gpu_id: int) -> Dict[str, str]:
-    """Run simulation with custom temperature by modifying MDP files."""
+    """Run simulation with custom temperature by modifying MDP files."""    
     
     # Create custom MDP files
     nvt_mdp = 'nvt_' + temp + '.mdp'
