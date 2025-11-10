@@ -351,15 +351,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
                                     n_threads: int, gpu_id: int) -> Dict[str, str]:
     """Run simulation using pre-installed temperature files."""
 
-    print(f'simulation time - {simulation_time}')
-    print(f"original mdp - {'md_' + temp + '.mdp'}")
-    print(f"new mdp - {'md_' + temp + '_' + str(simulation_time) + '.mdp'}")
-    new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
-    edit_mdp(gromacs.config.get_templates('md_' + temp + '.mdp')[0], new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
-    new_md = gromacs.config.get_templates(new_mdp)
-
-    print(f"new mdp - {new_md}")
-    raise Exception('ruk jaa')
+    # TODO : start here
     
     # Get MDP templates
     nvt = gromacs.config.get_templates('nvt_' + temp + '.mdp')
@@ -440,14 +432,10 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     else:
         # Custom simulation time
         new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
-        edit_mdp(gromacs.config.get_templates('md_' + temp + '.mdp')[0], new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
-        # add new mdp to gromacs.config.templates so gromacs can find it
-        # new_md = gromacs.config.get_templates(new_mdp)
-
-        # TODO force for now
-        new_md = ['/root/.gromacswrapper/templates/' + new_mdp]
+        template_path = Path(gromacs.config.get_templates('md_' + temp + '.mdp')[0])
+        _modify_mdp_nsteps(template_path, new_mdp, int(simulation_time*1000*1000/2))
+        new_md = gromacs.config.get_templates(new_mdp)
         
-        print('filepath : ', new_md[0])
         gromacs.grompp(
             f=new_md[0],
             o='md_' + temp + '_' + str(simulation_time) + '.tpr',
@@ -570,7 +558,8 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
     else:
         # Custom simulation time
         new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
-        edit_mdp(md_mdp, new_mdp=new_mdp, nsteps=[int(simulation_time*1000*1000/2)])
+        template_path = Path(gromacs.config.get_templates(md_mdp)[0])
+        _modify_mdp_nsteps(template_path, new_mdp, int(simulation_time*1000*1000/2))
         new_md_custom = gromacs.config.get_templates(new_mdp)
         
         gromacs.grompp(
@@ -745,6 +734,41 @@ def _modify_mdp_temperature(mdp_file: Path, temperature: int):
             
     except Exception as e:
         logger.error(f"Failed to modify MDP file {mdp_file}: {e}")
+
+
+def _modify_mdp_nsteps(template_file: Path, output_name: str, nsteps: int):
+    """
+    Copy an MDP template into the working directory and update its nsteps value.
+    """
+    try:
+        from shutil import copy2
+
+        destination = Path(output_name)
+        copy2(template_file, destination)
+
+        with open(destination, 'r') as src:
+            lines = src.readlines()
+
+        updated_lines = []
+        nsteps_updated = False
+        for line in lines:
+            if line.strip().startswith('nsteps'):
+                updated_lines.append(f"nsteps                  = {nsteps}\n")
+                nsteps_updated = True
+            else:
+                updated_lines.append(line)
+
+        if not nsteps_updated:
+            updated_lines.append(f"\n; inserted by pipeline\nnsteps                  = {nsteps}\n")
+
+        with open(destination, 'w') as dst:
+            dst.writelines(updated_lines)
+
+        gromacs.config.templates[output_name] = str(destination.resolve())
+        logger.info(f"Created {output_name} with nsteps={nsteps}")
+    except Exception as e:
+        logger.error(f"Failed to update nsteps for {template_file}: {e}")
+        raise
 
 
 def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
