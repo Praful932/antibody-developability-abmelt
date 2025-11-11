@@ -351,7 +351,6 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
                                     n_threads: int, gpu_id: int) -> Dict[str, str]:
     """Run simulation using pre-installed temperature files."""
 
-    # TODO : start here
     
     # Get MDP templates
     nvt = gromacs.config.get_templates('nvt_' + temp + '.mdp')
@@ -712,7 +711,6 @@ def _modify_mdp_temperature(mdp_file: Path, temperature: int):
         temperature: Target temperature in Kelvin
     """
     try:
-        # Read the MDP file
         with open(mdp_file, 'r') as f:
             lines = f.readlines()
         
