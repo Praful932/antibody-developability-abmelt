@@ -47,41 +47,115 @@ def parse_propka (pka):
     result_pka_file.close()
     return(list_results)
 
-def convert_pkas(pkas, pH):
+def identify_chain_types(pdb_file):
+    """
+    Use ANARCI to identify which PDB chain is heavy vs light.
+    
+    Args:
+        pdb_file: Path to PDB file
+        
+    Returns:
+        tuple: (light_chain_id, heavy_chain_id)
+    """
+    from anarci import anarci
+    from Bio.PDB import PDBParser
+    from Bio.SeqUtils import seq1
+    
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure("antibody", pdb_file)
+    chains = {chain.id: seq1(''.join(residue.resname for residue in chain)) 
+              for chain in structure.get_chains()}
+    
+    light_id = None
+    heavy_id = None
+    
+    for chain_id, sequence in chains.items():
+        # ANARCI can identify chain type
+        results = anarci([(chain_id, sequence)], scheme="imgt", output=False)
+        numbering, alignment_details, hit_tables = results
+        
+        if numbering[0] and numbering[0][0]:
+            # hit_tables is a list of lists where first row is headers
+            # Format: [['id', 'description', ...], ['human_K', '', ...], ['mouse_K', '', ...]]
+            if hit_tables and len(hit_tables[0]) > 1:
+                # Skip header row (index 0), get best hit (index 1)
+                best_hit = hit_tables[0][1]
+                hit_id = best_hit[0]  # e.g., 'human_K', 'human_H', 'human_L'
+                
+                # Extract chain type from hit_id (e.g., 'human_K' -> 'K', 'human_H' -> 'H')
+                if '_' in hit_id:
+                    chain_type = hit_id.split('_')[1]  # Get the part after underscore
+                    
+                    if chain_type in ['K', 'L']:  # Kappa or Lambda light chain
+                        light_id = chain_id
+                    elif chain_type == 'H':  # Heavy chain
+                        heavy_id = chain_id
+    
+    return light_id, heavy_id
+
+def convert_pkas(pkas, pH, light_chain_id='A', heavy_chain_id='B'):
+    """
+    Extract histidine protonation states for Gromacs.
+    
+    Args:
+        pkas: parsed PropKa results from parse_propka()
+        pH: target pH for simulation
+        light_chain_id: PDB chain identifier for light chain (default 'A')
+        heavy_chain_id: PDB chain identifier for heavy chain (default 'B')
+    
+    Returns:
+        List of protonation codes: '2' if protonated, '0' if neutral
+    """
     # extract residue pkas (lys, arg, asp, glu, gln, his)
     # propka3 skipping first residue of chain A breaks ordering for other residue types
     # ^^^ FIX NEEDED (works on titratation of HIS for now) ^^^
-    #LYS_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'LYS' and pkas[res][2] == 'A']
-    #ARG_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ARG' and pkas[res][2] == 'A']
-    #ASP_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ASP' and pkas[res][2] == 'A']
-    #GLU_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLU' and pkas[res][2] == 'A']
-    #GLN_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLN' and pkas[res][2] == 'A']
-    HIS_A = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'HIS' and pkas[res][2] == 'A']
-    #LYS_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'LYS' and pkas[res][2] == 'B']
-    #ARG_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ARG' and pkas[res][2] == 'B']
-    #ASP_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ASP' and pkas[res][2] == 'B']
-    #GLU_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLU' and pkas[res][2] == 'B']
-    #GLN_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLN' and pkas[res][2] == 'B']
-    HIS_B = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'HIS' and pkas[res][2] == 'B']
-    #LYS_protonsA = [('1' if float(LYS_A[res][3]) >= pH else '0') for res in range(len(LYS_A))]
-    #ARG_protonsA = [('1' if float(ARG_A[res][3]) >= pH else '0') for res in range(len(ARG_A))]
-    #ASP_protonsA = [('1' if float(ASP_A[res][3]) >= pH else '0') for res in range(len(ASP_A))]
-    #GLU_protonsA = [('1' if float(GLU_A[res][3]) >= pH else '0') for res in range(len(GLU_A))]
-    #GLN_protonsA = [('1' if float(GLN_A[res][3]) >= pH else '0') for res in range(len(GLN_A))]
-    HIS_protonsA = [('2' if float(HIS_A[res][3].strip("*")) >= pH else '0') for res in range(len(HIS_A))]
-    #LYS_protonsB = [('1' if float(LYS_B[res][3]) >= pH else '0') for res in range(len(LYS_B))]
-    #ARG_protonsB = [('1' if float(ARG_B[res][3]) >= pH else '0') for res in range(len(ARG_B))]
-    #ASP_protonsB = [('1' if float(ASP_B[res][3]) >= pH else '0') for res in range(len(ASP_B))]
-    #GLU_protonsB = [('1' if float(GLU_B[res][3]) >= pH else '0') for res in range(len(GLU_B))]
-    #GLN_protonsB = [('1' if float(GLN_B[res][3]) >= pH else '0') for res in range(len(GLN_B))]
-    HIS_protonsB = [('2' if float(HIS_B[res][3].strip("*")) >= pH else '0') for res in range(len(HIS_B))]
-    return  HIS_protonsA + HIS_protonsB
+    #LYS_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'LYS' and pkas[res][2] == light_chain_id]
+    #ARG_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ARG' and pkas[res][2] == light_chain_id]
+    #ASP_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ASP' and pkas[res][2] == light_chain_id]
+    #GLU_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLU' and pkas[res][2] == light_chain_id]
+    #GLN_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLN' and pkas[res][2] == light_chain_id]
+    HIS_light = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'HIS' and pkas[res][2] == light_chain_id]
+    #LYS_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'LYS' and pkas[res][2] == heavy_chain_id]
+    #ARG_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ARG' and pkas[res][2] == heavy_chain_id]
+    #ASP_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'ASP' and pkas[res][2] == heavy_chain_id]
+    #GLU_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLU' and pkas[res][2] == heavy_chain_id]
+    #GLN_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'GLN' and pkas[res][2] == heavy_chain_id]
+    HIS_heavy = [pkas[res] for res in range(len(pkas)) if pkas[res][0] == 'HIS' and pkas[res][2] == heavy_chain_id]
+    #LYS_protons_light = [('1' if float(LYS_light[res][3]) >= pH else '0') for res in range(len(LYS_light))]
+    #ARG_protons_light = [('1' if float(ARG_light[res][3]) >= pH else '0') for res in range(len(ARG_light))]
+    #ASP_protons_light = [('1' if float(ASP_light[res][3]) >= pH else '0') for res in range(len(ASP_light))]
+    #GLU_protons_light = [('1' if float(GLU_light[res][3]) >= pH else '0') for res in range(len(GLU_light))]
+    #GLN_protons_light = [('1' if float(GLN_light[res][3]) >= pH else '0') for res in range(len(GLN_light))]
+    HIS_protons_light = [('2' if float(HIS_light[res][3].strip("*")) >= pH else '0') for res in range(len(HIS_light))]
+    #LYS_protons_heavy = [('1' if float(LYS_heavy[res][3]) >= pH else '0') for res in range(len(LYS_heavy))]
+    #ARG_protons_heavy = [('1' if float(ARG_heavy[res][3]) >= pH else '0') for res in range(len(ARG_heavy))]
+    #ASP_protons_heavy = [('1' if float(ASP_heavy[res][3]) >= pH else '0') for res in range(len(ASP_heavy))]
+    #GLU_protons_heavy = [('1' if float(GLU_heavy[res][3]) >= pH else '0') for res in range(len(GLU_heavy))]
+    #GLN_protons_heavy = [('1' if float(GLN_heavy[res][3]) >= pH else '0') for res in range(len(GLN_heavy))]
+    HIS_protons_heavy = [('2' if float(HIS_heavy[res][3].strip("*")) >= pH else '0') for res in range(len(HIS_heavy))]
+    return  HIS_protons_light + HIS_protons_heavy
 
-def protonation_state(pdb_filename, pdb_path, pH = 7.4):
-    #Run Propka3 on pdb and return pKa summary
+def protonation_state(pdb_filename, pdb_path, pH=7.4, light_chain_id='A', heavy_chain_id='B'):
+    """
+    Run Propka3 on pdb and return pKa summary.
+    
+    Args:
+        pdb_filename: Path to PDB file
+        pdb_path: Path for output files
+        pH: Target pH for simulation (default 7.4)
+        light_chain_id: PDB chain identifier for light chain (default 'A')
+        heavy_chain_id: PDB chain identifier for heavy chain (default 'B')
+        
+    Returns:
+        List of protonation codes for Gromacs
+        
+    Note:
+        The inference pipeline automatically renames chains to A=light, B=heavy
+        before calling this function, so the default parameters work correctly.
+    """
     pk.single(pdb_filename, optargs=['--pH=%s'%(pH)],  stream=pdb_path, write_pka=True)
-    pkas = parse_propka(os.path.splitext(pdb_filename)[0]+'.pka')
-
+    pka_file_path = os.path.splitext(pdb_filename)[0]+'.pka'
+    pkas = parse_propka(pka_file_path)
 
     # remove NME because gromacs will add chain termini for CHARMM36m
     cli_cmd = 'grep -v " NME " '
@@ -90,8 +164,7 @@ def protonation_state(pdb_filename, pdb_path, pH = 7.4):
     os.system(grep_cmd)
 
     # string of protonation states for residue types (lys, arg, asp, glu, his)
-    gromacs_input = convert_pkas(pkas, pH)
-    
+    gromacs_input = convert_pkas(pkas, pH, light_chain_id, heavy_chain_id)
     return gromacs_input
 
 def canonical_index (pdb):

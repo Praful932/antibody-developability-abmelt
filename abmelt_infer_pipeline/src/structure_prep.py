@@ -100,6 +100,10 @@ def _preprocess_structure(pdb_file: str, antibody_name: str, work_dir: Path, con
         logger.error("Structure validation failed")
         raise Exception("Structure validation failed")
     
+    # Rename chains to A/B convention for compatibility with downstream code
+    logger.info("Renaming chains to A/B convention...")
+    rename_chains_to_ab(pdb_file)
+    
     # Extract chain sequences for reference
     chains = get_chain_sequences(pdb_file)
     logger.info(f"Found chains: {list(chains.keys())}")
@@ -135,11 +139,71 @@ def validate_structure(pdb_file: str) -> bool:
         return False
 
 
+def rename_chains_to_ab(pdb_file: str) -> None:
+    """
+    Rename chains in PDB file to use A/B convention instead of H/L.
+    This ensures compatibility with downstream code that expects A=light, B=heavy.
+    
+    Args:
+        pdb_file: Path to PDB file to modify in-place
+    """
+    from Bio.PDB import PDBIO
+    from anarci import anarci
+    
+    try:
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure("antibody", pdb_file)
+        
+        # Identify which chain is heavy vs light using ANARCI
+        chains = list(structure.get_chains())
+        chain_mapping = {}  # old_id -> new_id
+        
+        for chain in chains:
+            chain_id = chain.id
+            sequence = seq1(''.join(residue.resname for residue in chain))
+            
+            # Use ANARCI to identify chain type
+            results = anarci([(chain_id, sequence)], scheme="imgt", output=False)
+            numbering, alignment_details, hit_tables = results
+            
+            if numbering[0] and numbering[0][0] and hit_tables and len(hit_tables[0]) > 1:
+                best_hit = hit_tables[0][1]
+                hit_id = best_hit[0]
+                
+                if '_' in hit_id:
+                    chain_type = hit_id.split('_')[1]
+                    
+                    if chain_type in ['K', 'L']:  # Light chain
+                        chain_mapping[chain_id] = 'A'
+                    elif chain_type == 'H':  # Heavy chain
+                        chain_mapping[chain_id] = 'B'
+        
+        # Rename chains if needed
+        if chain_mapping:
+            logger.info(f"Renaming chains: {chain_mapping}")
+            for chain in structure.get_chains():
+                if chain.id in chain_mapping:
+                    chain.id = chain_mapping[chain.id]
+            
+            # Save modified structure
+            io = PDBIO()
+            io.set_structure(structure)
+            io.save(pdb_file)
+            logger.info(f"Chains renamed successfully. New chain IDs: {[c.id for c in structure.get_chains()]}")
+        else:
+            logger.warning("Could not identify chains for renaming")
+            
+    except Exception as e:
+        logger.error(f"Failed to rename chains: {e}")
+        raise
+
 def get_chain_sequences(pdb_file: str) -> Dict[str, str]:
     """Extract heavy and light chain sequences from PDB file."""
     try:
         parser = PDBParser(QUIET=True)
         structure = parser.get_structure("antibody", pdb_file)
+        # print unique chain ids
+        print(f"Unique chain ids: {list(set(chain.id for chain in structure.get_chains()))}")
         chains = {chain.id: seq1(''.join(residue.resname for residue in chain)) 
                  for chain in structure.get_chains()}
         return chains

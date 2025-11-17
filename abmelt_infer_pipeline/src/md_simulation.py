@@ -149,6 +149,9 @@ def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: Dict) -> Di
         pdb_path=pdb_filepath,
         pH=pH
     )
+    print("protonation state")
+    print(gromacs_input)
+    print('\n\n\n')
 
     
     # Step 2: Convert PDB to GROMACS format
