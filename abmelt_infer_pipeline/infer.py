@@ -9,6 +9,7 @@ sys.path.append(str(Path(__file__).parent / "src"))
 
 from structure_prep import prepare_structure
 from md_simulation import run_md_simulation
+from compute_descriptors import compute_descriptors
 
 def main():
     # Parse command line arguments
@@ -78,6 +79,10 @@ def main():
         print(f"  MD simulations completed at temperatures: {list(result['simulation_result']['trajectory_files'].keys())}")
         for temp, files in result['simulation_result']['trajectory_files'].items():
             print(f"    {temp}K: {files['final_xtc']}")
+    
+    if 'descriptor_result' in result:
+        print(f"  Descriptors computed: {result['descriptor_result']['descriptors_df'].shape[1]} features")
+        print(f"  XVG files generated: {len(result['descriptor_result']['xvg_files'])}")
     
     return result
     
@@ -157,15 +162,25 @@ def run_inference_pipeline(antibody, config):
         for temp, files in simulation_result["trajectory_files"].items():
             logging.info(f"  {temp}K: {files['final_xtc']}")
         
-        # TODO: Add remaining pipeline steps
-        # Step 3: Descriptor computation  
-        # Step 4: ML prediction
+        # Step 3: Descriptor computation
+        logging.info("Step 3: Computing descriptors...")
+        descriptor_result = compute_descriptors(simulation_result, config)
+        logging.info("Descriptor computation completed")
+        
+        # Log descriptor computation results
+        logging.info(f"Descriptors computed:")
+        logging.info(f"  DataFrame shape: {descriptor_result['descriptors_df'].shape}")
+        logging.info(f"  Number of features: {len(descriptor_result['descriptors_df'].columns)}")
+        logging.info(f"  XVG files generated: {len(descriptor_result['xvg_files'])}")
+        
+        # TODO: Step 4: ML prediction
         
         result = {
             "status": "success",
             "structure_files": structure_files,
             "simulation_result": simulation_result,
-            "message": "MD simulations completed. Ready for descriptor computation."
+            "descriptor_result": descriptor_result,
+            "message": "Descriptor computation completed. Ready for ML prediction."
         }
         
         logging.info("Inference pipeline completed successfully")

@@ -40,6 +40,13 @@ logging:
   max_size: "10MB"
   backup_count: 5
 
+# Descriptor computation settings
+descriptors:
+  equilibration_time: 1          # ns (can override simulation.equilibration_time)
+  block_length: 10                # ns for order parameter blocks
+  core_surface_k: 20              # number of residues for core/surface classification
+  compute_lambda: false           # requires multiple temps, set false for single-temp tests
+
 # Performance
 performance:
   parallel_jobs: 4               # Number of parallel jobs (future use)
