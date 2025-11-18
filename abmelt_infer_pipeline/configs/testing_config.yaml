@@ -1,7 +1,7 @@
 # AbMelt Inference Pipeline Configuration
 # Simulation parameters (for future use)
 simulation:
-  temperatures: [300]  # Kelvin
+  temperatures: [300, 350, 400]  # Kelvin
   simulation_time: 2           # nanoseconds
   equilibration_time: 1         # nanoseconds to remove from analysis
   force_field: "charmm27"        # or "charmm36-jul2022"
