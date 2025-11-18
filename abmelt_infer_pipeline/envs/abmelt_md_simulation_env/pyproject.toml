@@ -16,6 +16,7 @@ dependencies = [
     "joblib (>=1.5.2,<2.0.0)",
     "numpy (==1.26.0)",
     "mdanalysis (>=2.10.0,<3.0.0)",
+    "scikit-learn (==1.2.0)",
 ]
 
 
