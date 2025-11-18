@@ -811,6 +811,41 @@ extra-formats = ["chemfiles (>=0.10)", "gsd (>3.0.0)", "h5py (>=2.10)", "imdclie
 parallel = ["dask"]
 
 [[package]]
+name = "mdtraj"
+version = "1.11.0"
+description = "MDTraj: A modern, open library for the analysis of molecular dynamics trajectories"
+optional = false
+python-versions = ">=3.11"
+groups = ["main"]
+files = [
+    {file = "mdtraj-1.11.0-cp311-cp311-macosx_10_9_universal2.whl", hash = "sha256:a6bbf2bc03a2ed23fd1fe696f6f6f970f495e843f3baaa71a0e99da086420de1"},
+    {file = "mdtraj-1.11.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6c34002c49282d208fdd34cd1b2578859bc7377a22ebd66a194efa1fc17395e5"},
+    {file = "mdtraj-1.11.0-cp311-cp311-win_amd64.whl", hash = "sha256:4c794aac3db13937ed7e4f8c2b773564a89b2b539c15f43bae9dab6e1ffa5de1"},
+    {file = "mdtraj-1.11.0-cp312-cp312-macosx_10_13_universal2.whl", hash = "sha256:878fb8e62962b881ba75d4200637280b518e891e4aa5f213052ddb1905704558"},
+    {file = "mdtraj-1.11.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:01eb00d9b62f22056303fb8e4be0f85257a2ce1003f1e6274393bbcc977badaf"},
+    {file = "mdtraj-1.11.0-cp312-cp312-win_amd64.whl", hash = "sha256:f87117f7e6742b11a3a39e55fe5c9b4fc013d27691ac671bcc6dfb8193beae0f"},
+    {file = "mdtraj-1.11.0-cp313-cp313-macosx_10_13_universal2.whl", hash = "sha256:125db8d7b8f795ed2a771d5d6f419461e2f9dd21ef74d43311570b9dadbf0d46"},
+    {file = "mdtraj-1.11.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:46def167a429af5834f4f26a80bca372518952519847c1ceffd0163814b1164e"},
+    {file = "mdtraj-1.11.0-cp313-cp313-win_amd64.whl", hash = "sha256:8ad81b0aabf090b1b0e60ee7974bd676046e48d35a7efdc9a37a8eacaf5b70e4"},
+    {file = "mdtraj-1.11.0-cp314-cp314-macosx_10_13_x86_64.whl", hash = "sha256:18d237661deeb49e4b56c43426ef7e4824051ae5ee21df976cb70e2baeafb8fa"},
+    {file = "mdtraj-1.11.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:9d9e2b44e6139d40525cb78b3a1d79dbe0504256a133621bfdeec11a22f44519"},
+    {file = "mdtraj-1.11.0-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.whl", hash = "sha256:18433b12a7b08848589b459961e1ccfcf3152afbbbad8ca847783075ba79e9e1"},
+    {file = "mdtraj-1.11.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.whl", hash = "sha256:d4d682faf2dd2eaf1d9cbba53f8e04504e80f0710580d6cd95f05286bdbeb755"},
+    {file = "mdtraj-1.11.0.tar.gz", hash = "sha256:2cf0ed2ee9a603dc4599743b1806e1387c655e2a1e9d013841b99fb137ad852e"},
+]
+
+[package.dependencies]
+numpy = ">=1.25.0,<3"
+packaging = "*"
+pyparsing = "*"
+scipy = "*"
+
+[package.extras]
+all = ["netCDF4", "networkx", "pandas", "pytest", "pytest-rerunfailures", "pytest-xdist", "tables"]
+optional = ["netCDF4", "networkx", "pandas", "tables"]
+tests = ["pytest", "pytest-rerunfailures", "pytest-xdist"]
+
+[[package]]
 name = "mmtf-python"
 version = "1.1.3"
 description = "A decoding libary for the PDB mmtf format"
@@ -1927,4 +1962,4 @@ zstd = ["zstandard (>=0.18.0)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11,<3.13"
-content-hash = "f2769e16ea6a86e2db72b61626adc2a67f6af21c74c441928762588a11262e08"
+content-hash = "610eeb74e4843ca354e9c5da60b2a778bec1b99b34284dd8ac0456f8a3031b64"
