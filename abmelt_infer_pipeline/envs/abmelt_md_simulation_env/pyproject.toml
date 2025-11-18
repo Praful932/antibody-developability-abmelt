@@ -15,6 +15,7 @@ dependencies = [
     "pandas (>=2.3.2,<3.0.0)",
     "joblib (>=1.5.2,<2.0.0)",
     "numpy (==1.26.0)",
+    "mdanalysis (>=2.10.0,<3.0.0)",
 ]
 
 
