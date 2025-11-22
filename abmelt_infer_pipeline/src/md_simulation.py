@@ -811,6 +811,80 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
 
 
 
+def load_existing_simulation_results(structure_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+    """
+    Load existing MD simulation results and validate they exist.
+    
+    Args:
+        structure_files: Dictionary containing structure files
+        config: Configuration dictionary
+        
+    Returns:
+        Dictionary matching format from run_md_simulation
+        
+    Raises:
+        FileNotFoundError: If required trajectory files are missing
+    """
+    logger.info("Loading existing MD simulation results...")
+    
+    work_dir = Path(structure_files["work_dir"]).resolve()
+    temperatures = config["simulation"]["temperatures"]
+    simulation_time = config["simulation"]["simulation_time"]
+    
+    trajectory_files = {}
+    missing_files = []
+    
+    for temp in temperatures:
+        temp_str = str(temp)
+        
+        # Required files per temperature
+        final_xtc = work_dir / f"md_final_{temp_str}.xtc"
+        final_gro = work_dir / f"md_final_{temp_str}.gro"
+        tpr_file = work_dir / f"md_{temp_str}.tpr"
+        log_file = work_dir / f"md_{temp_str}.log"
+        
+        # Check if files exist
+        temp_missing = []
+        if not final_xtc.exists():
+            temp_missing.append(str(final_xtc))
+        if not final_gro.exists():
+            temp_missing.append(str(final_gro))
+        if not tpr_file.exists():
+            temp_missing.append(str(tpr_file))
+        if not log_file.exists():
+            temp_missing.append(str(log_file))
+        
+        if temp_missing:
+            missing_files.append(f"Temperature {temp_str}K:")
+            missing_files.extend(f"  - {f}" for f in temp_missing)
+        else:
+            trajectory_files[temp_str] = {
+                "final_xtc": f"md_final_{temp_str}.xtc",
+                "final_gro": f"md_final_{temp_str}.gro",
+                "tpr_file": f"md_{temp_str}.tpr",
+                "log_file": f"md_{temp_str}.log"
+            }
+    
+    if missing_files:
+        error_msg = f"Required MD simulation files not found when skipping MD step:\n"
+        error_msg += "\n".join(missing_files)
+        error_msg += f"\n\nWork directory: {work_dir}"
+        raise FileNotFoundError(error_msg)
+    
+    result = {
+        "status": "success",
+        "trajectory_files": trajectory_files,
+        "work_dir": str(work_dir),
+        "message": "MD simulation results loaded successfully"
+    }
+    
+    logger.info(f"Successfully loaded MD simulation results for {len(trajectory_files)} temperatures")
+    for temp, files in trajectory_files.items():
+        logger.info(f"  {temp}K: {files['final_xtc']}")
+    
+    return result
+
+
 def validate_simulation_setup(config: Dict) -> bool:
     """
     Validate that all required components are available for MD simulation.

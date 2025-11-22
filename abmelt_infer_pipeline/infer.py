@@ -7,9 +7,9 @@ import argparse
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from structure_prep import prepare_structure
-from md_simulation import run_md_simulation
-from compute_descriptors import compute_descriptors
+from structure_prep import prepare_structure, load_existing_structure_files
+from md_simulation import run_md_simulation, load_existing_simulation_results
+from compute_descriptors import compute_descriptors, load_existing_descriptors
 
 def main():
     # Parse command line arguments
@@ -30,6 +30,14 @@ def main():
                        help='Configuration file path')
     parser.add_argument('--output', type=str, default='results',
                        help='Output directory')
+    
+    # Skip step flags
+    parser.add_argument('--skip-structure', action='store_true',
+                       help='Skip structure preparation step (load existing files)')
+    parser.add_argument('--skip-md', action='store_true',
+                       help='Skip MD simulation step (load existing trajectory files)')
+    parser.add_argument('--skip-descriptors', action='store_true',
+                       help='Skip descriptor computation step (load existing descriptors)')
     
     args = parser.parse_args()
     
@@ -63,8 +71,14 @@ def main():
             "type": "sequences"
         }
     
-    # 4. Run structure preparation
-    result = run_inference_pipeline(antibody, config)
+    # 4. Run inference pipeline
+    result = run_inference_pipeline(
+        antibody, 
+        config,
+        skip_structure=args.skip_structure,
+        skip_md=args.skip_md,
+        skip_descriptors=args.skip_descriptors
+    )
     
     print(f"Inference pipeline for {args.name}:")
     print(f"  Status: {result['status']}")
@@ -132,46 +146,79 @@ def create_directories(config: dict):
         Path(directory).mkdir(parents=True, exist_ok=True)
 
 
-def run_inference_pipeline(antibody, config):
-    """Run the complete inference pipeline."""
+def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False, skip_descriptors=False):
+    """
+    Run the complete inference pipeline.
+    
+    Args:
+        antibody: Dictionary containing antibody information
+        config: Configuration dictionary
+        skip_structure: If True, load existing structure files instead of preparing
+        skip_md: If True, load existing MD simulation results instead of running
+        skip_descriptors: If True, load existing descriptors instead of computing
+        
+    Returns:
+        Dictionary containing pipeline results
+    """
     logging.info(f"Starting inference pipeline for antibody: {antibody['name']}")
+    
+    if skip_structure:
+        logging.info("Skipping structure preparation (using --skip-structure flag)")
+    if skip_md:
+        logging.info("Skipping MD simulation (using --skip-md flag)")
+    if skip_descriptors:
+        logging.info("Skipping descriptor computation (using --skip-descriptors flag)")
     
     try:
         # Step 1: Structure preparation
-        logging.info("Step 1: Preparing structure...")
-        structure_files = prepare_structure(antibody, config)
-        logging.info("Structure preparation completed")
+        if skip_structure:
+            logging.info("Step 1: Loading existing structure files...")
+            structure_files = load_existing_structure_files(antibody, config)
+            logging.info("Structure files loaded successfully")
+        else:
+            logging.info("Step 1: Preparing structure...")
+            structure_files = prepare_structure(antibody, config)
+            logging.info("Structure preparation completed")
         
-        # Log structure files created
-        logging.info(f"Structure files created:")
+        # Log structure files
+        logging.info(f"Structure files:")
         for key, path in structure_files.items():
             if key != "chains":
                 logging.info(f"  {key}: {path}")
-
         
         if "chains" in structure_files:
             logging.info(f"  chains: {list(structure_files['chains'].keys())}")
         
         # Step 2: MD simulation
-        logging.info("Step 2: Running MD simulations...")
-        simulation_result = run_md_simulation(structure_files, config)
-        logging.info("MD simulations completed")
+        if skip_md:
+            logging.info("Step 2: Loading existing MD simulation results...")
+            simulation_result = load_existing_simulation_results(structure_files, config)
+            logging.info("MD simulation results loaded successfully")
+        else:
+            logging.info("Step 2: Running MD simulations...")
+            simulation_result = run_md_simulation(structure_files, config)
+            logging.info("MD simulations completed")
         
-        # Log trajectory files created
-        logging.info(f"Trajectory files created:")
+        # Log trajectory files
+        logging.info(f"Trajectory files:")
         for temp, files in simulation_result["trajectory_files"].items():
             logging.info(f"  {temp}K: {files['final_xtc']}")
         
         # Step 3: Descriptor computation
-        logging.info("Step 3: Computing descriptors...")
-        descriptor_result = compute_descriptors(simulation_result, config)
-        logging.info("Descriptor computation completed")
+        if skip_descriptors:
+            logging.info("Step 3: Loading existing descriptor computation results...")
+            descriptor_result = load_existing_descriptors(simulation_result, config)
+            logging.info("Descriptor computation results loaded successfully")
+        else:
+            logging.info("Step 3: Computing descriptors...")
+            descriptor_result = compute_descriptors(simulation_result, config)
+            logging.info("Descriptor computation completed")
         
         # Log descriptor computation results
-        logging.info(f"Descriptors computed:")
+        logging.info(f"Descriptors:")
         logging.info(f"  DataFrame shape: {descriptor_result['descriptors_df'].shape}")
         logging.info(f"  Number of features: {len(descriptor_result['descriptors_df'].columns)}")
-        logging.info(f"  XVG files generated: {len(descriptor_result['xvg_files'])}")
+        logging.info(f"  XVG files: {len(descriptor_result['xvg_files'])}")
         
         # TODO: Step 4: ML prediction
         

@@ -221,6 +221,57 @@ def generate_structure_from_sequences(heavy_chain: str, light_chain: str,
     return output_file
 
 
+def load_existing_structure_files(antibody: Dict, config: Dict) -> Dict[str, str]:
+    """
+    Load existing structure files and validate they exist.
+    
+    Args:
+        antibody: Dictionary containing antibody information
+        config: Configuration dictionary
+        
+    Returns:
+        Dictionary with paths to structure files matching format from prepare_structure
+        
+    Raises:
+        FileNotFoundError: If required files are missing
+    """
+    logger.info("Loading existing structure files...")
+    
+    antibody_name = antibody['name']
+    work_dir = Path(config["paths"]["temp_dir"]).resolve()
+    
+    # Required file for structure step (processed files are created during MD preprocessing)
+    pdb_file = work_dir / f"{antibody_name}.pdb"
+    
+    # Validate required file exists
+    if not pdb_file.exists():
+        error_msg = f"Required structure file not found when skipping structure preparation:\n"
+        error_msg += f"  - {pdb_file}\n"
+        error_msg += f"\nWork directory: {work_dir}"
+        raise FileNotFoundError(error_msg)
+    
+    # Extract chain sequences from PDB
+    try:
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure("antibody", str(pdb_file))
+        chains = {chain.id: seq1(''.join(residue.resname for residue in chain)) 
+                 for chain in structure.get_chains()}
+    except Exception as e:
+        logger.warning(f"Failed to extract chain sequences from PDB: {e}")
+        chains = {}
+    
+    structure_files = {
+        "pdb_file": str(pdb_file),
+        "work_dir": str(work_dir),
+        "chains": chains
+    }
+    
+    logger.info(f"Successfully loaded structure files from {work_dir}")
+    logger.info(f"Found chains: {list(chains.keys())}")
+    
+    return structure_files
+
+
 def prepare_pdb_for_analysis(pdb_file: str, output_dir: str) -> Dict[str, str]:
     """Prepare existing PDB file for analysis."""
     antibody = {

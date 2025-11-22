@@ -95,6 +95,22 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         logger.info(f"Descriptor computation completed. DataFrame shape: {descriptors_df.shape}")
         logger.info(f"Features: {list(descriptors_df.columns)}")
         
+        # Save descriptors to file for future use
+        try:
+            descriptors_csv = work_dir / "descriptors.csv"
+            descriptors_pkl = work_dir / "descriptors.pkl"
+            
+            descriptors_df.to_csv(descriptors_csv, index=False)
+            logger.info(f"Saved descriptors to {descriptors_csv}")
+            
+            import pickle
+            with open(descriptors_pkl, 'wb') as f:
+                pickle.dump(descriptors_df, f)
+            logger.info(f"Saved descriptors to {descriptors_pkl}")
+        except Exception as e:
+            logger.warning(f"Failed to save descriptors to file: {e}")
+            logger.warning("Continuing without saving descriptors")
+        
         result = {
             "status": "success",
             "descriptors_df": descriptors_df,
@@ -577,6 +593,76 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
     df = pd.DataFrame([descriptor_dict])
     
     return df
+
+
+def load_existing_descriptors(simulation_result: Dict, config: Dict) -> Dict:
+    """
+    Load existing descriptor computation results.
+    
+    Args:
+        simulation_result: Dictionary containing simulation results
+        config: Configuration dictionary
+        
+    Returns:
+        Dictionary matching format from compute_descriptors
+        
+    Raises:
+        FileNotFoundError: If descriptor file not found
+    """
+    logger.info("Loading existing descriptor computation results...")
+    
+    work_dir = Path(simulation_result["work_dir"]).resolve()
+    
+    # Try CSV first, then pickle
+    descriptors_csv = work_dir / "descriptors.csv"
+    descriptors_pkl = work_dir / "descriptors.pkl"
+    
+    descriptors_df = None
+    
+    if descriptors_csv.exists():
+        try:
+            descriptors_df = pd.read_csv(descriptors_csv)
+            logger.info(f"Loaded descriptors from {descriptors_csv}")
+        except Exception as e:
+            logger.warning(f"Failed to load descriptors from CSV: {e}")
+    
+    if descriptors_df is None and descriptors_pkl.exists():
+        try:
+            import pickle
+            with open(descriptors_pkl, 'rb') as f:
+                descriptors_df = pickle.load(f)
+            logger.info(f"Loaded descriptors from {descriptors_pkl}")
+        except Exception as e:
+            logger.warning(f"Failed to load descriptors from pickle: {e}")
+    
+    if descriptors_df is None:
+        error_msg = f"Descriptor file not found when skipping descriptor computation.\n"
+        error_msg += f"Expected one of:\n"
+        error_msg += f"  - {descriptors_csv}\n"
+        error_msg += f"  - {descriptors_pkl}\n"
+        error_msg += f"\nWork directory: {work_dir}"
+        raise FileNotFoundError(error_msg)
+    
+    # Get list of XVG files in work directory (if they exist)
+    xvg_files = []
+    try:
+        xvg_files = [str(f.name) for f in work_dir.glob("*.xvg")]
+        logger.info(f"Found {len(xvg_files)} XVG files in work directory")
+    except Exception as e:
+        logger.warning(f"Could not enumerate XVG files: {e}")
+    
+    result = {
+        "status": "success",
+        "descriptors_df": descriptors_df,
+        "xvg_files": xvg_files,
+        "work_dir": str(work_dir),
+        "message": "Descriptor computation results loaded successfully"
+    }
+    
+    logger.info(f"Successfully loaded descriptors. DataFrame shape: {descriptors_df.shape}")
+    logger.info(f"Features: {len(descriptors_df.columns)}")
+    
+    return result
 
 
 def _parse_xvg_file(xvg_file: str) -> Optional[np.ndarray]:
