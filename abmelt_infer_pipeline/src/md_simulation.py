@@ -841,7 +841,16 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
         final_xtc = work_dir / f"md_final_{temp_str}.xtc"
         final_gro = work_dir / f"md_final_{temp_str}.gro"
         tpr_file = work_dir / f"md_{temp_str}.tpr"
-        log_file = work_dir / f"md_{temp_str}.log"
+        
+        # Log file naming depends on simulation_time
+        # Standard (100ns): md_{temp}.log
+        # Custom time: md_{temp}_{simulation_time}.log
+        if simulation_time == 100:
+            log_file = work_dir / f"md_{temp_str}.log"
+            log_file_name = f"md_{temp_str}.log"
+        else:
+            log_file = work_dir / f"md_{temp_str}_{simulation_time}.log"
+            log_file_name = f"md_{temp_str}_{simulation_time}.log"
         
         # Check if files exist
         temp_missing = []
@@ -862,7 +871,7 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
                 "final_xtc": f"md_final_{temp_str}.xtc",
                 "final_gro": f"md_final_{temp_str}.gro",
                 "tpr_file": f"md_{temp_str}.tpr",
-                "log_file": f"md_{temp_str}.log"
+                "log_file": log_file_name
             }
     
     if missing_files:

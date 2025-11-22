@@ -41,6 +41,7 @@ logging:
 
 # Descriptor computation settings
 descriptors:
+  equilibration_time: 20 
   block_length: 10                # ns for order parameter blocks
   core_surface_k: 20             # number of residues for core/surface classification
   compute_lambda: true           # requires multiple temps, enabled for multi-temp runs

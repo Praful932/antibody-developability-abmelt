@@ -1,0 +1,34 @@
+# This file was created Sat Nov 22 12:05:39 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl1_350.xvg -oc charge_cdrl1_350.xvg -of field_cdrl1_350.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# GROningen MAchine for Chemical Simulation
+#
+@    title "Electric Field"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Field (V/nm)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr1l"
+                   0                     -nan
+  0.6448248028755188       0.7953832320000001
+   1.289649605751038       0.7953832320000001
+   1.934474468231201              0.530255488
+   2.579299211502075              0.397691616
+   3.224123954772949               0.31815328
+   3.868948936462402              0.265127744
+   4.513773918151855              0.227252352
+    5.15859842300415              0.198845808
+   5.803423404693604              0.176751824
