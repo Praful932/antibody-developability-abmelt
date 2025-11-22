@@ -3,7 +3,6 @@
 simulation:
   temperatures: [300, 350, 400]  # Kelvin
   simulation_time: 100           # nanoseconds
-  equilibration_time: 20         # nanoseconds to remove from analysis
   force_field: "charmm27"        # or "charmm36-jul2022"
   water_model: "tip3p"
   salt_concentration: 150        # mM (PBS-like)
@@ -42,7 +41,6 @@ logging:
 
 # Descriptor computation settings
 descriptors:
-  equilibration_time: 20         # ns (can override simulation.equilibration_time)
   block_length: 10                # ns for order parameter blocks
   core_surface_k: 20             # number of residues for core/surface classification
   compute_lambda: true           # requires multiple temps, enabled for multi-temp runs
