@@ -5,19 +5,17 @@ MD Simulation module for AbMelt inference pipeline.
 Handles GROMACS preprocessing, system setup, and multi-temperature MD simulations.
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
-import numpy as np
 
 # Add the original AbMelt src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
 
 try:
     import gromacs
-    from preprocess import protonation_state, canonical_index, edit_mdp
+    from preprocess import canonical_index, edit_mdp, protonation_state
 except ImportError as e:
     logging.error(f"Failed to import required modules: {e}")
     raise
@@ -25,7 +23,7 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+def run_md_simulation(structure_files: dict[str, str], config: dict) -> dict[str, str]:
     """
     Run complete MD simulation workflow for antibody structure.
     
@@ -40,7 +38,6 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
     
     pdb_file = structure_files["pdb_file"]
     work_dir = Path(structure_files["work_dir"])
-    antibody_name = work_dir.name
     
     # Store original working directory
     original_cwd = os.getcwd()
@@ -123,7 +120,7 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
         os.chdir(original_cwd)
 
 
-def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: Dict) -> Dict[str, str]:
+def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: dict) -> dict[str, str]:
     """
     Preprocess PDB file for GROMACS: pKa calculation, conversion, and indexing.
     
@@ -196,7 +193,7 @@ def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: Dict) -> Di
     }
 
 
-def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+def _setup_simulation_system(gromacs_files: dict[str, str], config: dict) -> dict[str, str]:
     """
     Set up simulation system: box creation, solvation, and ion addition.
     
@@ -295,7 +292,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
     }
 
 
-def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+def _run_multi_temp_simulations(system_files: dict[str, str], config: dict) -> dict[str, str]:
     """
     Run multi-temperature MD simulations.
     
@@ -320,7 +317,6 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     gpu_id = gromacs_config["gpu_id"]
     
     # Available pre-installed temperatures
-    avail_temps = ['300', '310', '350', '373', '400']
     temps = [str(temp) for temp in temperatures]
     
     trajectory_files = {}
@@ -350,9 +346,9 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     return trajectory_files
 
 
-def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str], 
+def _run_preinstalled_temp_simulation(temp: str, system_files: dict[str, str], 
                                     simulation_time: int, gpu_enabled: bool,
-                                    n_threads: int, gpu_id: int) -> Dict[str, str]:
+                                    n_threads: int, gpu_id: int) -> dict[str, str]:
     """Run simulation using pre-installed temperature files."""
 
     
@@ -468,9 +464,9 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     }
 
 
-def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
+def _run_custom_temp_simulation(temp: str, system_files: dict[str, str],
                               simulation_time: int, gpu_enabled: bool,
-                              n_threads: int, gpu_id: int) -> Dict[str, str]:
+                              n_threads: int, gpu_id: int) -> dict[str, str]:
     """Run simulation with custom temperature by modifying MDP files."""    
     
     # Create custom MDP files
@@ -592,7 +588,7 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
     }
 
 
-def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: Dict) -> Dict[str, Dict[str, str]]:
+def _process_trajectories(trajectory_files: dict[str, dict[str, str]], config: dict) -> dict[str, dict[str, str]]:
     """
     Process trajectories: remove PBC and prepare for analysis.
     
@@ -713,7 +709,7 @@ def _modify_mdp_temperature(mdp_file: Path, temperature: int):
         temperature: Target temperature in Kelvin
     """
     try:
-        with open(mdp_file, 'r') as f:
+        with open(mdp_file) as f:
             lines = f.readlines()
         
         # Modify temperature-related lines
@@ -746,7 +742,7 @@ def _modify_mdp_nsteps(template_file: Path, output_name: str, nsteps: int):
         destination = Path(output_name)
         copy2(template_file, destination)
 
-        with open(destination, 'r') as src:
+        with open(destination) as src:
             lines = src.readlines()
 
         updated_lines = []
@@ -784,7 +780,6 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
     
     # Initialize GROMACS configuration first
     gromacs.config.get_configuration()
-    gromacs.tools.registry
     gromacs.config.check_setup()
     gromacs.config.setup()
     
@@ -810,7 +805,7 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
 
 
 
-def load_existing_simulation_results(structure_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+def load_existing_simulation_results(structure_files: dict[str, str], config: dict) -> dict[str, str]:
     """
     Load existing MD simulation results and validate they exist.
     
@@ -828,7 +823,7 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
     
     work_dir = Path(structure_files["work_dir"]).resolve()
     temperatures = config["simulation"]["temperatures"]
-    simulation_time = config["simulation"]["simulation_time"]
+    config["simulation"]["simulation_time"]
     
     trajectory_files = {}
     missing_files = []
@@ -863,7 +858,7 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
             }
     
     if missing_files:
-        error_msg = f"Required MD simulation files not found when skipping MD step:\n"
+        error_msg = "Required MD simulation files not found when skipping MD step:\n"
         error_msg += "\n".join(missing_files)
         error_msg += f"\n\nWork directory: {work_dir}"
         raise FileNotFoundError(error_msg)
@@ -882,7 +877,7 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
     return result
 
 
-def validate_simulation_setup(config: Dict) -> bool:
+def validate_simulation_setup(config: dict) -> bool:
     """
     Validate that all required components are available for MD simulation.
     

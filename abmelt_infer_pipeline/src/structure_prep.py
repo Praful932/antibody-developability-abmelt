@@ -5,20 +5,17 @@ Structure preparation module for AbMelt inference pipeline.
 Handles antibody structure generation and preprocessing.
 """
 
-import os
-import sys
 import logging
+import sys
 from pathlib import Path
-import numpy as np
-from typing import Dict, List, Optional, Tuple
 
 # Add the original AbMelt src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
 
 try:
-    from structure import immune_builder
     from Bio.PDB import PDBParser
     from Bio.SeqUtils import seq1
+    from structure import immune_builder
 except ImportError as e:
     logging.error(f"Failed to import required modules: {e}")
     raise
@@ -26,19 +23,19 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def prepare_structure(antibody: Dict, config: Dict) -> Dict[str, str]:
+def prepare_structure(antibody: dict, config: dict) -> dict[str, str]:
     """
     Prepare antibody structure for MD simulation.
-    
+
     Args:
         antibody: Dictionary containing antibody information
         config: Configuration dictionary
-        
+
     Returns:
         Dictionary with paths to prepared structure files
     """
     logger.info(f"Preparing structure for antibody: {antibody['name']}")
-    
+
     if antibody["type"] == "pdb":
         return _prepare_from_pdb(antibody, config)
     elif antibody["type"] == "sequences":
@@ -47,74 +44,77 @@ def prepare_structure(antibody: Dict, config: Dict) -> Dict[str, str]:
         raise ValueError(f"Unsupported antibody type: {antibody['type']}")
 
 
-def _prepare_from_pdb(antibody: Dict, config: Dict) -> Dict[str, str]:
+def _prepare_from_pdb(antibody: dict, config: dict) -> dict[str, str]:
     """Prepare structure from existing PDB file."""
     pdb_file = antibody["pdb_file"]
     antibody_name = antibody["name"]
-    
+
     # Create working directory
     work_dir = Path(config["paths"]["temp_dir"])
     work_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Copy PDB to working directory
     import shutil
+
     target_pdb = work_dir / f"{antibody_name}.pdb"
     shutil.copy2(pdb_file, target_pdb)
-    
+
     # Preprocess the structure
     return _preprocess_structure(str(target_pdb), antibody_name, work_dir, config)
 
 
-def _prepare_from_sequences(antibody: Dict, config: Dict) -> Dict[str, str]:
+def _prepare_from_sequences(antibody: dict, config: dict) -> dict[str, str]:
     """Generate structure from heavy and light chain sequences."""
     heavy_chain = antibody["heavy_chain"]
     light_chain = antibody["light_chain"]
     antibody_name = antibody["name"]
-    
+
     # Create working directory
     work_dir = Path(config["paths"]["temp_dir"])
     work_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Generate structure using ImmuneBuilder
     logger.info("Generating structure using ImmuneBuilder...")
-    sequence = {'H': heavy_chain, 'L': light_chain}
+    sequence = {"H": heavy_chain, "L": light_chain}
     pdb_file = work_dir / f"{antibody_name}.pdb"
-    
+
     try:
         immune_builder(sequence, str(pdb_file))
         logger.info(f"Structure generated: {pdb_file}")
     except Exception as e:
         logger.error(f"Failed to generate structure: {e}")
         raise
-    
+
     # Preprocess the structure
     return _preprocess_structure(str(pdb_file), antibody_name, work_dir, config)
 
 
-def _preprocess_structure(pdb_file: str, antibody_name: str, work_dir: Path, config: Dict) -> Dict[str, str]:
+def _preprocess_structure(
+    pdb_file: str, antibody_name: str, work_dir: Path, config: dict
+) -> dict[str, str]:
     """Basic structure validation and organization."""
     logger.info("Validating structure...")
-    
+
     # Validate the PDB structure
     if not validate_structure(pdb_file):
         logger.error("Structure validation failed")
         raise Exception("Structure validation failed")
-    
+
     # Rename chains to A/B convention for compatibility with downstream code
     logger.info("Renaming chains to A/B convention...")
     rename_chains_to_ab(pdb_file)
-    
+
     # Extract chain sequences for reference
     chains = get_chain_sequences(pdb_file)
     logger.info(f"Found chains: {list(chains.keys())}")
-    
+
     # Return basic structure information
     structure_files = {
         "pdb_file": str(work_dir / f"{antibody_name}.pdb"),
         "work_dir": str(work_dir),
-        "chains": chains
+        "chains": chains,
     }
-    
+
     logger.info("Structure preparation completed successfully")
     return structure_files
 
@@ -124,16 +124,18 @@ def validate_structure(pdb_file: str) -> bool:
     try:
         parser = PDBParser(QUIET=True)
         structure = parser.get_structure("antibody", pdb_file)
-        
+
         # Check for heavy and light chains
         chains = list(structure.get_chains())
         if len(chains) < 2:
-            logger.warning("Structure should contain at least 2 chains (heavy and light)")
+            logger.warning(
+                "Structure should contain at least 2 chains (heavy and light)"
+            )
             return False
-        
+
         # Basic validation passed
         return True
-        
+
     except Exception as e:
         logger.error(f"Structure validation failed: {e}")
         return False
@@ -143,69 +145,81 @@ def rename_chains_to_ab(pdb_file: str) -> None:
     """
     Rename chains in PDB file to use A/B convention instead of H/L.
     This ensures compatibility with downstream code that expects A=light, B=heavy.
-    
+
     Args:
         pdb_file: Path to PDB file to modify in-place
     """
-    from Bio.PDB import PDBIO
     from anarci import anarci
-    
+    from Bio.PDB import PDBIO
+
     try:
         parser = PDBParser(QUIET=True)
         structure = parser.get_structure("antibody", pdb_file)
-        
+
         # Identify which chain is heavy vs light using ANARCI
         chains = list(structure.get_chains())
         chain_mapping = {}  # old_id -> new_id
-        
+
         for chain in chains:
             chain_id = chain.id
-            sequence = seq1(''.join(residue.resname for residue in chain))
-            
+            sequence = seq1("".join(residue.resname for residue in chain))
+
             # Use ANARCI to identify chain type
             results = anarci([(chain_id, sequence)], scheme="imgt", output=False)
             numbering, alignment_details, hit_tables = results
-            
-            if numbering[0] and numbering[0][0] and hit_tables and len(hit_tables[0]) > 1:
+
+            if (
+                numbering[0]
+                and numbering[0][0]
+                and hit_tables
+                and len(hit_tables[0]) > 1
+            ):
                 best_hit = hit_tables[0][1]
                 hit_id = best_hit[0]
-                
-                if '_' in hit_id:
-                    chain_type = hit_id.split('_')[1]
-                    
-                    if chain_type in ['K', 'L']:  # Light chain
-                        chain_mapping[chain_id] = 'A'
-                    elif chain_type == 'H':  # Heavy chain
-                        chain_mapping[chain_id] = 'B'
-        
+
+                if "_" in hit_id:
+                    chain_type = hit_id.split("_")[1]
+
+                    if chain_type in ["K", "L"]:  # Light chain
+                        chain_mapping[chain_id] = "A"
+                    elif chain_type == "H":  # Heavy chain
+                        chain_mapping[chain_id] = "B"
+
         # Rename chains if needed
         if chain_mapping:
             logger.info(f"Renaming chains: {chain_mapping}")
             for chain in structure.get_chains():
                 if chain.id in chain_mapping:
                     chain.id = chain_mapping[chain.id]
-            
+
             # Save modified structure
             io = PDBIO()
             io.set_structure(structure)
             io.save(pdb_file)
-            logger.info(f"Chains renamed successfully. New chain IDs: {[c.id for c in structure.get_chains()]}")
+            logger.info(
+                f"Chains renamed successfully. New chain IDs: {[c.id for c in structure.get_chains()]}"
+            )
         else:
             logger.warning("Could not identify chains for renaming")
-            
+
     except Exception as e:
         logger.error(f"Failed to rename chains: {e}")
         raise
 
-def get_chain_sequences(pdb_file: str) -> Dict[str, str]:
+
+def get_chain_sequences(pdb_file: str) -> dict[str, str]:
     """Extract heavy and light chain sequences from PDB file."""
     try:
         parser = PDBParser(QUIET=True)
         structure = parser.get_structure("antibody", pdb_file)
         # print unique chain ids
-        print(f"Unique chain ids: {list(set(chain.id for chain in structure.get_chains()))}")
-        chains = {chain.id: seq1(''.join(residue.resname for residue in chain)) 
-                 for chain in structure.get_chains()}
+        print(
+            f"Unique chain ids: {list(set(chain.id for chain in structure.get_chains()))}"
+        )
+        chains = {
+            chain.id: seq1("".join(residue.resname for residue in chain))
+            for chain in structure.get_chains()
+        }
         return chains
     except Exception as e:
         logger.error(f"Failed to extract sequences: {e}")
@@ -213,75 +227,74 @@ def get_chain_sequences(pdb_file: str) -> Dict[str, str]:
 
 
 # Convenience functions for direct usage
-def generate_structure_from_sequences(heavy_chain: str, light_chain: str, 
-                                    output_file: str = "antibody.pdb") -> str:
+def generate_structure_from_sequences(
+    heavy_chain: str, light_chain: str, output_file: str = "antibody.pdb"
+) -> str:
     """Generate antibody structure from sequences using ImmuneBuilder."""
-    sequence = {'H': heavy_chain, 'L': light_chain}
+    sequence = {"H": heavy_chain, "L": light_chain}
     immune_builder(sequence, output_file)
     return output_file
 
 
-def load_existing_structure_files(antibody: Dict, config: Dict) -> Dict[str, str]:
+def load_existing_structure_files(antibody: dict, config: dict) -> dict[str, str]:
     """
     Load existing structure files and validate they exist.
-    
+
     Args:
         antibody: Dictionary containing antibody information
         config: Configuration dictionary
-        
+
     Returns:
         Dictionary with paths to structure files matching format from prepare_structure
-        
+
     Raises:
         FileNotFoundError: If required files are missing
     """
     logger.info("Loading existing structure files...")
-    
-    antibody_name = antibody['name']
+
+    antibody_name = antibody["name"]
     work_dir = Path(config["paths"]["temp_dir"]).resolve()
-    
+
     # Required file for structure step (processed files are created during MD preprocessing)
     pdb_file = work_dir / f"{antibody_name}.pdb"
-    
+
     # Validate required file exists
     if not pdb_file.exists():
-        error_msg = f"Required structure file not found when skipping structure preparation:\n"
+        error_msg = (
+            "Required structure file not found when skipping structure preparation:\n"
+        )
         error_msg += f"  - {pdb_file}\n"
         error_msg += f"\nWork directory: {work_dir}"
         raise FileNotFoundError(error_msg)
-    
+
     # Extract chain sequences from PDB
     try:
         parser = PDBParser(QUIET=True)
         structure = parser.get_structure("antibody", str(pdb_file))
-        chains = {chain.id: seq1(''.join(residue.resname for residue in chain)) 
-                 for chain in structure.get_chains()}
+        chains = {
+            chain.id: seq1("".join(residue.resname for residue in chain))
+            for chain in structure.get_chains()
+        }
     except Exception as e:
         logger.warning(f"Failed to extract chain sequences from PDB: {e}")
         chains = {}
-    
+
     structure_files = {
         "pdb_file": str(pdb_file),
         "work_dir": str(work_dir),
-        "chains": chains
+        "chains": chains,
     }
-    
+
     logger.info(f"Successfully loaded structure files from {work_dir}")
     logger.info(f"Found chains: {list(chains.keys())}")
-    
+
     return structure_files
 
 
-def prepare_pdb_for_analysis(pdb_file: str, output_dir: str) -> Dict[str, str]:
+def prepare_pdb_for_analysis(pdb_file: str, output_dir: str) -> dict[str, str]:
     """Prepare existing PDB file for analysis."""
-    antibody = {
-        "name": Path(pdb_file).stem,
-        "pdb_file": pdb_file,
-        "type": "pdb"
-    }
-    
-    config = {
-        "paths": {"temp_dir": output_dir}
-    }
-    
+    antibody = {"name": Path(pdb_file).stem, "pdb_file": pdb_file, "type": "pdb"}
+
+    config = {"paths": {"temp_dir": output_dir}}
+
     return prepare_structure(antibody, config)
