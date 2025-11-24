@@ -70,20 +70,39 @@ disallow_untyped_defs = true
 check_untyped_defs = true
 strict_equality = true
 exclude = [
-    "AbMelt/",
-    "reference_repos/",
-    "burner_docs/",
+    "AbMelt/.*",
+    "reference_repos/.*",
+    "burner_docs/.*",
 ]
-mypy_path = "AbMelt/src"
 
 [[tool.mypy.overrides]]
 module = "abmelt_infer_pipeline.tests.*"
 disallow_untyped_defs = false
 
 [[tool.mypy.overrides]]
-module = ["AbMelt.*", "sklearn.*", "pandas.*", "numpy.*", "Bio.*", "simtk.*", "mdtraj.*", "MDAnalysis.*", "gromacswrapper.*", "freesasa.*"]
-ignore_errors = true
+module = [
+    "AbMelt.*",
+    "gromacs.*",
+    "Bio.*",
+    "MDAnalysis.*",
+    "joblib.*",
+    "ImmuneBuilder.*",
+    "preprocess.*",
+    "order_param.*",
+    "res_sasa.*",
+    "structure.*",
+    "anarci.*",
+    "simtk.*",
+    "mdtraj.*",
+    "pandas.*",
+    "numpy.*",
+    "freesasa.*",
+    "scikit-learn.*",
+    "sklearn.*"
+]
 ignore_missing_imports = true
+ignore_errors = true
+
 
 # Pytest configuration
 [tool.pytest.ini_options]

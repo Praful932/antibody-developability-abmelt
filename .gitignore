@@ -208,3 +208,4 @@ burner_docs/
 .DS_Store
 *.so
 *.dylib
+abmelt_infer_pipeline/my_antibody.pdb

@@ -31,14 +31,14 @@ except ImportError as e:
     sys.exit(1)
 
 
-def test_imports():
+def test_imports() -> bool:
     """Test that all required modules can be imported."""
     logger.info("Testing imports...")
     logger.info("✓ Successfully imported structure_prep modules")
     return True
 
 
-def test_immune_builder():
+def test_immune_builder() -> bool:
     """Test ImmuneBuilder functionality."""
     logger.info("Testing ImmuneBuilder...")
 
@@ -87,7 +87,7 @@ def test_immune_builder():
         return False
 
 
-def test_prepare_structure():
+def test_prepare_structure() -> bool:
     """Test the main prepare_structure function."""
     logger.info("Testing prepare_structure function...")
 
@@ -157,7 +157,7 @@ def test_prepare_structure():
         return False
 
 
-def main():
+def main() -> int:
     """Run all tests."""
     logger.info("=" * 50)
     logger.info("ABMELT STRUCTURE GENERATION TEST")

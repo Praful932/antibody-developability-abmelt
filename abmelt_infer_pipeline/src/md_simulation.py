@@ -9,6 +9,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Any, Collection, Optional
 
 # Add the original AbMelt src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
@@ -23,7 +24,7 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def run_md_simulation(structure_files: dict[str, str], config: dict) -> dict[str, str]:
+def run_md_simulation(structure_files: dict[str, str], config: dict[str, Any]) -> dict[str, Any]:
     """
     Run complete MD simulation workflow for antibody structure.
     
@@ -63,7 +64,7 @@ def run_md_simulation(structure_files: dict[str, str], config: dict) -> dict[str
         setup_gromacs_environment(mdp_dir=mdp_dir)
 
         # Create temperature-specific MDP files in template directory
-        temperatures = config.get("simulation")['temperatures']
+        temperatures = config.get("simulation", {}).get('temperatures', [])
         for temp in temperatures:
             temp_str = str(temp)
             for mdp_type in ["nvt", "npt", "md"]:
@@ -120,7 +121,7 @@ def run_md_simulation(structure_files: dict[str, str], config: dict) -> dict[str
         os.chdir(original_cwd)
 
 
-def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: dict) -> dict[str, str]:
+def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath: Path, config: dict[str, Any]) -> dict[str, Any]:
     """
     Preprocess PDB file for GROMACS: pKa calculation, conversion, and indexing.
     
@@ -193,7 +194,7 @@ def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: dict) -> di
     }
 
 
-def _setup_simulation_system(gromacs_files: dict[str, str], config: dict) -> dict[str, str]:
+def _setup_simulation_system(gromacs_files: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """
     Set up simulation system: box creation, solvation, and ion addition.
     
@@ -292,7 +293,7 @@ def _setup_simulation_system(gromacs_files: dict[str, str], config: dict) -> dic
     }
 
 
-def _run_multi_temp_simulations(system_files: dict[str, str], config: dict) -> dict[str, str]:
+def _run_multi_temp_simulations(system_files: dict[str, Any], config: dict[str, Any]) -> dict[str, dict[str, str]]:
     """
     Run multi-temperature MD simulations.
     
@@ -346,7 +347,7 @@ def _run_multi_temp_simulations(system_files: dict[str, str], config: dict) -> d
     return trajectory_files
 
 
-def _run_preinstalled_temp_simulation(temp: str, system_files: dict[str, str], 
+def _run_preinstalled_temp_simulation(temp: str, system_files: dict[str, Any], 
                                     simulation_time: int, gpu_enabled: bool,
                                     n_threads: int, gpu_id: int) -> dict[str, str]:
     """Run simulation using pre-installed temperature files."""
@@ -464,7 +465,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: dict[str, str],
     }
 
 
-def _run_custom_temp_simulation(temp: str, system_files: dict[str, str],
+def _run_custom_temp_simulation(temp: str, system_files: dict[str, Any],
                               simulation_time: int, gpu_enabled: bool,
                               n_threads: int, gpu_id: int) -> dict[str, str]:
     """Run simulation with custom temperature by modifying MDP files."""    
@@ -700,7 +701,7 @@ def _process_trajectories(trajectory_files: dict[str, dict[str, str]], config: d
     return processed_trajectories
 
 
-def _modify_mdp_temperature(mdp_file: Path, temperature: int):
+def _modify_mdp_temperature(mdp_file: Path, temperature: int) -> None:
     """
     Modify MDP file to set the correct temperature.
     
@@ -732,7 +733,7 @@ def _modify_mdp_temperature(mdp_file: Path, temperature: int):
         logger.error(f"Failed to modify MDP file {mdp_file}: {e}")
 
 
-def _modify_mdp_nsteps(template_file: Path, output_name: str, nsteps: int):
+def _modify_mdp_nsteps(template_file: Path, output_name: str, nsteps: int) -> None:
     """
     Copy an MDP template into the working directory and update its nsteps value.
     """
@@ -767,7 +768,7 @@ def _modify_mdp_nsteps(template_file: Path, output_name: str, nsteps: int):
         raise
 
 
-def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
+def setup_gromacs_environment(gromacs_path: Optional[str] = None, mdp_dir: Optional[str] = None) -> None:
     """
     Setup GROMACS environment and configuration.
     
@@ -805,7 +806,7 @@ def setup_gromacs_environment(gromacs_path: str = None, mdp_dir: str = None):
 
 
 
-def load_existing_simulation_results(structure_files: dict[str, str], config: dict) -> dict[str, str]:
+def load_existing_simulation_results(structure_files: dict[str, str], config: dict[str, Any]) -> dict[str, Any]:
     """
     Load existing MD simulation results and validate they exist.
     
@@ -877,7 +878,7 @@ def load_existing_simulation_results(structure_files: dict[str, str], config: di
     return result
 
 
-def validate_simulation_setup(config: dict) -> bool:
+def validate_simulation_setup(config: dict[str, Any]) -> bool:
     """
     Validate that all required components are available for MD simulation.
     

@@ -9,9 +9,10 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
 
-def run_script(script_name, args=None):
+def run_script(script_name: str, args: Optional[list[str]] = None) -> bool:
     """Run a Python script and return the result."""
     script_path = Path(__file__).parent / script_name
 
@@ -34,7 +35,7 @@ def run_script(script_name, args=None):
         return False
 
 
-def main():
+def main() -> int:
     """Main test runner."""
     parser = argparse.ArgumentParser(
         description="Run AbMelt structure generation tests"

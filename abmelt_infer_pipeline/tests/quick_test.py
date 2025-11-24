@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 
-def test_imports():
+def test_imports() -> bool:
     """Test basic imports."""
     print("Testing imports...")
 
@@ -40,7 +40,7 @@ def test_imports():
         return False
 
 
-def test_basic_generation():
+def test_basic_generation() -> bool:
     """Test basic structure generation."""
     print("\nTesting basic structure generation...")
 
@@ -73,7 +73,7 @@ def test_basic_generation():
         return False
 
 
-def main():
+def main() -> int:
     """Run quick tests."""
     print("=" * 50)
     print("ABMELT QUICK TEST")

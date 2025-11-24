@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
+from typing import Optional, cast
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent / "src"))
@@ -44,7 +45,7 @@ logger = logging.getLogger(__name__)
 class StructureGenerationTester:
     """Test class for structure generation functionality."""
 
-    def __init__(self, test_dir: str = None):
+    def __init__(self, test_dir: Optional[str] = None):
         """Initialize tester with optional test directory."""
         self.test_dir = (
             Path(test_dir)
@@ -81,8 +82,8 @@ class StructureGenerationTester:
         }
 
         # Create output directories
-        for path in self.config["paths"].values():
-            Path(path).mkdir(parents=True, exist_ok=True)
+        for path_str in cast(dict[str, str], self.config["paths"]).values():
+            Path(path_str).mkdir(parents=True, exist_ok=True)
 
     def test_sequence_based_generation(self) -> dict[str, bool]:
         """Test structure generation from sequences."""
@@ -148,30 +149,30 @@ class StructureGenerationTester:
         results = {}
 
         # First generate some test PDBs
-        test_pdbs = {}
+        test_pdbs: dict[str, Path] = {}
         for antibody_name, sequences in self.test_sequences.items():
             try:
-                pdb_file = self.test_dir / f"{antibody_name}_test.pdb"
+                pdb_file_path = self.test_dir / f"{antibody_name}_test.pdb"
                 generate_structure_from_sequences(
                     heavy_chain=sequences["heavy"],
                     light_chain=sequences["light"],
-                    output_file=str(pdb_file),
+                    output_file=str(pdb_file_path),
                 )
-                test_pdbs[antibody_name] = str(pdb_file)
-                logger.info(f"Generated test PDB: {pdb_file}")
+                test_pdbs[antibody_name] = pdb_file_path
+                logger.info(f"Generated test PDB: {pdb_file_path}")
             except Exception as e:
                 logger.error(f"Failed to generate test PDB for {antibody_name}: {e}")
                 continue
 
         # Test PDB processing
-        for antibody_name, pdb_file in test_pdbs.items():
+        for antibody_name, pdb_file_path in test_pdbs.items():
             logger.info(f"\nTesting PDB processing for {antibody_name}...")
 
             try:
                 # Test prepare_pdb_for_analysis
                 logger.info("Testing prepare_pdb_for_analysis...")
                 structure_files = prepare_pdb_for_analysis(
-                    pdb_file=pdb_file, output_dir=str(self.test_dir / "pdb_analysis")
+                    pdb_file=str(pdb_file_path), output_dir=str(self.test_dir / "pdb_analysis")
                 )
 
                 if self._verify_structure_files(structure_files, antibody_name):
@@ -189,7 +190,7 @@ class StructureGenerationTester:
                 logger.info("Testing prepare_structure with PDB type...")
                 antibody = {
                     "name": f"{antibody_name}_pdb",
-                    "pdb_file": pdb_file,
+                    "pdb_file": str(pdb_file_path),
                     "type": "pdb",
                 }
 
@@ -395,7 +396,7 @@ class StructureGenerationTester:
 
         return all_results
 
-    def print_summary(self, results: dict[str, bool]):
+    def print_summary(self, results: dict[str, bool]) -> None:
         """Print test summary."""
         logger.info("=" * 60)
         logger.info("TEST SUMMARY")
@@ -419,14 +420,14 @@ class StructureGenerationTester:
         logger.info(f"\nTest directory: {self.test_dir}")
         logger.info("You can inspect the generated files in the test directory.")
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         """Clean up test directory."""
         if self.test_dir.exists():
             shutil.rmtree(self.test_dir)
             logger.info(f"Cleaned up test directory: {self.test_dir}")
 
 
-def main():
+def main() -> int:
     """Main function to run structure generation tests."""
     parser = argparse.ArgumentParser(description="Test AbMelt structure generation")
     parser.add_argument(

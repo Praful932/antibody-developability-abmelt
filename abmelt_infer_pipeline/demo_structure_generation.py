@@ -17,7 +17,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def demo_sequence_based_generation():
+def demo_sequence_based_generation() -> bool:
     """Demonstrate structure generation from sequences."""
     logger.info("=" * 60)
     logger.info("DEMO: Sequence-based Structure Generation")
@@ -77,7 +77,7 @@ def demo_sequence_based_generation():
         return False
 
 
-def demo_pdb_processing():
+def demo_pdb_processing() -> bool:
     """Demonstrate PDB file processing."""
     logger.info("\n" + "=" * 60)
     logger.info("DEMO: PDB File Processing")
@@ -128,7 +128,7 @@ def demo_pdb_processing():
         return False
 
 
-def demo_structure_analysis():
+def demo_structure_analysis() -> bool:
     """Demonstrate structure analysis capabilities."""
     logger.info("\n" + "=" * 60)
     logger.info("DEMO: Structure Analysis")
@@ -180,7 +180,7 @@ def demo_structure_analysis():
             logger.info(f"  Chain {chain_id}: {len(sequence)} amino acids")
 
             # Count amino acid types
-            aa_counts = {}
+            aa_counts: dict[str, int] = {}
             for aa in sequence:
                 aa_counts[aa] = aa_counts.get(aa, 0) + 1
 
@@ -195,7 +195,7 @@ def demo_structure_analysis():
         return False
 
 
-def cleanup_demo_files():
+def cleanup_demo_files() -> None:
     """Clean up demo files."""
     logger.info("\n" + "=" * 60)
     logger.info("CLEANUP")
@@ -222,7 +222,7 @@ def cleanup_demo_files():
     logger.info("✓ Cleanup completed")
 
 
-def main():
+def main() -> int:
     """Run the complete demo."""
     logger.info("ABMELT STRUCTURE GENERATION DEMO")
     logger.info("This demo shows how to use the structure generation functionality")

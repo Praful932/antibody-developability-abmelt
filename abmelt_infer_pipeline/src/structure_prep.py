@@ -8,6 +8,7 @@ Handles antibody structure generation and preprocessing.
 import logging
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 # Add the original AbMelt src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
@@ -23,7 +24,7 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def prepare_structure(antibody: dict, config: dict) -> dict[str, str]:
+def prepare_structure(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """
     Prepare antibody structure for MD simulation.
 
@@ -44,7 +45,7 @@ def prepare_structure(antibody: dict, config: dict) -> dict[str, str]:
         raise ValueError(f"Unsupported antibody type: {antibody['type']}")
 
 
-def _prepare_from_pdb(antibody: dict, config: dict) -> dict[str, str]:
+def _prepare_from_pdb(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """Prepare structure from existing PDB file."""
     pdb_file = antibody["pdb_file"]
     antibody_name = antibody["name"]
@@ -63,7 +64,7 @@ def _prepare_from_pdb(antibody: dict, config: dict) -> dict[str, str]:
     return _preprocess_structure(str(target_pdb), antibody_name, work_dir, config)
 
 
-def _prepare_from_sequences(antibody: dict, config: dict) -> dict[str, str]:
+def _prepare_from_sequences(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """Generate structure from heavy and light chain sequences."""
     heavy_chain = antibody["heavy_chain"]
     light_chain = antibody["light_chain"]
@@ -90,8 +91,8 @@ def _prepare_from_sequences(antibody: dict, config: dict) -> dict[str, str]:
 
 
 def _preprocess_structure(
-    pdb_file: str, antibody_name: str, work_dir: Path, config: dict
-) -> dict[str, str]:
+    pdb_file: str, antibody_name: str, work_dir: Path, config: dict[str, Any]
+) -> dict[str, Any]:
     """Basic structure validation and organization."""
     logger.info("Validating structure...")
 
@@ -236,7 +237,7 @@ def generate_structure_from_sequences(
     return output_file
 
 
-def load_existing_structure_files(antibody: dict, config: dict) -> dict[str, str]:
+def load_existing_structure_files(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     """
     Load existing structure files and validate they exist.
 
@@ -291,7 +292,7 @@ def load_existing_structure_files(antibody: dict, config: dict) -> dict[str, str
     return structure_files
 
 
-def prepare_pdb_for_analysis(pdb_file: str, output_dir: str) -> dict[str, str]:
+def prepare_pdb_for_analysis(pdb_file: str, output_dir: str) -> dict[str, Any]:
     """Prepare existing PDB file for analysis."""
     antibody = {"name": Path(pdb_file).stem, "pdb_file": pdb_file, "type": "pdb"}
 
