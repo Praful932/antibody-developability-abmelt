@@ -1,15 +1,15 @@
-# This file was created Mon Nov 24 19:28:15 2025
+# This file was created Mon Nov 24 17:03:19 2025
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrh1_350.xvg -oc charge_cdrh1_350.xvg -of field_cdrh1_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Glycine aRginine prOline Methionine Alanine Cystine Serine
+# GROtesk MACabre and Sinister
 #
 @    title "Electric Field"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,7 +22,7 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr1h"
-                   0                      nan
+                   0                     -nan
   0.6448248028755188              3.150938624
    1.289649605751038              3.150938624
    1.934474468231201              2.100625664

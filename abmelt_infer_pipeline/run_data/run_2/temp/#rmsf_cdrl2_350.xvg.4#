@@ -1,0 +1,80 @@
+# This file was created Mon Nov 24 16:07:33 2025
+# Created by:
+#                        :-) GROMACS - gmx rmsf, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx rmsf -f md_final_350.xtc -s md_final_350.gro -o rmsf_cdrl2_350.xvg -n index.ndx -b 1000
+# gmx rmsf is part of G R O M A C S:
+#
+# Great Red Owns Many ACres of Sand 
+#
+@    title "RMS fluctuation"
+@    xaxis  label "Atom"
+@    yaxis  label "(nm)"
+@TYPE xy
+  762   0.0342
+  763   0.0406
+  764   0.0253
+  765   0.0335
+  766   0.0274
+  767   0.0437
+  768   0.0439
+  769   0.0247
+  770   0.1283
+  771   0.2171
+  772   0.1376
+  773   0.2285
+  774   0.0657
+  775   0.0856
+  776   0.1170
+  777   0.2084
+  778   0.1217
+  779   0.2097
+  780   0.0234
+  781   0.0371
+  782   0.0211
+  783   0.0325
+  784   0.0187
+  785   0.0265
+  786   0.0225
+  787   0.0321
+  788   0.0384
+  789   0.1140
+  790   0.1067
+  791   0.1157
+  792   0.0365
+  793   0.0706
+  794   0.0771
+  795   0.0648
+  796   0.1346
+  797   0.1295
+  798   0.1214
+  799   0.0187
+  800   0.0303
+  801   0.0226
+  802   0.0317
+  803   0.0274
+  804   0.0347
+  805   0.0326
+  806   0.0434
+  807   0.0498
+  808   0.0331
+  809   0.0664
+  810   0.0689
+  811   0.0537
+  812   0.0967
+  813   0.0939
+  814   0.0389
+  815   0.0517
+  816   0.0486
+  817   0.0776
+  818   0.0808
+  819   0.1036
+  820   0.0662
+  821   0.0681
+  822   0.0918
+  823   0.0365
+  824   0.0450

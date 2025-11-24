@@ -1,15 +1,15 @@
-# This file was created Mon Nov 24 19:28:14 2025
+# This file was created Mon Nov 24 17:03:19 2025
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl1_350.xvg -oc charge_cdrl1_350.xvg -of field_cdrl1_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Good gRace! Old Maple Actually Chews Slate
+# GROtesk MACabre and Sinister
 #
 @    title "Charge Distribution"
 @    xaxis  label "Average coordinate (nm)"

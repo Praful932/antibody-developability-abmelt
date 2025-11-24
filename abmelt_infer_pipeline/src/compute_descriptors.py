@@ -314,7 +314,8 @@ def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int,
                 logger.warning("This is common with short trajectories. Continuing...")
         
         all_master_s2_dicts[block_length] = master_s2_dict
-    
+    print(f"all_master_s2_dicts - {all_master_s2_dicts}")
+    raise Exception("Stop here")
     return all_master_s2_dicts
 
 

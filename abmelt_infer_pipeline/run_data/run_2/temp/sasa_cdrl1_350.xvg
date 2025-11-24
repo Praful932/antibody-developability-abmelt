@@ -1,15 +1,15 @@
-# This file was created Mon Nov 24 19:28:11 2025
+# This file was created Mon Nov 24 17:03:12 2025
 # Created by:
-#                  :-) GROMACS - gmx sasa, 2025.3-Homebrew (-:
+#                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx sasa -f md_final_350.xtc -s md_final_350.gro -o sasa_cdrl1_350.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Good ROcking Metal Altar for Chronical Sinners
+# GROwing Monsters And Cloning Shrimps
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

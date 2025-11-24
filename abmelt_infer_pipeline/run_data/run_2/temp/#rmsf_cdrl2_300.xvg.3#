@@ -1,0 +1,80 @@
+# This file was created Mon Nov 24 19:28:05 2025
+# Created by:
+#                  :-) GROMACS - gmx rmsf, 2025.3-Homebrew (-:
+# 
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx rmsf -f md_final_300.xtc -s md_final_300.gro -o rmsf_cdrl2_300.xvg -n index.ndx -b 1000
+# gmx rmsf is part of G R O M A C S:
+#
+# Green Red Orange Magenta Azure Cyan Skyblue
+#
+@    title "RMS fluctuation"
+@    xaxis  label "Atom"
+@    yaxis  label "(nm)"
+@TYPE xy
+  762   0.0292
+  763   0.0351
+  764   0.0225
+  765   0.0263
+  766   0.0282
+  767   0.0367
+  768   0.0364
+  769   0.0274
+  770   0.0373
+  771   0.0496
+  772   0.0438
+  773   0.0594
+  774   0.0407
+  775   0.0518
+  776   0.0336
+  777   0.0447
+  778   0.0386
+  779   0.0512
+  780   0.0181
+  781   0.0296
+  782   0.0179
+  783   0.0295
+  784   0.0155
+  785   0.0214
+  786   0.0170
+  787   0.0255
+  788   0.0283
+  789   0.1101
+  790   0.1043
+  791   0.1058
+  792   0.0267
+  793   0.0408
+  794   0.0430
+  795   0.0405
+  796   0.1142
+  797   0.1135
+  798   0.1140
+  799   0.0174
+  800   0.0256
+  801   0.0225
+  802   0.0295
+  803   0.0221
+  804   0.0282
+  805   0.0237
+  806   0.0309
+  807   0.0298
+  808   0.0321
+  809   0.0470
+  810   0.0467
+  811   0.0285
+  812   0.0444
+  813   0.0399
+  814   0.0327
+  815   0.0457
+  816   0.0505
+  817   0.0691
+  818   0.0690
+  819   0.0901
+  820   0.0718
+  821   0.0756
+  822   0.0943
+  823   0.0274
+  824   0.0326

@@ -1,0 +1,34 @@
+# This file was created Mon Nov 24 16:28:01 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrl3_300.xvg -oc charge_cdrl3_300.xvg -of field_cdrl3_300.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gnomes, ROck Monsters And Chili Sauce
+#
+@    title "Electric Field"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Field (V/nm)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr3l"
+                   0                     -nan
+  0.6348134279251099             -0.459126496
+    1.26962685585022             -0.458811424
+    1.90444016456604             -0.305664256
+   2.539253711700439             -0.229248192
+    3.17406702041626              -0.18339856
+    3.80888032913208             -0.152832128
+     4.4436936378479             -0.130998968
+   5.078507423400879             -0.114624096
+   5.713320732116699             -0.101888088

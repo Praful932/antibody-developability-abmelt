@@ -1,0 +1,34 @@
+# This file was created Mon Nov 24 16:07:27 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrs_300.xvg -oc charge_cdrs_300.xvg -of field_cdrs_300.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Good ROcking Metal Altar for Chronical Sinners
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdrs"
+                   0                     -nan
+  0.6348134279251099       -1.138906121253967
+    1.26962685585022       -2.481904745101929
+    1.90444016456604       -3.608955860137939
+   2.539253711700439       -4.315518856048584
+    3.17406702041626       -4.755314826965332
+    3.80888032913208       -5.048213005065918
+     4.4436936378479       -5.257425785064697
+   5.078507423400879        -5.41433572769165
+   5.713320732116699       -5.536376476287842
