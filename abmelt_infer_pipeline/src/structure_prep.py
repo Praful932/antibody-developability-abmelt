@@ -8,7 +8,7 @@ Handles antibody structure generation and preprocessing.
 import logging
 import sys
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 # Add the original AbMelt src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
@@ -24,7 +24,9 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
-def prepare_structure(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+def prepare_structure(
+    antibody: dict[str, Any], config: dict[str, Any]
+) -> dict[str, Any]:
     """
     Prepare antibody structure for MD simulation.
 
@@ -45,7 +47,9 @@ def prepare_structure(antibody: dict[str, Any], config: dict[str, Any]) -> dict[
         raise ValueError(f"Unsupported antibody type: {antibody['type']}")
 
 
-def _prepare_from_pdb(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+def _prepare_from_pdb(
+    antibody: dict[str, Any], config: dict[str, Any]
+) -> dict[str, Any]:
     """Prepare structure from existing PDB file."""
     pdb_file = antibody["pdb_file"]
     antibody_name = antibody["name"]
@@ -64,7 +68,9 @@ def _prepare_from_pdb(antibody: dict[str, Any], config: dict[str, Any]) -> dict[
     return _preprocess_structure(str(target_pdb), antibody_name, work_dir, config)
 
 
-def _prepare_from_sequences(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+def _prepare_from_sequences(
+    antibody: dict[str, Any], config: dict[str, Any]
+) -> dict[str, Any]:
     """Generate structure from heavy and light chain sequences."""
     heavy_chain = antibody["heavy_chain"]
     light_chain = antibody["light_chain"]
@@ -237,7 +243,9 @@ def generate_structure_from_sequences(
     return output_file
 
 
-def load_existing_structure_files(antibody: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
+def load_existing_structure_files(
+    antibody: dict[str, Any], config: dict[str, Any]
+) -> dict[str, Any]:
     """
     Load existing structure files and validate they exist.
 

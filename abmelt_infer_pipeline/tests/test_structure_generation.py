@@ -11,7 +11,7 @@ import shutil
 import sys
 import tempfile
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent / "src"))
@@ -45,7 +45,7 @@ logger = logging.getLogger(__name__)
 class StructureGenerationTester:
     """Test class for structure generation functionality."""
 
-    def __init__(self, test_dir: Optional[str] = None):
+    def __init__(self, test_dir: str | None = None):
         """Initialize tester with optional test directory."""
         self.test_dir = (
             Path(test_dir)
@@ -172,7 +172,8 @@ class StructureGenerationTester:
                 # Test prepare_pdb_for_analysis
                 logger.info("Testing prepare_pdb_for_analysis...")
                 structure_files = prepare_pdb_for_analysis(
-                    pdb_file=str(pdb_file_path), output_dir=str(self.test_dir / "pdb_analysis")
+                    pdb_file=str(pdb_file_path),
+                    output_dir=str(self.test_dir / "pdb_analysis"),
                 )
 
                 if self._verify_structure_files(structure_files, antibody_name):

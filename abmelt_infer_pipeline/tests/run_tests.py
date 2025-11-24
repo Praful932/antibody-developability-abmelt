@@ -9,10 +9,9 @@ import argparse
 import subprocess
 import sys
 from pathlib import Path
-from typing import Optional
 
 
-def run_script(script_name: str, args: Optional[list[str]] = None) -> bool:
+def run_script(script_name: str, args: list[str] | None = None) -> bool:
     """Run a Python script and return the result."""
     script_path = Path(__file__).parent / script_name
 
