@@ -48,7 +48,9 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
     # Get descriptor computation parameters
     desc_config = config["descriptors"]
     eq_time = desc_config["equilibration_time"]
-    block_length = desc_config["block_length"]
+    block_lengths = desc_config["block_length"]  # Now expects a list [2.5, 25]
+    if not isinstance(block_lengths, list):
+        block_lengths = [block_lengths]  # Backwards compatibility
     core_surface_k = desc_config["core_surface_k"]
     compute_lambda = desc_config["compute_lambda"]
     
@@ -70,7 +72,7 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         
         # Step 2: Compute order parameters
         logger.info("Step 2: Computing order parameters...")
-        master_s2_dict = _compute_order_parameters(work_dir, temps, eq_time, block_length, antibody_name)
+        master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name)
         
         # Step 3: Compute core/surface SASA
         logger.info("Step 3: Computing core/surface SASA...")
@@ -79,17 +81,16 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         # Step 4: Compute multi-temperature features (lambda)
         if len(temps) >= 2 and compute_lambda:
             logger.info("Step 4: Computing multi-temperature lambda...")
-            lambda_dict, r_dict = _compute_lambda_features(master_s2_dict, temps, block_length, eq_time, antibody_name)
+            all_lambda_features = _compute_lambda_features(master_s2_dicts, temps, eq_time, antibody_name)
         else:
             logger.warning(f"Skipping lambda computation: need >=2 temperatures, got {len(temps)}")
-            lambda_dict = None
-            r_dict = None
+            all_lambda_features = None
         
         # Step 5: Aggregate all descriptors into DataFrame
         logger.info("Step 5: Aggregating descriptors to DataFrame...")
         descriptors_df = _aggregate_descriptors_to_dataframe(
-            work_dir, temps, antibody_name, eq_time, master_s2_dict, 
-            lambda_dict, r_dict, sasa_dict, core_surface_k
+            work_dir, temps, antibody_name, eq_time, master_s2_dicts, 
+            all_lambda_features, sasa_dict, core_surface_k
         )
         
         logger.info(f"Descriptor computation completed. DataFrame shape: {descriptors_df.shape}")
@@ -273,42 +274,48 @@ def _compute_gromacs_descriptors(work_dir: Path, temps: List[str], eq_time: int)
 
 
 def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int, 
-                             block_length: int, antibody_name: str) -> Dict[int, Dict]:
+                             block_lengths: List[float], antibody_name: str) -> Dict[float, Dict[int, Dict]]:
     """
-    Compute N-H bond order parameters (S²) for each temperature.
+    Compute N-H bond order parameters (S²) for each temperature and block length.
     
     Args:
         work_dir: Working directory
         temps: List of temperature strings
         eq_time: Equilibration time in ns
-        block_length: Block length for order parameter calculation in ns
+        block_lengths: List of block lengths for order parameter calculation in ns
         antibody_name: Name of antibody
         
     Returns:
-        Dictionary mapping temperature (int) to S² values per residue
+        Dictionary mapping block_length (float) to dictionary mapping temperature (int) to S² values per residue
     """
-    master_s2_dict = {int(temp): {} for temp in temps}
+    all_master_s2_dicts = {}
     
-    for temp in temps:
-        logger.info(f"Computing order parameters for {temp}K...")
+    for block_length in block_lengths:
+        logger.info(f"Computing order parameters for block_length={block_length}ns...")
+        master_s2_dict = {int(temp): {} for temp in temps}
         
-        final_xtc = f'md_final_{temp}.xtc'
-        final_gro = f'md_final_{temp}.gro'
+        for temp in temps:
+            logger.info(f"  Computing S² for {temp}K, block={block_length}ns...")
+            
+            final_xtc = f'md_final_{temp}.xtc'
+            final_gro = f'md_final_{temp}.gro'
+            
+            if not os.path.exists(final_xtc) or not os.path.exists(final_gro):
+                logger.warning(f"Trajectory files not found for {temp}K, skipping")
+                continue
+            
+            try:
+                s2_blocks_dict = order_s2(mab=antibody_name, temp=temp, 
+                                        block_length=block_length, start=eq_time)
+                master_s2_dict[int(temp)] = avg_s2_blocks(s2_blocks_dict)
+                logger.info(f"  Order parameters computed for {temp}K")
+            except Exception as e:
+                logger.warning(f"Order parameter computation failed for {temp}K: {e}")
+                logger.warning("This is common with short trajectories. Continuing...")
         
-        if not os.path.exists(final_xtc) or not os.path.exists(final_gro):
-            logger.warning(f"Trajectory files not found for {temp}K, skipping order parameters")
-            continue
-        
-        try:
-            s2_blocks_dict = order_s2(mab=antibody_name, temp=temp, 
-                                    block_length=block_length, start=eq_time)
-            master_s2_dict[int(temp)] = avg_s2_blocks(s2_blocks_dict)
-            logger.info(f"Order parameters computed for {temp}K")
-        except Exception as e:
-            logger.warning(f"Order parameter computation failed for {temp}K: {e}")
-            logger.warning("This is common with short trajectories. Continuing...")
+        all_master_s2_dicts[block_length] = master_s2_dict
     
-    return master_s2_dict
+    return all_master_s2_dicts
 
 
 def _compute_core_surface_sasa(work_dir: Path, temps: List[str], eq_time: int, k: int) -> Dict:
@@ -350,54 +357,59 @@ def _compute_core_surface_sasa(work_dir: Path, temps: List[str], eq_time: int, k
     return sasa_dict
 
 
-def _compute_lambda_features(master_s2_dict: Dict[int, Dict], temps: List[str],
-                            block_length: int, eq_time: int, antibody_name: str) -> Tuple[Dict, Dict]:
+def _compute_lambda_features(master_s2_dicts: Dict[float, Dict[int, Dict]], temps: List[str],
+                            eq_time: int, antibody_name: str) -> Dict[float, Tuple[Dict, Dict]]:
     """
-    Compute multi-temperature lambda (order parameter slope).
+    Compute multi-temperature lambda (order parameter slope) for each block length.
     
     Args:
-        master_s2_dict: Dictionary of S² values per temperature
+        master_s2_dicts: Dictionary mapping block_length to dictionary of S² values per temperature
         temps: List of temperature strings
-        block_length: Block length used for order parameter calculation
         eq_time: Equilibration time
         antibody_name: Name of antibody
         
     Returns:
-        Tuple of (lambda_dict, r_dict) - lambda values and correlation coefficients per residue
+        Dictionary mapping block_length to tuple of (lambda_dict, r_dict) - lambda values and correlation coefficients per residue
     """
-    # Convert temps to ints for consistency
     temp_ints = [int(t) for t in temps]
-    
-    # Filter out temperatures that don't have S² data
-    available_temps = [t for t in temp_ints if t in master_s2_dict and len(master_s2_dict[t]) > 0]
-    
-    if len(available_temps) < 2:
-        logger.warning(f"Need at least 2 temperatures with S² data for lambda, got {len(available_temps)}")
-        return None, None
-    
-    try:
-        # Use order_lambda function from order_param module (saves CSV)
-        # Note: start parameter expects picoseconds
-        order_lambda(master_dict=master_s2_dict, mab=antibody_name, 
-                    temps=available_temps, block_length=str(block_length), 
-                    start=str(eq_time * 1000))
+    all_lambda_features = {}
+
+    for block_length, master_s2_dict in master_s2_dicts.items():
+        logger.info(f"Computing lambda features for block_length={block_length}ns...")
         
-        # Compute lambda and r for each residue directly
-        lambda_dict, r_dict = get_lambda(master_s2_dict, temps=available_temps)
+        # Filter out temperatures that don't have S² data
+        available_temps = [t for t in temp_ints if t in master_s2_dict and len(master_s2_dict[t]) > 0]
         
-        logger.info(f"Lambda computed for {len(lambda_dict)} residues")
-        return lambda_dict, r_dict
+        if len(available_temps) < 2:
+            logger.warning(f"Need at least 2 temperatures with S² data for lambda, got {len(available_temps)}")
+            all_lambda_features[block_length] = (None, None)
+            continue
         
-    except Exception as e:
-        logger.warning(f"Lambda computation failed: {e}")
-        return None, None
+        try:
+            # Use order_lambda function from order_param module (saves CSV)
+            # Note: start parameter expects picoseconds
+            order_lambda(master_dict=master_s2_dict, mab=antibody_name, 
+                        temps=available_temps, block_length=str(block_length), 
+                        start=str(eq_time * 1000))
+            
+            # Compute lambda and r for each residue directly
+            lambda_dict, r_dict = get_lambda(master_s2_dict, temps=available_temps)
+            
+            logger.info(f"Lambda computed for {len(lambda_dict)} residues at block={block_length}ns")
+            all_lambda_features[block_length] = (lambda_dict, r_dict)
+            
+        except Exception as e:
+            logger.warning(f"Lambda computation failed for block={block_length}ns: {e}")
+            all_lambda_features[block_length] = (None, None)
+
+    return all_lambda_features
 
 
 def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str], 
                                        antibody_name: str, eq_time: int,
-                                       master_s2_dict: Dict, lambda_dict: Optional[Dict],
-                                       r_dict: Optional[Dict], sasa_dict: Dict,
-                                       core_surface_k: int) -> pd.DataFrame:
+                                       master_s2_dicts: Dict[float, Dict[int, Dict]], 
+                                       all_lambda_features: Dict[float, Tuple[Dict, Dict]],
+                                       sasa_dict: Dict, core_surface_k: int) -> pd.DataFrame:
     """
     Aggregate all computed descriptors into a single-row DataFrame.
     
@@ -406,9 +418,8 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
         temps: List of temperature strings
         antibody_name: Name of antibody
         eq_time: Equilibration time in ns
-        master_s2_dict: Order parameter dictionary
-        lambda_dict: Lambda values dictionary (optional)
-        r_dict: Correlation coefficients dictionary (optional)
+        master_s2_dicts: Dictionary mapping block_length to order parameter dictionary per temperature
+        all_lambda_features: Dictionary mapping block_length to tuple of (lambda_dict, r_dict)
         sasa_dict: Core/surface SASA dictionary
         core_surface_k: Number of residues for core/surface classification
         
@@ -525,26 +536,28 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
             logger.warning(f"Failed to parse {xvg_file}: {e}")
             continue
     
-    # Add order parameter features
-    for temp_int, s2_values in master_s2_dict.items():
-        if s2_values and len(s2_values) > 0:
-            temp_str = str(temp_int)
-            s2_mean = np.mean(list(s2_values.values()))
-            s2_std = np.std(list(s2_values.values()))
-            descriptor_dict[f'order_s2_{temp_str}_mu'] = s2_mean
-            descriptor_dict[f'order_s2_{temp_str}_std'] = s2_std
+    # Add order parameter features for each block length
+    for block_length, master_s2_dict in master_s2_dicts.items():
+        for temp_int, s2_values in master_s2_dict.items():
+            if s2_values and len(s2_values) > 0:
+                temp_str = str(temp_int)
+                s2_mean = np.mean(list(s2_values.values()))
+                s2_std = np.std(list(s2_values.values()))
+                # Include block length in feature name for clarity (optional)
+                descriptor_dict[f'order_s2_{temp_str}_b={block_length}_mu'] = s2_mean
+                descriptor_dict[f'order_s2_{temp_str}_b={block_length}_std'] = s2_std
     
-    # Add lambda features
-    # Match training data formats:
-    # - tagg: all-temp_lamda_b=25_eq=20
-    # - tmon: r-lamda_b=2.5_eq=20
-    if lambda_dict and r_dict:
-        lambda_mean = np.mean(list(lambda_dict.values()))
-        r_mean = np.mean(list(r_dict.values()))
-        # Use block_length as shown in training data (may need adjustment)
-        descriptor_dict[f'all-temp_lamda_b={block_length}_eq={eq_time}'] = lambda_mean
-        descriptor_dict[f'r-lamda_b={block_length}_eq={eq_time}'] = lambda_mean  # For tmon model
-        descriptor_dict[f'all-temp_lamda_r_b={block_length}_eq={eq_time}'] = r_mean
+    # Add lambda features for each block length
+    if all_lambda_features:
+        for block_length, (lambda_dict, r_dict) in all_lambda_features.items():
+            if lambda_dict and r_dict:
+                lambda_mean = np.mean(list(lambda_dict.values()))
+                r_mean = np.mean(list(r_dict.values()))
+                
+                # Generate features with correct values
+                descriptor_dict[f'all-temp_lamda_b={block_length}_eq={eq_time}'] = lambda_mean
+                descriptor_dict[f'r-lamda_b={block_length}_eq={eq_time}'] = r_mean  # FIX: was lambda_mean
+                descriptor_dict[f'all-temp_lamda_r_b={block_length}_eq={eq_time}'] = r_mean
     
     # Add core/surface SASA features
     if sasa_dict:

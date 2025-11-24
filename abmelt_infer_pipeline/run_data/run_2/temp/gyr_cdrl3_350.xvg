@@ -1,15 +1,15 @@
-# This file was created Sat Nov 22 12:05:35 2025
+# This file was created Mon Nov 24 19:28:13 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_350.xtc -s md_final_350.gro -o gyr_cdrl3_350.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Gyas ROwers Mature At Cryogenic Speed
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -150,7 +150,7 @@
    1220.000 0.718147 0.473043 0.690000 0.575847
    1230.000 0.735201 0.513647 0.704312 0.566703
    1240.000 0.700151 0.520893 0.669683 0.510508
-   1250.000 0.723897 0.495682 0.695002 0.565089
+   1250.000 0.723897 0.495682 0.695002 0.565090
    1260.000 0.733699 0.522383 0.705327 0.553406
    1270.000 0.709549 0.534729 0.678309 0.510765
    1280.000 0.727631 0.552849 0.697145 0.516955

@@ -1,15 +1,15 @@
-# This file was created Sat Nov 22 12:05:40 2025
+# This file was created Mon Nov 24 19:28:15 2025
 # Created by:
-#                        :-) GROMACS - gmx sasa, 2024 (-:
+#                  :-) GROMACS - gmx sasa, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx sasa -f md_final_400.xtc -s md_final_400.gro -o sasa_400.xvg
 # gmx sasa is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Glycine aRginine prOline Methionine Alanine Cystine Serine
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

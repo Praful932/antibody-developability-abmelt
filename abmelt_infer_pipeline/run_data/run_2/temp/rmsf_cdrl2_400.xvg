@@ -1,15 +1,15 @@
-# This file was created Sat Nov 22 12:05:48 2025
+# This file was created Mon Nov 24 19:28:19 2025
 # Created by:
-#                        :-) GROMACS - gmx rmsf, 2024 (-:
+#                  :-) GROMACS - gmx rmsf, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx rmsf -f md_final_400.xtc -s md_final_400.gro -o rmsf_cdrl2_400.xvg -n index.ndx -b 1000
 # gmx rmsf is part of G R O M A C S:
 #
-# GRoups of Organic Molecules in ACtion for Science
+# GROup of MAchos and Cynical Suckers
 #
 @    title "RMS fluctuation"
 @    xaxis  label "Atom"

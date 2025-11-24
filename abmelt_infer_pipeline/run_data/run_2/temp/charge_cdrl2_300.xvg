@@ -1,15 +1,15 @@
-# This file was created Sat Nov 22 12:05:26 2025
+# This file was created Mon Nov 24 19:28:08 2025
 # Created by:
-#                     :-) GROMACS - gmx potential, 2024 (-:
+#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrl2_300.xvg -oc charge_cdrl2_300.xvg -of field_cdrl2_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
+# God Rules Over Mankind, Animals, Cosmos and Such
 #
 @    title "Charge Distribution"
 @    xaxis  label "Average coordinate (nm)"

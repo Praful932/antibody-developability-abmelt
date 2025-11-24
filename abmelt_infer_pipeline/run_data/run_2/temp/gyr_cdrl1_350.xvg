@@ -1,15 +1,15 @@
-# This file was created Sat Nov 22 12:05:35 2025
+# This file was created Mon Nov 24 19:28:13 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_350.xtc -s md_final_350.gro -o gyr_cdrl1_350.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Gyas ROwers Mature At Cryogenic Speed
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -48,7 +48,7 @@
     200.000 0.471722 0.400117 0.359620 0.394490
     210.000 0.472876 0.395806 0.356933 0.403930
     220.000 0.475515 0.408578 0.348262 0.404979
-    230.000 0.481171 0.410728 0.360393 0.405549
+    230.000 0.481171 0.410728 0.360393 0.405548
     240.000 0.474587 0.405917 0.354566 0.399975
     250.000 0.482320 0.408840 0.364841 0.406209
     260.000 0.483139 0.414414 0.377987 0.390170
@@ -62,7 +62,7 @@
     340.000 0.470544 0.394628 0.378365 0.379383
     350.000 0.477548 0.403164 0.382366 0.383875
     360.000 0.479231 0.408591 0.377488 0.387146
-    370.000 0.470764 0.396316 0.377030 0.379501
+    370.000 0.470765 0.396316 0.377030 0.379501
     380.000 0.465502 0.386083 0.375315 0.378765
     390.000 0.470017 0.391664 0.368417 0.390770
     400.000 0.478132 0.405101 0.378912 0.386704
@@ -137,7 +137,7 @@
    1090.000 0.483011 0.401129 0.405692 0.375644
    1100.000 0.471980 0.396281 0.390408 0.368880
    1110.000 0.488640 0.412911 0.401953 0.381413
-   1120.000 0.473433 0.390680 0.395030 0.373628
+   1120.000 0.473433 0.390680 0.395029 0.373628
    1130.000 0.477542 0.400488 0.394536 0.374223
    1140.000 0.478111 0.400809 0.400925 0.368500
    1150.000 0.486937 0.403913 0.405088 0.383371

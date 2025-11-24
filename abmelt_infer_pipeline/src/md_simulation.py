@@ -463,8 +463,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     return {
         "tpr_file": f"md_{temp}.tpr",
         "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro",
-        "log_file": f"md_{temp}.log"
+        "gro_file": f"md_{temp}.gro"
     }
 
 
@@ -588,8 +587,7 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
     return {
         "tpr_file": f"md_{temp}.tpr",
         "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro",
-        "log_file": f"md_{temp}.log"
+        "gro_file": f"md_{temp}.gro"
     }
 
 
@@ -838,21 +836,13 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
         temp_str = str(temp)
         
         # Required files per temperature
+        # Note: Log files are not required when loading existing results
+        # as they are only used for monitoring during simulation
         final_xtc = work_dir / f"md_final_{temp_str}.xtc"
         final_gro = work_dir / f"md_final_{temp_str}.gro"
         tpr_file = work_dir / f"md_{temp_str}.tpr"
         
-        # Log file naming depends on simulation_time
-        # Standard (100ns): md_{temp}.log
-        # Custom time: md_{temp}_{simulation_time}.log
-        if simulation_time == 100:
-            log_file = work_dir / f"md_{temp_str}.log"
-            log_file_name = f"md_{temp_str}.log"
-        else:
-            log_file = work_dir / f"md_{temp_str}_{simulation_time}.log"
-            log_file_name = f"md_{temp_str}_{simulation_time}.log"
-        
-        # Check if files exist
+        # Check if required files exist
         temp_missing = []
         if not final_xtc.exists():
             temp_missing.append(str(final_xtc))
@@ -860,8 +850,6 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
             temp_missing.append(str(final_gro))
         if not tpr_file.exists():
             temp_missing.append(str(tpr_file))
-        if not log_file.exists():
-            temp_missing.append(str(log_file))
         
         if temp_missing:
             missing_files.append(f"Temperature {temp_str}K:")
@@ -870,8 +858,7 @@ def load_existing_simulation_results(structure_files: Dict[str, str], config: Di
             trajectory_files[temp_str] = {
                 "final_xtc": f"md_final_{temp_str}.xtc",
                 "final_gro": f"md_final_{temp_str}.gro",
-                "tpr_file": f"md_{temp_str}.tpr",
-                "log_file": log_file_name
+                "tpr_file": f"md_{temp_str}.tpr"
             }
     
     if missing_files:
