@@ -163,12 +163,62 @@ def avg_s2_blocks(s2_dic):
         avg_dict[resid] = sum([s2_dic[block][resid] for block in blocks])/len(blocks)
     return avg_dict
 
-def order_s2(mab='mab01', temp='310', block_length=10, start=20):
+def order_s2(mab='mab01', temp='310', block_length=10, start=20, use_dummy=False):
     temp = str(temp)
     topology = 'md_final_' + temp + '.gro'
     trajectory = 'md_final_' + temp + '.xtc'
-    u = mda.Universe(topology,trajectory)
+    
+    # Load universe to detect number of residues
+    u = mda.Universe(topology, trajectory)
     protein = u.select_atoms("protein")
+    
+    # Get number of residues (excluding first residue and prolines, matching get_h_n_coords logic)
+    backbone_residues = u.select_atoms('backbone and not resname PRO').residues[1:]
+    num_res = backbone_residues.n_residues
+    
+    if use_dummy:
+        print("Generating dummy S2 values for testing...")
+        print("Number of residues detected: {}".format(num_res))
+        print("Temperature: {}K".format(temp))
+        print("Block length: {} ns".format(block_length))
+        print("-----------------------------------------")
+        
+        # Generate 2-4 blocks for dummy data regardless of simulation length
+        # Use block_length to determine number: smaller blocks -> more blocks, larger blocks -> fewer blocks
+        if block_length <= 2.5:
+            num_blocks = 4
+        elif block_length <= 10:
+            num_blocks = 3
+        else:
+            num_blocks = 2
+        
+        # Set seed based on temperature for reproducibility
+        np.random.seed(int(temp))
+        
+        s2_blocks_dict = {}
+        for block in range(num_blocks):
+            # Generate realistic S2 values between 0.6-0.9 for each residue
+            # Add some variation between blocks
+            base_s2 = 0.75 + np.random.normal(0, 0.05)  # Base around 0.75 with small variation
+            base_s2 = np.clip(base_s2, 0.6, 0.9)  # Keep in realistic range
+            
+            s2_dict = {}
+            for resid in range(1, num_res + 1):
+                # Add residue-specific variation
+                residue_s2 = base_s2 + np.random.normal(0, 0.08)
+                residue_s2 = np.clip(residue_s2, 0.6, 0.9)
+                s2_dict[resid] = residue_s2
+            
+            s2_blocks_dict[block] = s2_dict
+            print("    block {} dummy order parameter values generated".format(block))
+        
+        print("saving dummy order parameter values...")
+        get_s2_df(s2_blocks_dict).to_csv('order_s2_{}K_{}block_{}start.csv'.format(str(temp),str(block_length),str(start)))
+        print("dummy order parameter values saved.")
+        print("")
+        return s2_blocks_dict
+    
+    # Original computation code
     prealigner = align.AlignTraj(u, u, select="protein and name CA", in_memory=True).run()
     ref_coordinates = u.trajectory.timeseries(asel=protein).mean(axis=1)
     ref = mda.Merge(protein).load_new(ref_coordinates[:, None, :], order="afc")

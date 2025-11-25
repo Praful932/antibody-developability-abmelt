@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:14 2025
+# This file was created Tue Nov 25 02:43:07 2025
 # Created by:
 #                       :-) GROMACS - gmx hbond, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx hbond -f md_final_350.xtc -s md_350.tpr -num bonds_lh_350.xvg -n index.ndx
 # gmx hbond is part of G R O M A C S:
 #
-# GRoups of Organic Molecules in ACtion for Science
+# Grunge ROck MAChoS
 #
 @    title "Number of hydrogen bonds"
 @    xaxis  label "Time (ps)"

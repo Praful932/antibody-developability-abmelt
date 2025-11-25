@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:15 2025
+# This file was created Tue Nov 25 02:43:07 2025
 # Created by:
 #                       :-) GROMACS - gmx gyrate, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx gyrate -f md_final_350.xtc -s md_final_350.gro -o gyr_cdrl2_350.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# God Rules Over Mankind, Animals, Cosmos and Such
+# Grunge ROck MAChoS
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"

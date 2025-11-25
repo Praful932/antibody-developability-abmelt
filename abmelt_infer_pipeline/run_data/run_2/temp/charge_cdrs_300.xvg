@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:08 2025
+# This file was created Tue Nov 25 02:42:44 2025
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrs_300.xvg -oc charge_cdrs_300.xvg -of field_cdrs_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Gravel Rubs Often Many Awfully Cauterized Sores
 #
 @    title "Charge Distribution"
 @    xaxis  label "Average coordinate (nm)"

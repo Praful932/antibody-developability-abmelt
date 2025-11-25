@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:31 2025
+# This file was created Tue Nov 25 02:43:34 2025
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrh3_400.xvg -oc charge_cdrh3_400.xvg -of field_cdrh3_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gravel Rubs Often Many Awfully Cauterized Sores
+# Guyana Rwanda Oman Macau Angola Cameroon Senegal
 #
 @    title "Electric Field"
 @    xaxis  label "Average coordinate (nm)"

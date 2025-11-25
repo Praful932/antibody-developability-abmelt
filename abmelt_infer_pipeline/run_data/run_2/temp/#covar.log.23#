@@ -1,0 +1,21 @@
+Covariance analysis log, written Tue Nov 25 01:31:41 2025
+
+Program: covar
+Working directory: /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+
+Read 201 frames from md_final_covar_300.xtc (time 0 to 2000 ps)
+Read reference structure for fit from md_300.tpr
+Read index groups from index.ndx
+
+Analysis group is 'Backbone' (684 atoms)
+Fit group is 'Backbone' (684 atoms)
+Analysis is non-mass weighted
+Fit is non-mass weighted
+Diagonalized the 2052x2052 covariance matrix
+Trace of the covariance matrix before diagonalizing: 3.12657
+Trace of the covariance matrix after diagonalizing: 3.12657
+
+Wrote 200 eigenvalues to covar_300.xvg
+Wrote reference structure to covar_300.trr
+Wrote average structure to avg_covar300.pdb and covar_300.trr
+Wrote eigenvectors 1 to 200 to covar_300.trr

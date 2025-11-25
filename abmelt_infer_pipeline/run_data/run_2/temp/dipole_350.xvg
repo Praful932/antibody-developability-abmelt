@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:20 2025
+# This file was created Tue Nov 25 02:43:12 2025
 # Created by:
 #                      :-) GROMACS - gmx dipoles, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx dipoles -f md_final_350.xtc -s md_350.tpr -o dipole_350.xvg -n index.ndx
 # gmx dipoles is part of G R O M A C S:
 #
-# Good ROcking Metal Altar for Chronical Sinners
+# Good gRace! Old Maple Actually Chews Slate
 #
 @    title "Total dipole moment of the simulation box vs. time"
 @    xaxis  label "Time (ps)"

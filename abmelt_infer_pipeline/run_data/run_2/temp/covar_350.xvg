@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:18 2025
+# This file was created Tue Nov 25 02:43:11 2025
 # Created by:
 #                       :-) GROMACS - gmx covar, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_350.xtc -s md_350.tpr -n index.ndx -o covar_350.xvg -av avg_covar350.pdb -ascii covar_matrix_350.dat -v covar_350.trr
 # gmx covar is part of G R O M A C S:
 #
-# GROwing Monsters And Cloning Shrimps
+# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

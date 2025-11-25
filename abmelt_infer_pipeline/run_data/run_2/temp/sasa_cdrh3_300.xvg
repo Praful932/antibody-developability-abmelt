@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:01 2025
+# This file was created Tue Nov 25 02:42:37 2025
 # Created by:
 #                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_300.xtc -s md_final_300.gro -o sasa_cdrh3_300.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Good gRace! Old Maple Actually Chews Slate
+# GRoups of Organic Molecules in ACtion for Science
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

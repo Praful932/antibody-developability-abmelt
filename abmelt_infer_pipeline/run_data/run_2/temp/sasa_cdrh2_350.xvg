@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:13 2025
+# This file was created Tue Nov 25 02:43:06 2025
 # Created by:
 #                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_350.xtc -s md_final_350.gro -o sasa_cdrh2_350.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Grunge ROck MAChoS
+# Gyas ROwers Mature At Cryogenic Speed
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

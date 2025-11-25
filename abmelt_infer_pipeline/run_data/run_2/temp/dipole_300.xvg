@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:08 2025
+# This file was created Tue Nov 25 02:42:44 2025
 # Created by:
 #                      :-) GROMACS - gmx dipoles, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx dipoles -f md_final_300.xtc -s md_300.tpr -o dipole_300.xvg -n index.ndx
 # gmx dipoles is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Gravel Rubs Often Many Awfully Cauterized Sores
 #
 @    title "Total dipole moment of the simulation box vs. time"
 @    xaxis  label "Time (ps)"

@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:12 2025
+# This file was created Tue Nov 25 02:43:05 2025
 # Created by:
 #                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_350.xtc -s md_final_350.gro -o sasa_cdrh1_350.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# GROwing Monsters And Cloning Shrimps
+# Gromacs Runs On Most of All Computer Systems
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

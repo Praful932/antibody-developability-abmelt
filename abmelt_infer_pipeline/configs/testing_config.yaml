@@ -45,6 +45,7 @@ descriptors:
   block_length: [2.5, 25]                # ns for order parameter blocks
   core_surface_k: 20              # number of residues for core/surface classification
   compute_lambda: true           # requires multiple temps, set false for single-temp tests
+  use_dummy_s2: true             # Enable dummy S2 values for testing with short trajectories
 
 # Performance
 performance:

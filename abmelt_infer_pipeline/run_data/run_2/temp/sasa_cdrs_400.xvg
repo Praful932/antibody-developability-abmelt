@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:25 2025
+# This file was created Tue Nov 25 02:43:28 2025
 # Created by:
 #                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_400.xtc -s md_final_400.gro -o sasa_cdrs_400.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Good ROcking Metal Altar for Chronical Sinners
+# Great Red Owns Many ACres of Sand 
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

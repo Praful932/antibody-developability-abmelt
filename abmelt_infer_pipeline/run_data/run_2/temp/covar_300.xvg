@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:06 2025
+# This file was created Tue Nov 25 02:42:43 2025
 # Created by:
 #                       :-) GROMACS - gmx covar, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_300.xtc -s md_300.tpr -n index.ndx -o covar_300.xvg -av avg_covar300.pdb -ascii covar_matrix_300.dat -v covar_300.trr
 # gmx covar is part of G R O M A C S:
 #
-# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
+# Great Red Owns Many ACres of Sand 
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:02 2025
+# This file was created Tue Nov 25 02:42:38 2025
 # Created by:
 #                        :-) GROMACS - gmx rmsf, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx rmsf -f md_final_300.xtc -s md_final_300.gro -o rmsf_cdrh1_300.xvg -n index.ndx -b 1000
 # gmx rmsf is part of G R O M A C S:
 #
-# GRowing Old MAkes el Chrono Sweat
+# Green Red Orange Magenta Azure Cyan Skyblue
 #
 @    title "RMS fluctuation"
 @    xaxis  label "Atom"

@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:07 2025
+# This file was created Tue Nov 25 02:42:43 2025
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrh2_300.xvg -oc charge_cdrh2_300.xvg -of field_cdrh2_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GROningen MAchine for Chemical Simulation
+# Great Red Owns Many ACres of Sand 
 #
 @    title "Charge Distribution"
 @    xaxis  label "Average coordinate (nm)"

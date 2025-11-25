@@ -1,0 +1,34 @@
+# This file was created Mon Nov 24 17:03:31 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl1_400.xvg -oc charge_cdrl1_400.xvg -of field_cdrl1_400.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gravel Rubs Often Many Awfully Cauterized Sores
+#
+@    title "Electric Field"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Field (V/nm)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr1l"
+                   0                     -nan
+  0.6585641503334045               0.71421472
+   1.317128300666809               0.71421472
+   1.975692391395569              0.476143168
+   2.634256601333618               0.35710736
+   3.292820692062378              0.285685888
+   3.951384782791138              0.238071584
+   4.609948635101318               0.20406136
+   5.268513202667236               0.17855368
+   5.927077293395996              0.158714384

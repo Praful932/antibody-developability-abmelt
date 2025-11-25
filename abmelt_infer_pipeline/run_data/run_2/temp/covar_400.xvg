@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:30 2025
+# This file was created Tue Nov 25 02:43:33 2025
 # Created by:
 #                       :-) GROMACS - gmx covar, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_400.xtc -s md_400.tpr -n index.ndx -o covar_400.xvg -av avg_covar400.pdb -ascii covar_matrix_400.dat -v covar_400.trr
 # gmx covar is part of G R O M A C S:
 #
-# Gromacs Runs On Most of All Computer Systems
+# GRowing Old MAkes el Chrono Sweat
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

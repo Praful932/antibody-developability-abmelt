@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:32 2025
+# This file was created Tue Nov 25 02:43:34 2025
 # Created by:
 #                      :-) GROMACS - gmx dipoles, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx dipoles -f md_final_400.xtc -s md_400.tpr -o dipole_400.xvg -n index.ndx
 # gmx dipoles is part of G R O M A C S:
 #
-# GROningen Mixture of Alchemy and Childrens' Stories
+# Guyana Rwanda Oman Macau Angola Cameroon Senegal
 #
 @    title "Total dipole moment"
 @    xaxis  label "Time (ps)"

@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:00 2025
+# This file was created Tue Nov 25 02:42:37 2025
 # Created by:
 #                        :-) GROMACS - gmx sasa, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_300.xtc -s md_final_300.gro -o sasa_cdrl3_300.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Guyana Rwanda Oman Macau Angola Cameroon Senegal
+# GRoups of Organic Molecules in ACtion for Science
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

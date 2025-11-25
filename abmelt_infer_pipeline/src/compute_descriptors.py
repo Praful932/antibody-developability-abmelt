@@ -53,6 +53,7 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         block_lengths = [block_lengths]  # Backwards compatibility
     core_surface_k = desc_config["core_surface_k"]
     compute_lambda = desc_config["compute_lambda"]
+    use_dummy_s2 = desc_config.get("use_dummy_s2", False)  # Default to False if not specified
     
     # Extract temperatures from trajectory files
     temps = [str(temp) for temp in trajectory_files.keys()]
@@ -72,7 +73,7 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         
         # Step 2: Compute order parameters
         logger.info("Step 2: Computing order parameters...")
-        master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name)
+        master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name, use_dummy_s2)
         
         # Step 3: Compute core/surface SASA
         logger.info("Step 3: Computing core/surface SASA...")
@@ -179,8 +180,9 @@ def _compute_gromacs_descriptors(work_dir: Path, temps: List[str], eq_time: int)
             gromacs.sasa(f=final_xtc, s=final_gro, o=f'sasa_{temp}.xvg', input=['1'])
             xvg_files.append(f'sasa_{temp}.xvg')
             
-            logger.debug(f"  Computing hydrogen bonds...")
-            gromacs.hbond(f=final_xtc, s=tpr_file, num=f'bonds_{temp}.xvg', input=['1', '1'])
+            logger.debug(f"  Computing hydrogen bonds and contacts...")
+            # Use legacy hbond to get both hydrogen bonds AND contacts in one file
+            gromacs.hbond_legacy(f=final_xtc, s=tpr_file, num=f'bonds_{temp}.xvg', input=['1', '1'])
             xvg_files.append(f'bonds_{temp}.xvg')
             
             logger.debug(f"  Computing RMSD...")
@@ -274,7 +276,7 @@ def _compute_gromacs_descriptors(work_dir: Path, temps: List[str], eq_time: int)
 
 
 def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int, 
-                             block_lengths: List[float], antibody_name: str) -> Dict[float, Dict[int, Dict]]:
+                             block_lengths: List[float], antibody_name: str, use_dummy_s2: bool = False) -> Dict[float, Dict[int, Dict]]:
     """
     Compute N-H bond order parameters (S²) for each temperature and block length.
     
@@ -284,11 +286,15 @@ def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int,
         eq_time: Equilibration time in ns
         block_lengths: List of block lengths for order parameter calculation in ns
         antibody_name: Name of antibody
+        use_dummy_s2: If True, generate dummy S2 values instead of computing from trajectory
         
     Returns:
         Dictionary mapping block_length (float) to dictionary mapping temperature (int) to S² values per residue
     """
     all_master_s2_dicts = {}
+    
+    if use_dummy_s2:
+        logger.info("Using dummy S2 values for testing (use_dummy_s2=True)")
     
     for block_length in block_lengths:
         logger.info(f"Computing order parameters for block_length={block_length}ns...")
@@ -306,7 +312,7 @@ def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int,
             
             try:
                 s2_blocks_dict = order_s2(mab=antibody_name, temp=temp, 
-                                        block_length=block_length, start=eq_time)
+                                        block_length=block_length, start=eq_time, use_dummy=use_dummy_s2)
                 master_s2_dict[int(temp)] = avg_s2_blocks(s2_blocks_dict)
                 logger.info(f"  Order parameters computed for {temp}K")
             except Exception as e:
@@ -314,8 +320,7 @@ def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int,
                 logger.warning("This is common with short trajectories. Continuing...")
         
         all_master_s2_dicts[block_length] = master_s2_dict
-    print(f"all_master_s2_dicts - {all_master_s2_dicts}")
-    raise Exception("Stop here")
+    
     return all_master_s2_dicts
 
 
@@ -453,11 +458,20 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                 continue
             
             # Compute equilibrated statistics
-            eq_time_ps = eq_time * 1000  # Convert to ps
-            eq_start_idx = int(eq_time_ps / 10)  # Assuming 10 ps per frame (adjust if needed)
-            
-            if len(data) > eq_start_idx:
+            # Note: RMSF files contain per-residue data (not time-series), 
+            # and equilibration is already handled by the -b flag in GROMACS
+            if 'rmsf' in metric_name:
+                # RMSF: per-residue data, no time-based equilibration needed
+                equilibrated_data = data
+            else:
+                # Time-series data: apply equilibration slicing
+                eq_time_ps = eq_time * 1000  # Convert to ps
+                eq_start_idx = int(eq_time_ps / 10)  # Assuming 10 ps per frame (adjust if needed)
+                if len(data) <= eq_start_idx:
+                    continue
                 equilibrated_data = data[eq_start_idx:]
+            
+            if len(equilibrated_data) > 0:
                 
                 # Handle different data shapes
                 if equilibrated_data.ndim == 1:

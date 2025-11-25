@@ -2,23 +2,20 @@ Model: tagg
 Feature names: [
     'rmsf_cdrs_mu_400', present
     'gyr_cdrs_Rg_std_400', present
-    'all-temp_lamda_b=25_eq=20'
+    'all-temp_lamda_b=25_eq=20' dependent on simulation time being atleast > 30, verified with dummy s2 values
 ]
 
 Model: tm
 Feature names: [
     'gyr_cdrs_Rg_std_350', present
-    'bonds_contacts_std_350', 
+    'bonds_contacts_std_350', present
     'rmsf_cdrl1_std_350'
 ]
 
 Model: tmon
 Feature names: [
-    'bonds_contacts_std_350',
+    'bonds_contacts_std_350', present
     'all-temp-sasa_core_mean_k=20_eq=20', eq=1  present
     'all-temp-sasa_core_std_k=20_eq=20', eq=1 presemt
-    'r-lamda_b=2.5_eq=20'
+    'r-lamda_b=2.5_eq=20' dependent on simulation time being atleast > 30, verified with dummy s2 values
 ]
-
-
-rmsf_cdrs_mu_400

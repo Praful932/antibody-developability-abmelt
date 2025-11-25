@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:27 2025
+# This file was created Tue Nov 25 02:43:30 2025
 # Created by:
 #                       :-) GROMACS - gmx gyrate, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx gyrate -f md_final_400.xtc -s md_final_400.gro -o gyr_cdrs_400.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# GRoups of Organic Molecules in ACtion for Science
+# Gravel Rubs Often Many Awfully Cauterized Sores
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"

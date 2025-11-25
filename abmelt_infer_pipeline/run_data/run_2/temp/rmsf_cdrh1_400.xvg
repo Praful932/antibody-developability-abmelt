@@ -1,4 +1,4 @@
-# This file was created Mon Nov 24 17:03:26 2025
+# This file was created Tue Nov 25 02:43:29 2025
 # Created by:
 #                        :-) GROMACS - gmx rmsf, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx rmsf -f md_final_400.xtc -s md_final_400.gro -o rmsf_cdrh1_400.xvg -n index.ndx -b 1000
 # gmx rmsf is part of G R O M A C S:
 #
-# Gromacs Runs One Microsecond At Cannonball Speeds
+# GRowing Old MAkes el Chrono Sweat
 #
 @    title "RMS fluctuation"
 @    xaxis  label "Atom"
