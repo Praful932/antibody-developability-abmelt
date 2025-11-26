@@ -1,0 +1,34 @@
+# This file was created Tue Nov 25 02:43:34 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrs_400.xvg -oc charge_cdrs_400.xvg -of field_cdrs_400.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Guyana Rwanda Oman Macau Angola Cameroon Senegal
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdrs"
+                   0                     -nan
+  0.6585641503334045       -1.570634603500366
+   1.317128300666809       -3.386497497558594
+   1.975692391395569       -4.852866172790527
+   2.634256601333618       -5.718658924102783
+   3.292820692062378       -6.235108375549316
+   3.951384782791138       -6.575506210327148
+   4.609948635101318       -6.818647384643555
+   5.268513202667236       -7.001003265380859
+   5.927077293395996        -7.14283561706543

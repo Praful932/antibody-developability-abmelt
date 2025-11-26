@@ -1,0 +1,34 @@
+# This file was created Tue Nov 25 02:43:12 2025
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrh3_350.xvg -oc charge_cdrh3_350.xvg -of field_cdrh3_350.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Good gRace! Old Maple Actually Chews Slate
+#
+@    title "Electric Field"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Field (V/nm)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr3h"
+                   0                     -nan
+  0.6448248028755188                1.0256416
+   1.289649605751038              1.274286592
+   1.934474468231201              1.015287616
+   2.579299211502075              0.761465728
+   3.224123954772949       0.6091726079999999
+   3.868948936462402              0.507643808
+   4.513773918151855              0.435123264
+    5.15859842300415              0.380732864
+   5.803423404693604              0.338429216

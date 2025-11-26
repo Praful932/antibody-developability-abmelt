@@ -14,9 +14,6 @@ import numpy as np
 import pandas as pd
 import glob
 
-# Add the original AbMelt src to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
-
 try:
     import gromacs
     from order_param import order_s2, avg_s2_blocks, get_lambda, order_lambda

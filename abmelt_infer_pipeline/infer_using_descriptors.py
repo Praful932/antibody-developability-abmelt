@@ -12,7 +12,7 @@ label_field_to_exclude = [
 ]
 
 current_dir = Path(__file__).parent
-model_dir = current_dir.parent / "AbMelt" / "models"
+model_dir = current_dir / "models"
 print(model_dir)
 
 model_map = {
@@ -22,11 +22,10 @@ model_map = {
 }
 
 # data files that contain the features
-data_dir = current_dir.parent / "AbMelt" / "data"
 data_files = {
-    "tagg" : data_dir / "tagg/rf_efs.csv",
-    "tm" : data_dir / "tm/rf_efs.csv",
-    "tmon" : data_dir / "tmon/rf_efs.csv",
+    "tagg" : model_dir / "tagg/rf_efs.csv",
+    "tm" : model_dir / "tm/rf_efs.csv",
+    "tmon" : model_dir / "tmon/rf_efs.csv",
 }
 
 
@@ -41,15 +40,19 @@ def build_model_feature_col_map():
 model_feature_col_map = build_model_feature_col_map()
 print(model_feature_col_map)
 
+# Note: Holdout files are in the AbMelt directory for testing only
+# In production, descriptors come from the pipeline
+abmelt_data_dir = current_dir.parent / "AbMelt" / "data"
 holdout_files = {
-    "tagg" : data_dir / "tagg/holdout.csv",
-    "tm" : data_dir / "tm/holdout.csv",
-    "tmon" : data_dir / "tmon/holdout.csv",
+    "tagg" : abmelt_data_dir / "tagg/holdout.csv",
+    "tm" : abmelt_data_dir / "tm/holdout.csv",
+    "tmon" : abmelt_data_dir / "tmon/holdout.csv",
 }
 
 def infer_using_descriptors(model_name, descriptor_file, feature_names):
     model = joblib.load(model_map[model_name])
     df = pd.read_csv(descriptor_file)
+    print(f"df shape: {df.shape}, columns: {df.columns}")
     df_features = df[feature_names]
     predictions = model.predict(df_features)
     return predictions

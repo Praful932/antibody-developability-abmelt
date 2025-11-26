@@ -1,15 +1,15 @@
-# This file was created Tue Nov 25 02:43:27 2025
+# This file was created Wed Nov 26 21:33:22 2025
 # Created by:
-#                        :-) GROMACS - gmx sasa, 2024 (-:
+#                  :-) GROMACS - gmx sasa, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx sasa -f md_final_400.xtc -s md_final_400.gro -o sasa_cdrl1_400.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# Gromacs Runs On Most of All Computer Systems
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

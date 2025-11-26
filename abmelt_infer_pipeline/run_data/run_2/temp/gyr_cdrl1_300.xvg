@@ -1,15 +1,15 @@
-# This file was created Tue Nov 25 02:42:39 2025
+# This file was created Wed Nov 26 21:33:09 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_300.xtc -s md_final_300.gro -o gyr_cdrl1_300.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Grunge ROck MAChoS
+# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -192,7 +192,7 @@
    1640.000 0.473521 0.404448 0.370899 0.383799
    1650.000 0.479461 0.410275 0.371320 0.391868
    1660.000 0.478365 0.415900 0.373978 0.380570
-   1670.000 0.475093 0.402432 0.373378 0.387380
+   1670.000 0.475093 0.402432 0.373378 0.387381
    1680.000 0.482426 0.414749 0.377834 0.388194
    1690.000 0.490426 0.426900 0.393818 0.379077
    1700.000 0.469834 0.396647 0.367644 0.386000

@@ -1,15 +1,15 @@
-# This file was created Tue Nov 25 02:42:39 2025
+# This file was created Wed Nov 26 21:33:10 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_300.xtc -s md_final_300.gro -o gyr_cdrh1_300.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Grunge ROck MAChoS
+# Glycine aRginine prOline Methionine Alanine Cystine Serine
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -40,7 +40,7 @@
     120.000 0.614902 0.482953 0.552069 0.467103
     130.000 0.616591 0.487902 0.551948 0.466555
     140.000 0.611448 0.489872 0.552475 0.450037
-    150.000 0.611033 0.479965 0.547905 0.464928
+    150.000 0.611034 0.479965 0.547905 0.464928
     160.000 0.606479 0.475740 0.554040 0.449826
     170.000 0.612808 0.465957 0.562654 0.466231
     180.000 0.621013 0.483626 0.578966 0.449688
@@ -168,7 +168,7 @@
    1400.000 0.600633 0.475318 0.558945 0.427988
    1410.000 0.596690 0.489037 0.544040 0.420645
    1420.000 0.598782 0.491557 0.554227 0.410224
-   1430.000 0.597612 0.486762 0.552485 0.414851
+   1430.000 0.597612 0.486762 0.552485 0.414852
    1440.000 0.608360 0.482579 0.567628 0.430255
    1450.000 0.593100 0.476976 0.552081 0.413805
    1460.000 0.599310 0.480649 0.551458 0.428037
@@ -176,7 +176,7 @@
    1480.000 0.594800 0.456707 0.552356 0.440335
    1490.000 0.595441 0.471251 0.548731 0.431180
    1500.000 0.592248 0.466611 0.547026 0.429595
-   1510.000 0.595682 0.467834 0.551853 0.431583
+   1510.000 0.595682 0.467834 0.551852 0.431583
    1520.000 0.608333 0.480761 0.565660 0.434783
    1530.000 0.607677 0.481149 0.561140 0.438361
    1540.000 0.598081 0.476213 0.546969 0.435257

@@ -1,0 +1,34 @@
+# This file was created Wed Nov 26 19:00:24 2025
+# Created by:
+#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+# 
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrh1_300.xvg -oc charge_cdrh1_300.xvg -of field_cdrh1_300.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gromacs Runs One Microsecond At Cannonball Speeds
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr1h"
+                   0                      nan
+  0.6348134279251099       -1.095307111740112
+    1.26962685585022       -2.190614223480225
+    1.90444016456604       -2.920819044113159
+   2.539253711700439       -3.285921335220337
+    3.17406702041626       -3.504982709884644
+    3.80888032913208       -3.651023864746094
+     4.4436936378479       -3.755338668823242
+   5.078507423400879       -3.833575010299683
+   5.713320732116699       -3.894425392150879

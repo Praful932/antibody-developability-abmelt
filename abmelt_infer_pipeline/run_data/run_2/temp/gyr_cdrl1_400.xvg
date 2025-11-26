@@ -1,15 +1,15 @@
-# This file was created Tue Nov 25 02:43:29 2025
+# This file was created Wed Nov 26 21:33:24 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_400.xtc -s md_final_400.gro -o gyr_cdrl1_400.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# GRowing Old MAkes el Chrono Sweat
+# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -80,7 +80,7 @@
     520.000 0.473353 0.390093 0.376763 0.392432
     530.000 0.475783 0.387827 0.391186 0.386396
     540.000 0.484444 0.402250 0.390695 0.393606
-    550.000 0.477945 0.387464 0.387816 0.395389
+    550.000 0.477945 0.387465 0.387816 0.395389
     560.000 0.463358 0.388519 0.367643 0.378541
     570.000 0.484308 0.401483 0.374752 0.409244
     580.000 0.470572 0.388052 0.369427 0.394734
@@ -196,9 +196,9 @@
    1680.000 0.487017 0.388076 0.425416 0.377874
    1690.000 0.490746 0.403420 0.415199 0.382787
    1700.000 0.480545 0.376746 0.422673 0.375843
-   1710.000 0.484399 0.387607 0.418679 0.379147
+   1710.000 0.484399 0.387607 0.418679 0.379148
    1720.000 0.481742 0.396001 0.406688 0.376749
-   1730.000 0.469153 0.372731 0.409725 0.365250
+   1730.000 0.469154 0.372731 0.409725 0.365250
    1740.000 0.475177 0.385342 0.398958 0.379382
    1750.000 0.478776 0.373783 0.406644 0.391638
    1760.000 0.478179 0.366131 0.406368 0.397648

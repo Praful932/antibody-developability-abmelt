@@ -1,15 +1,15 @@
-# This file was created Tue Nov 25 02:43:30 2025
+# This file was created Wed Nov 26 21:33:24 2025
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
 # Command line:
 #   gmx gyrate -f md_final_400.xtc -s md_final_400.gro -o gyr_cdrh2_400.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Gravel Rubs Often Many Awfully Cauterized Sores
+# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -142,7 +142,7 @@
    1140.000 0.605671 0.532415 0.425280 0.518986
    1150.000 0.622185 0.537331 0.457942 0.525160
    1160.000 0.625942 0.554580 0.441480 0.530229
-   1170.000 0.625673 0.546875 0.464207 0.518046
+   1170.000 0.625673 0.546875 0.464206 0.518046
    1180.000 0.618510 0.534589 0.469459 0.508855
    1190.000 0.610714 0.531713 0.464016 0.497909
    1200.000 0.610319 0.531517 0.466662 0.494668
@@ -159,7 +159,7 @@
    1310.000 0.606847 0.506091 0.503179 0.476665
    1320.000 0.614131 0.516787 0.505547 0.481318
    1330.000 0.608015 0.504505 0.509787 0.474296
-   1340.000 0.619725 0.533017 0.508294 0.475025
+   1340.000 0.619725 0.533016 0.508294 0.475025
    1350.000 0.621714 0.517694 0.509189 0.495757
    1360.000 0.618952 0.521343 0.515316 0.478385
    1370.000 0.610848 0.529134 0.511248 0.452673
