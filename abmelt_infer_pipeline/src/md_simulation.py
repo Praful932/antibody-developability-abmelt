@@ -183,8 +183,9 @@ def _preprocess_for_gromacs(pdb_filename: str, pdb_filepath, config: Dict) -> Di
 
     # Step 3: Create index groups for CDRs
     logger.info("Creating index groups for CDRs...")
-    annotation = canonical_index(pdb=config['paths']['temp_dir'] / "processed.pdb")
-    gromacs.make_ndx(f= config['paths']['temp_dir'] / "processed.gro", o=config['paths']['temp_dir'] / "index.ndx", input=annotation)
+    # Files are in current working directory (already changed to work_dir)
+    annotation = canonical_index(pdb="processed.pdb")
+    gromacs.make_ndx(f="processed.gro", o="index.ndx", input=annotation)
 
     
     return {

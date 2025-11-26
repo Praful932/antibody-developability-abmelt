@@ -507,16 +507,46 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                         descriptor_dict[f'gyr_{region}_Rg_mu_{temp}'] = mu
                         descriptor_dict[f'gyr_{region}_Rg_std_{temp}'] = std
                     elif 'potential' in metric_name:
-                        region = metric_name.replace('potential_', '').replace(f'_{temp}', '')
-                        # Use mean value (potential at specific radius)
-                        descriptor_dict[f'potential_{region}_mu_{temp}'] = mu
+                        # Potential features should NOT use time-series mean
+                        # They need specific radius index extraction (handled in 2D case below)
+                        # This 1D case should not happen for potential files
+                        pass
                     elif 'dipole' in metric_name:
+                        # Dipole files should have 4 columns, handled in 2D case
+                        # This 1D case should not happen for dipole files
+                        # But if it does, use the mean
                         descriptor_dict[f'dipole_mu_{temp}'] = mu
                         descriptor_dict[f'dipole_std_{temp}'] = std
                 
                 elif equilibrated_data.ndim == 2:
-                    # Multi-column data (e.g., gyration with Rg, Rx, Ry, Rz)
-                    if equilibrated_data.shape[1] >= 4:
+                    # Multi-column data (e.g., gyration with Rg, Rx, Ry, Rz, potential with multiple radii)
+                    
+                    # Handle potential files (multiple radii/slices)
+                    if 'potential' in metric_name:
+                        region = metric_name.replace('potential_', '').replace(f'_{temp}', '')
+                        # Potential is measured at specific radius indices
+                        # Original code uses radius index based on region type
+                        if region in ['cdrl1', 'cdrl2', 'cdrl3', 'cdrh1', 'cdrh2', 'cdrh3']:
+                            # Individual CDRs use radius index 2
+                            radius_idx = 2
+                        elif region == 'cdrs':
+                            # Combined CDRs use radius index 5
+                            radius_idx = 5
+                        else:
+                            # Default to radius index 2
+                            radius_idx = 2
+                        
+                        # Extract value at specific radius (column 1 is potential value, column 0 is radius)
+                        if equilibrated_data.shape[0] > radius_idx:
+                            # Potential files have 2 columns: [radius, potential]
+                            # We need the potential value (column 1) at the specific radius index (row)
+                            descriptor_dict[f'potential_{region}_mu_{temp}'] = equilibrated_data[radius_idx, 1]
+                            # Original code sets std to 0 for potential
+                            descriptor_dict[f'potential_{region}_std_{temp}'] = 0
+                        else:
+                            logger.warning(f"Not enough radii in potential file for {region} (need idx {radius_idx}, have {equilibrated_data.shape[0]} rows)")
+                    
+                    elif equilibrated_data.shape[1] >= 4:
                         # Gyration radius components
                         if 'gyr' in metric_name:
                             region = metric_name.replace('gyr_', '').replace(f'_{temp}', '')
@@ -546,6 +576,24 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                             descriptor_dict[f'bonds_hbonds_std_{temp}'] = np.std(hbonds)
                             descriptor_dict[f'bonds_contacts_mu_{temp}'] = np.mean(contacts)
                             descriptor_dict[f'bonds_contacts_std_{temp}'] = np.std(contacts)
+                    
+                    elif equilibrated_data.shape[1] == 3:
+                        # Three-column data (e.g., dipole with Mx, My, Mz)
+                        if 'dipole' in metric_name:
+                            # Dipole files have columns: Mx, My, Mz(magnitude), [|Mtot|]
+                            # Original code uses Z (Mz, the magnitude) = column index 2
+                            dipole_z = equilibrated_data[:, 2]  # Mz column
+                            descriptor_dict[f'dipole_mu_{temp}'] = np.mean(dipole_z)
+                            descriptor_dict[f'dipole_std_{temp}'] = np.std(dipole_z)
+                    
+                    elif equilibrated_data.shape[1] == 4:
+                        # Four-column data (e.g., dipole with Mx, My, Mz, |Mtot|)
+                        if 'dipole' in metric_name:
+                            # Dipole files have 4 columns: Mx, My, Mz(magnitude), |Mtot|
+                            # Original code uses Z (Mz) = column index 2
+                            dipole_z = equilibrated_data[:, 2]  # Mz column
+                            descriptor_dict[f'dipole_mu_{temp}'] = np.mean(dipole_z)
+                            descriptor_dict[f'dipole_std_{temp}'] = np.std(dipole_z)
         
         except Exception as e:
             logger.warning(f"Failed to parse {xvg_file}: {e}")
