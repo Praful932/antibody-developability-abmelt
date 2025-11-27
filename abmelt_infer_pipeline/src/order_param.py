@@ -57,8 +57,10 @@ def pad_short_lists(dic):
     return dic
 
 
-def get_lambda(master_dict, temps=[310, 350, 373]):
+def get_lambda(master_dict, temps=None):
     # temps = [int(x) for x in temp.split(",")]
+    if temps is None:
+        temps = [310, 350, 373]
     residues = master_dict[temps[0]].keys()
     lambda_dict = {}
     r_dict = {}
@@ -82,7 +84,7 @@ def get_df(master_s2_dict, lambda_dict, r_dict, temps):
     for resid in residues:
         for temp in temps:
             df_dict[resid][temp] = master_s2_dict[temp][resid]
-        if lambda_dict != None and r_dict != None:
+        if lambda_dict is not None and r_dict is not None:
             df_dict[resid]["lamda"] = lambda_dict[resid]
             df_dict[resid]["r"] = r_dict[resid]
     return pd.DataFrame(df_dict).T
@@ -164,11 +166,11 @@ def update_average(dict1, dict2, ts):
     if ts == -1:
         return dict1
     else:
-        for pair1, pair2 in zip(dict1.items(), dict2.items()):
+        for pair1, pair2 in zip(dict1.items(), dict2.items(), strict=False):
             key1, val1 = pair1
             key2, val2 = pair2
             new_val = []
-            for prod1, prod2 in zip(val1, val2):
+            for prod1, prod2 in zip(val1, val2, strict=False):
                 new_val.append((prod1 * ts + prod2) / (ts + 1))
             new_dict[key1] = new_val
     return new_dict
@@ -243,14 +245,10 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
         return s2_blocks_dict
 
     # Original computation code
-    prealigner = align.AlignTraj(
-        u, u, select="protein and name CA", in_memory=True
-    ).run()
+    align.AlignTraj(u, u, select="protein and name CA", in_memory=True).run()
     ref_coordinates = u.trajectory.timeseries(asel=protein).mean(axis=1)
     ref = mda.Merge(protein).load_new(ref_coordinates[:, None, :], order="afc")
-    aligner = align.AlignTraj(
-        u, ref, select="protein and name CA", in_memory=True
-    ).run()
+    align.AlignTraj(u, ref, select="protein and name CA", in_memory=True).run()
     traj_length = len(u.trajectory)
     print("starting order parameter calculations...")
     print(f"trajectory length: {int(round(traj_length / 100, 0))} ns")
@@ -272,7 +270,7 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
 
             # if this is the first ts in the block, the avg product is just the product for the ts
             # else we update the average
-            if block_product_dict != None:
+            if block_product_dict is not None:
                 block_product_dict = update_average(
                     block_product_dict, ts_product_dict, ts
                 )
@@ -281,7 +279,7 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
 
         # using the average vector products across the block, we get the s2 value for the block
         # and store it in the dictionary
-        if block_product_dict == None:
+        if block_product_dict is None:
             continue
 
         s2_blocks_dict[block] = get_s2(block_product_dict)
@@ -297,7 +295,7 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
 
             # if this is the first ts in the block, the avg product is just the product for the ts
             # else we update the average
-            if block_product_dict != None:
+            if block_product_dict is not None:
                 block_product_dict = update_average(
                     block_product_dict, ts_product_dict, ts
                 )
@@ -306,7 +304,7 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
 
         # using the average vector products across the block, we get the s2 value for the block
         # and store it in the dictionary
-        if block_product_dict == None:
+        if block_product_dict is None:
             continue
 
         s2_blocks_dict[block] = get_s2(block_product_dict)
@@ -321,13 +319,15 @@ def order_s2(mab="mab01", temp="310", block_length=10, start=20, use_dummy=False
 def order_lambda(
     master_dict=None,
     mab="mab01",
-    temps=[310, 350, 373],
+    temps=None,
     block_length="10",
     start="20000",
 ):
+    if temps is None:
+        temps = [310, 350, 373]
     temps = [int(x) for x in temps]
     # master_s2_dict = {temp:{} for temp in temps}
-    for temp in temps:
+    for _temp in temps:
         lambda_dict, r_dict = get_lambda(master_dict=master_dict, temps=temps)
         df = get_df(master_dict, lambda_dict, r_dict, temps)
         df.to_csv(f"order_lambda_{block_length}block_{start}start.csv")

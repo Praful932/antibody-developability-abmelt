@@ -144,7 +144,7 @@ def load_config(config_path: str) -> dict:
             config = yaml.safe_load(f)
         return config
     except Exception as e:
-        raise Exception(f"Failed to load config: {e}")
+        raise Exception(f"Failed to load config: {e}") from e
 
 
 def setup_logging(config: dict):

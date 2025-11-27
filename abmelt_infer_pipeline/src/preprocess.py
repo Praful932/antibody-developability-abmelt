@@ -36,19 +36,19 @@ def parse_propka(pka):
     # Parse the output from propka and store the results of interest in lists
     result_pka_file = open(pka)
     list_results = []
-    for l in result_pka_file:
-        if not l.strip():
+    for line in result_pka_file:
+        if not line.strip():
             continue
         else:
-            if len(l.strip().split()) == 22:
+            if len(line.strip().split()) == 22:
                 list_results.append(
                     [
-                        l.strip().split()[0],
-                        l.strip().split()[1],
-                        l.strip().split()[2],
-                        l.strip().split()[3],
-                        l.strip().split()[6],
-                        l.strip().split()[8],
+                        line.strip().split()[0],
+                        line.strip().split()[1],
+                        line.strip().split()[2],
+                        line.strip().split()[3],
+                        line.strip().split()[6],
+                        line.strip().split()[8],
                     ]
                 )
     result_pka_file.close()
@@ -181,7 +181,7 @@ def protonation_state(
         The inference pipeline automatically renames chains to A=light, B=heavy
         before calling this function, so the default parameters work correctly.
     """
-    pk.single(pdb_filename, optargs=["--pH=%s" % (pH)], stream=pdb_path, write_pka=True)
+    pk.single(pdb_filename, optargs=[f"--pH={pH}"], stream=pdb_path, write_pka=True)
     pka_file_path = os.path.splitext(pdb_filename)[0] + ".pka"
     pkas = parse_propka(pka_file_path)
 
@@ -214,7 +214,7 @@ def canonical_index(pdb):
     results_L = anarci(L_seq, scheme="imgt", output=False)
     numbering_L, alignment_details_L, hit_tables_L = results_L
     lc_anarci = [v for k, v in numbering_L[0][0][0]]
-    lc_anarci_txt = "".join(lc_anarci)
+    "".join(lc_anarci)
     lc_anarci_n = [k[0] for k, v in numbering_L[0][0][0]]
     gapl, cdr1l, cdr2l, cdr3l = [], [], [], []
     for i in range(0, len(lc_anarci)):
@@ -280,7 +280,7 @@ def canonical_index(pdb):
     results_H = anarci(H_seq, scheme="imgt", output=False)
     numbering_H, alignment_details_H, hit_tables_H = results_H
     hc_anarci = [v for k, v in numbering_H[0][0][0]]
-    hc_anarci_txt = "".join(hc_anarci)
+    "".join(hc_anarci)
     hc_anarci_n = [k[0] for k, v in numbering_H[0][0][0]]
     gaph, cdr1h, cdr2h, cdr3h = [], [], [], []
     for i in range(0, len(hc_anarci)):
@@ -425,15 +425,6 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
                 :class:`gromacs.formats.MDP`, edit the object (a dict), and save it again.
     """
     base = "~/.gromacswrapper/templates/"
-    if new_mdp is None:
-        new_mdp = mdp
-    if extend_parameters is None:
-        extend_parameters = ["include"]
-    else:
-        extend_parameters = list(asiterable(extend_parameters))
-
-    # mdp = base + mdp
-    new_mdp = base + new_mdp
 
     def asiterable(v):
         if isinstance(v, str):
@@ -443,6 +434,16 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
             return v
         except TypeError:
             return [v]
+
+    if new_mdp is None:
+        new_mdp = mdp
+    if extend_parameters is None:
+        extend_parameters = ["include"]
+    else:
+        extend_parameters = list(asiterable(extend_parameters))
+
+    # mdp = base + mdp
+    new_mdp = base + new_mdp
 
     logger = logging.getLogger("gromacs.cbook")
     # None parameters should be ignored (simple way to keep the template defaults)
@@ -471,8 +472,7 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
             (
                 parameter,
                 re.compile(
-                    """(?P<assignment>\s*%s\s*=\s*)(?P<value>[^;]*)(?P<comment>\s*;.*)?"""
-                    % demangled(parameter),
+                    f"""(?P<assignment>\s*{demangled(parameter)}\s*=\s*)(?P<value>[^;]*)(?P<comment>\s*;.*)?""",
                     re.VERBOSE,
                 ),
             )
@@ -482,7 +482,7 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
 
     target = tempfile.TemporaryFile()
     with open(os.path.expanduser(mdp)) as src:
-        logger.info("editing mdp = %r: %r" % (mdp, substitutions.keys()))
+        logger.info(f"editing mdp = {mdp!r}: {substitutions.keys()!r}")
         for line in src:
             new_line = (
                 line.strip()
@@ -519,5 +519,5 @@ def edit_mdp(mdp, new_mdp=None, extend_parameters=None, **substitutions):
     target.close()
     # return all parameters that have NOT been substituted
     if len(params) > 0:
-        logger.warn("Not substituted in %(new_mdp)r: %(params)r" % vars())
+        logger.warn("Not substituted in {new_mdp!r}: {params!r}".format(**vars()))
     return dict([(p, substitutions[p]) for p in params])

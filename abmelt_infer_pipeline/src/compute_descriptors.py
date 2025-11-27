@@ -792,7 +792,7 @@ def _aggregate_descriptors_to_dataframe(
 
         # Cross-temperature SASA slopes
         if len(temps) >= 2:
-            temp_ints = sorted([int(t) for t in temps])
+            sorted([int(t) for t in temps])
             sasa_slopes = {}
 
             for key in [
