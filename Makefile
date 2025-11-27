@@ -6,33 +6,33 @@
 # Detect OS
 OS := $(shell uname -s 2>/dev/null || echo Windows)
 
-# Python command (assumes uv is installed)
-UV := uv
+# Python command (assumes poetry is installed)
+POETRY := poetry
 
 help:  ## Show this help message
 	@echo "Usage: make [target]"
 	@echo ""
 	@echo "Targets:"
-	@echo "  install    Sync dependencies with uv"
+	@echo "  install    Install dependencies with poetry"
 	@echo "  format     Format code with ruff"
 	@echo "  lint       Lint code with ruff and mypy"
 	@echo "  test       Run tests with pytest"
 	@echo "  clean      Remove build artifacts and cache"
 	@echo "  all        Run format, lint, and test"
 
-install:  ## Sync dependencies
-	$(UV) sync
+install:  ## Install dependencies
+	$(POETRY) install
 
 format:  ## Format code
-	$(UV) run ruff format .
-	$(UV) run ruff check --fix .
+	$(POETRY) run ruff format .
+	$(POETRY) run ruff check --fix .
 
 lint:  ## Run static analysis
-	$(UV) run ruff check .
-	$(UV) run mypy abmelt_infer_pipeline/src/
+	$(POETRY) run ruff check .
+	$(POETRY) run mypy abmelt_infer_pipeline/src/
 
 test:  ## Run tests
-	$(UV) run pytest
+	$(POETRY) run pytest
 
 all: format lint test  ## Run all checks
 
