@@ -222,15 +222,112 @@ __marimo__/
 # ===========================================
 # Simulation temp/intermediate files
 # ===========================================
-# GROMACS backups
-\#*.xvg.*\#
-\#*.pdb.*\#
-\#*.gro.*\#
-\#*.trr.*\#
-\#*.xtc.*\#
-\#*.dat.*\#
-\#*.ndx.*\#
+# GROMACS backup files (created when overwriting existing files)
+#*#
 
-# Temp directories (keep structure, ignore contents)
+# Intermediate trajectory processing files
+md_whole_*.xtc
+md_nopbcjump_*.xtc
+md_*.xtc
+md_*.gro
+!md_final_*.xtc
+!md_final_*.gro
+!md_*.tpr
+
+# Equilibration files
+nvt_*.gro
+nvt_*.xtc
+nvt_*.tpr
+nvt_*.cpt
+nvt_*.edr
+nvt_*.log
+npt_*.gro
+npt_*.xtc
+npt_*.tpr
+npt_*.cpt
+npt_*.edr
+npt_*.log
+
+# System setup intermediates
+box.gro
+solv.gro
+solv_ions.gro
+em.gro
+em.tpr
+em.edr
+em.log
+em.trr
+ions.tpr
+
+# Covariance analysis intermediates
+md_final_covar_*.xtc
+covar_*.trr
+covar_*.xvg
+avg_covar*.pdb
+covar_matrix_*.dat
+covar.log
+# Note: Other *.xvg files are required and should NOT be ignored
+
+# PropKa output
+*.pka
+
+# MD run logs (except sconf logs which are kept)
+md_*.log
+md_*.edr
+!sconf_*.log
+
+# Checkpoint files (can be regenerated)
+*.cpt
+
+# Temporary MDP files created in work dir
+nvt_*.mdp
+npt_*.mdp
+md_*.mdp
+mdout.mdp
+ions.mdp
+em.mdp
+
+# Topology include files (generated during pdb2gmx)
+posre_*.itp
+topol_*.itp
+
+# Custom simulation time files (when simulation_time != 100)
+md_*_*.gro
+md_*_*.xtc
+md_*_*.tpr
+!md_final_*.gro
+!md_final_*.xtc
+
+# Other intermediate files
+hbond.ndx
+
+# Temp directories (keep structure, ignore intermediate contents)
+# Note: Global patterns above already handle most intermediate files
+# These patterns ensure required files in temp directories are tracked
 **/temp/*
 !**/temp/.gitkeep
+# Required files that should be tracked in temp directories
+!**/temp/*.csv
+!**/temp/*.pkl
+!**/temp/*.np
+!**/temp/*.pdb
+!**/temp/*.gro
+!**/temp/*.top
+!**/temp/*.ndx
+!**/temp/sconf_*.log
+# Required trajectory files (explicit patterns to ensure they're tracked)
+!**/temp/md_final_*.xtc
+!**/temp/md_final_*.gro
+!**/temp/md_*.tpr
+!**/temp/processed.gro
+# Required descriptor files (xvg files, but exclude intermediate ones)
+!**/temp/*.xvg
+**/temp/covar_*.xvg
+**/temp/charge_*.xvg
+**/temp/field_*.xvg
+
+# Run data directories (keep structure, ignore intermediate contents)
+**/run_data/**/temp/*
+!**/run_data/**/temp/.gitkeep
+**/run_data/**/logs/*
+!**/run_data/**/logs/.gitkeep
