@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:27 2025
+# This file was created Thu Nov 27 20:58:24 2025
 # Created by:
 #                 :-) GROMACS - gmx dipoles, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx dipoles -f md_final_400.xtc -s md_400.tpr -o dipole_400.xvg -n index.ndx
 # gmx dipoles is part of G R O M A C S:
 #
-# Giant Rising Ordinary Mutants for A Clerical Setup
+# GRowing Old MAkes el Chrono Sweat
 #
 @    title "Epsilon and Kirkwood factors"
 @    xaxis  label "Time (ps)"

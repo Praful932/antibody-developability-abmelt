@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:26 2025
+# This file was created Thu Nov 27 20:58:23 2025
 # Created by:
 #                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl3_400.xvg -oc charge_cdrl3_400.xvg -of field_cdrl3_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GRoups of Organic Molecules in ACtion for Science
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Charge Distribution"
 @    xaxis  label "Average coordinate (nm)"

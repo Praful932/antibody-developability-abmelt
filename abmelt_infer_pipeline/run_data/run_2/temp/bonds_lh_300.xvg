@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:09 2025
+# This file was created Thu Nov 27 20:58:05 2025
 # Created by:
 #                  :-) GROMACS - gmx hbond, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx hbond -f md_final_300.xtc -s md_300.tpr -num bonds_lh_300.xvg -n index.ndx
 # gmx hbond is part of G R O M A C S:
 #
-# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
+# Grunge ROck MAChoS
 #
 @    title "Number of hydrogen bonds"
 @    xaxis  label "Time (ps)"

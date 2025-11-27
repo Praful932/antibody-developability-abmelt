@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:22 2025
+# This file was created Thu Nov 27 20:58:19 2025
 # Created by:
 #              :-) GROMACS - gmx hbond-legacy, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx hbond-legacy -f md_final_400.xtc -s md_400.tpr -num bonds_400.xvg
 # gmx hbond-legacy is part of G R O M A C S:
 #
-# Getting the Right Output Means no Artefacts in Calculating Stuff
+# Gromacs Runs On Most of All Computer Systems
 #
 @    title "Hydrogen Bonds"
 @    xaxis  label "Time (ps)"

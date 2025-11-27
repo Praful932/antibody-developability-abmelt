@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:19 2025
+# This file was created Thu Nov 27 20:58:15 2025
 # Created by:
 #                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl2_350.xvg -oc charge_cdrl2_350.xvg -of field_cdrl2_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Giant Rising Ordinary Mutants for A Clerical Setup
+# GROningen Mixture of Alchemy and Childrens' Stories
 #
 @    title "Electric Field"
 @    xaxis  label "Average coordinate (nm)"

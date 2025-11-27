@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:26 2025
+# This file was created Thu Nov 27 20:58:23 2025
 # Created by:
 #                  :-) GROMACS - gmx covar, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_400.xtc -s md_400.tpr -n index.ndx -o covar_400.xvg -av avg_covar400.pdb -ascii covar_matrix_400.dat -v covar_400.trr
 # gmx covar is part of G R O M A C S:
 #
-# GRoups of Organic Molecules in ACtion for Science
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:15 2025
+# This file was created Thu Nov 27 20:58:11 2025
 # Created by:
 #              :-) GROMACS - gmx hbond-legacy, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx hbond-legacy -f md_final_350.xtc -s md_350.tpr -num bonds_350.xvg
 # gmx hbond-legacy is part of G R O M A C S:
 #
-# Guyana Rwanda Oman Macau Angola Cameroon Senegal
+# GROningen MAchine for Chemical Simulation
 #
 @    title "Hydrogen Bonds"
 @    xaxis  label "Time (ps)"

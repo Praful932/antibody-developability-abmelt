@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:08 2025
+# This file was created Thu Nov 27 20:58:04 2025
 # Created by:
 #                  :-) GROMACS - gmx sasa, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx sasa -f md_final_300.xtc -s md_final_300.gro -o sasa_cdrh3_300.xvg -n index.ndx
 # gmx sasa is part of G R O M A C S:
 #
-# S  C  A  M  O  R  G
+# Green Red Orange Magenta Azure Cyan Skyblue
 #
 @    title "Solvent Accessible Surface"
 @    xaxis  label "Time (ps)"

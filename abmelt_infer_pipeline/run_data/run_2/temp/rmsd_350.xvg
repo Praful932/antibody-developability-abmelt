@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:15 2025
+# This file was created Thu Nov 27 20:58:11 2025
 # Created by:
 #                   :-) GROMACS - gmx rms, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx rms -f md_final_350.xtc -s md_final_350.gro -o rmsd_350.xvg
 # gmx rms is part of G R O M A C S:
 #
-# Guyana Rwanda Oman Macau Angola Cameroon Senegal
+# GROningen MAchine for Chemical Simulation
 #
 @    title "RMSD"
 @    xaxis  label "Time (ps)"

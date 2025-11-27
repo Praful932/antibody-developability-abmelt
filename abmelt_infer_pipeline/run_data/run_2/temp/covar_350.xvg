@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:18 2025
+# This file was created Thu Nov 27 20:58:15 2025
 # Created by:
 #                  :-) GROMACS - gmx covar, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_350.xtc -s md_350.tpr -n index.ndx -o covar_350.xvg -av avg_covar350.pdb -ascii covar_matrix_350.dat -v covar_350.trr
 # gmx covar is part of G R O M A C S:
 #
-# Great Red Owns Many ACres of Sand 
+# GROningen Mixture of Alchemy and Childrens' Stories
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

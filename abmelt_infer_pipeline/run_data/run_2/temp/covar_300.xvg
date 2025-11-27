@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:11 2025
+# This file was created Thu Nov 27 20:58:07 2025
 # Created by:
 #                  :-) GROMACS - gmx covar, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx covar -f md_final_covar_300.xtc -s md_300.tpr -n index.ndx -o covar_300.xvg -av avg_covar300.pdb -ascii covar_matrix_300.dat -v covar_300.trr
 # gmx covar is part of G R O M A C S:
 #
-# Grunge ROck MAChoS
+# GROwing Monsters And Cloning Shrimps
 #
 @    title "Eigenvalues of the covariance matrix"
 @    xaxis  label "Eigenvector index"

@@ -11,6 +11,7 @@ from structure_prep import prepare_structure, load_existing_structure_files
 from md_simulation import run_md_simulation, load_existing_simulation_results
 from compute_descriptors import compute_descriptors, load_existing_descriptors
 from model_inference import run_model_inference, load_existing_predictions
+from cleanup_temp_files import cleanup_temp_directory
 
 def main():
     # Parse command line arguments
@@ -239,7 +240,6 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
         # Step 4: Model inference
         if skip_inference:
             logging.info("Step 4: Loading existing model predictions...")
-            from pathlib import Path
             work_dir = Path(descriptor_result['work_dir'])
             inference_result = load_existing_predictions(work_dir, antibody['name'])
             logging.info("Model predictions loaded successfully")
@@ -255,6 +255,25 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
                 logging.info(f"  {model_name}: {pred[0]:.3f}")
             else:
                 logging.info(f"  {model_name}: FAILED")
+        
+        # Cleanup intermediate files if configured
+        cleanup_config = config.get("performance", {})
+        if cleanup_config.get("cleanup_temp", False):
+            cleanup_after = cleanup_config.get("cleanup_after", "inference")
+            if cleanup_after == "inference":
+                logging.info("Cleaning up intermediate files...")
+                try:
+                    temperatures = [str(t) for t in config["simulation"]["temperatures"]]
+                    cleanup_stats = cleanup_temp_directory(
+                        work_dir=Path(descriptor_result['work_dir']),
+                        antibody_name=antibody['name'],
+                        temperatures=temperatures,
+                        dry_run=False,
+                        keep_order_params=not cleanup_config.get("delete_order_params", False)
+                    )
+                    logging.info(f"Cleanup completed: deleted {cleanup_stats.get('deleted', 0)} files")
+                except Exception as e:
+                    logging.warning(f"Cleanup failed (non-fatal): {e}")
         
         result = {
             "status": "success",

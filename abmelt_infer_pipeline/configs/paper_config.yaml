@@ -49,5 +49,7 @@ descriptors:
 # Performance
 performance:
   parallel_jobs: 4               # Number of parallel jobs (future use)
+  cleanup_after: "inference"      # When to cleanup: "descriptors" (after descriptor computation) or "inference" (after predictions)
+  delete_order_params: false     # If true, also delete order parameter CSV files (default: keep them for debugging)
   cleanup_temp: true             # Clean up temporary files after completion
   save_trajectories: false       # Save MD trajectories (large files)

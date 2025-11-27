@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:17 2025
+# This file was created Thu Nov 27 20:58:13 2025
 # Created by:
 #                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx gyrate -f md_final_350.xtc -s md_final_350.gro -o gyr_cdrh1_350.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Good gRace! Old Maple Actually Chews Slate
+# Great Red Owns Many ACres of Sand 
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"

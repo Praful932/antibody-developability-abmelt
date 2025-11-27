@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:12 2025
+# This file was created Thu Nov 27 20:58:08 2025
 # Created by:
 #                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrh1_300.xvg -oc charge_cdrh1_300.xvg -of field_cdrh1_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Great Red Oystrich Makes All Chemists Sane
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"

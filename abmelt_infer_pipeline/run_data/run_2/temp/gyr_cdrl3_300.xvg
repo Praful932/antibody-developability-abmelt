@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:10 2025
+# This file was created Thu Nov 27 20:58:05 2025
 # Created by:
 #                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx gyrate -f md_final_300.xtc -s md_final_300.gro -o gyr_cdrl3_300.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Glycine aRginine prOline Methionine Alanine Cystine Serine
+# Grunge ROck MAChoS
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"

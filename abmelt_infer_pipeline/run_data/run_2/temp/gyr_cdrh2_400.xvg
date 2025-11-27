@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:24 2025
+# This file was created Thu Nov 27 20:58:21 2025
 # Created by:
 #                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx gyrate -f md_final_400.xtc -s md_final_400.gro -o gyr_cdrh2_400.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
+# Gravel Rubs Often Many Awfully Cauterized Sores
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"

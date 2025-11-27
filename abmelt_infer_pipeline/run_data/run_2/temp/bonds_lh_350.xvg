@@ -1,4 +1,4 @@
-# This file was created Wed Nov 26 21:33:16 2025
+# This file was created Thu Nov 27 20:58:13 2025
 # Created by:
 #                  :-) GROMACS - gmx hbond, 2025.3-Homebrew (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx hbond -f md_final_350.xtc -s md_350.tpr -num bonds_lh_350.xvg -n index.ndx
 # gmx hbond is part of G R O M A C S:
 #
-# GROningen Mixture of Alchemy and Childrens' Stories
+# Great Red Owns Many ACres of Sand 
 #
 @    title "Number of hydrogen bonds"
 @    xaxis  label "Time (ps)"
