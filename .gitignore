@@ -205,3 +205,32 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ===========================================
+# Editor backup/autosave files
+# ===========================================
+# Emacs
+\#*\#
+*~
+.\#*
+
+# Vim
+*.swp
+*.swo
+*~
+
+# ===========================================
+# Simulation temp/intermediate files
+# ===========================================
+# GROMACS backups
+\#*.xvg.*\#
+\#*.pdb.*\#
+\#*.gro.*\#
+\#*.trr.*\#
+\#*.xtc.*\#
+\#*.dat.*\#
+\#*.ndx.*\#
+
+# Temp directories (keep structure, ignore contents)
+**/temp/*
+!**/temp/.gitkeep
