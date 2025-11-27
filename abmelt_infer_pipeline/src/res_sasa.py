@@ -2,7 +2,7 @@
 
 #    MIT License
 
-#    COPYRIGHT (C) 2024 MERCK SHARP & DOHME CORP. A SUBSIDIARY OF MERCK & CO., 
+#    COPYRIGHT (C) 2024 MERCK SHARP & DOHME CORP. A SUBSIDIARY OF MERCK & CO.,
 #    INC., RAHWAY, NJ, USA. ALL RIGHTS RESERVED
 
 #    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -23,40 +23,45 @@
 #    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #    SOFTWARE.
 
-import numpy as np
-import os
-import pandas as pd
+
 import mdtraj as md
+import numpy as np
 from sklearn.linear_model import LinearRegression as reg
+
 
 def core_surface(temp):
     temp = str(temp)
-    topology = 'md_final_' + temp + '.gro'
-    trajectory = 'md_final_' + temp + '.xtc'
-    traj = md.load_xtc(trajectory, top= topology)
-    sasa = md.shrake_rupley(traj, mode = 'residue')
-    np.savetxt(fname = 'res_sasa_{}.np'.format(temp), X = sasa, fmt = '%d')
+    topology = "md_final_" + temp + ".gro"
+    trajectory = "md_final_" + temp + ".xtc"
+    traj = md.load_xtc(trajectory, top=topology)
+    sasa = md.shrake_rupley(traj, mode="residue")
+    np.savetxt(fname=f"res_sasa_{temp}.np", X=sasa, fmt="%d")
 
-def get_core_surface(sasa_dict, temp, k = 20, start = 20):
-    data = np.loadtxt('res_sasa_{}.np'.format(temp))
+
+def get_core_surface(sasa_dict, temp, k=20, start=20):
+    data = np.loadtxt(f"res_sasa_{temp}.np")
     traj_length = data.shape[0]
-    traj_length = int(round(traj_length/100, 0))
-    per_res = data[0,:]
+    traj_length = int(round(traj_length / 100, 0))
+    per_res = data[0, :]
     # highest 20 & lowest 20 SASA residues are considered surface and core residues, respectively
-    ns = traj_length - start # last (traj_length - start) ns of trajectory
-    core = np.mean(data[:-ns*100,np.argpartition(per_res, k)[:k]], axis = 0)
-    surface = np.mean(data[:-ns*100,np.argpartition(per_res, -k)[-k:]], axis = 0)
-    total = np.mean(data[:-ns*100,:], axis = 1)
-    sasa_dict[temp]['total_mean'] = np.mean(total)
-    sasa_dict[temp]['core_mean'] = np.mean(core)
-    sasa_dict[temp]['surface_mean'] = np.mean(surface)
-    sasa_dict[temp]['total_std'] = np.std(total)
-    sasa_dict[temp]['core_std'] = np.std(core)
-    sasa_dict[temp]['surface_std'] = np.std(surface)
+    ns = traj_length - start  # last (traj_length - start) ns of trajectory
+    core = np.mean(data[: -ns * 100, np.argpartition(per_res, k)[:k]], axis=0)
+    surface = np.mean(data[: -ns * 100, np.argpartition(per_res, -k)[-k:]], axis=0)
+    total = np.mean(data[: -ns * 100, :], axis=1)
+    sasa_dict[temp]["total_mean"] = np.mean(total)
+    sasa_dict[temp]["core_mean"] = np.mean(core)
+    sasa_dict[temp]["surface_mean"] = np.mean(surface)
+    sasa_dict[temp]["total_std"] = np.std(total)
+    sasa_dict[temp]["core_std"] = np.std(core)
+    sasa_dict[temp]["surface_std"] = np.std(surface)
     return sasa_dict
+
 
 def get_slope(data):
     lin_reg = reg()
-    x, y = np.array([np.log(xy[0]) for xy in data]).reshape(-1,1) ,[xy[1] for xy in data]
-    lin_reg.fit(x,y)
+    x, y = (
+        np.array([np.log(xy[0]) for xy in data]).reshape(-1, 1),
+        [xy[1] for xy in data],
+    )
+    lin_reg.fit(x, y)
     return lin_reg.coef_[0]
