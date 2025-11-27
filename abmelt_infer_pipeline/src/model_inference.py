@@ -8,6 +8,7 @@ Loads trained models and makes predictions on computed descriptors.
 import logging
 import warnings
 from pathlib import Path
+from typing import Any
 
 import joblib
 import numpy as np
@@ -23,7 +24,7 @@ class AbMeltPredictor:
     Predictor class that loads trained models and makes predictions.
     """
 
-    def __init__(self, models_dir: Path = None):
+    def __init__(self, models_dir: Path | None = None):
         """
         Initialize the predictor with model directory.
 
@@ -66,12 +67,12 @@ class AbMeltPredictor:
         }
 
         # Loaded models cache
-        self.loaded_models = {}
+        self.loaded_models: dict[str, Any] = {}
 
         # Validate model files exist
         self._validate_models()
 
-    def _validate_models(self):
+    def _validate_models(self) -> None:
         """Validate that all model files exist."""
         missing_models = []
         for model_name, model_path in self.model_paths.items():
@@ -85,7 +86,7 @@ class AbMeltPredictor:
 
         logger.info(f"Validated {len(self.model_paths)} model files")
 
-    def load_model(self, model_name: str):
+    def load_model(self, model_name: str) -> Any:
         """
         Load a trained model from disk.
 
@@ -176,9 +177,9 @@ class AbMeltPredictor:
 
         logger.info(f"Prediction completed: {predictions}")
 
-        return predictions
+        return np.asarray(predictions)
 
-    def predict_all(self, descriptors_df: pd.DataFrame) -> dict[str, np.ndarray]:
+    def predict_all(self, descriptors_df: pd.DataFrame) -> dict[str, np.ndarray | None]:
         """
         Make predictions using all three models.
 
@@ -190,7 +191,7 @@ class AbMeltPredictor:
         """
         logger.info("Making predictions with all models...")
 
-        predictions = {}
+        predictions: dict[str, np.ndarray | None] = {}
         for model_name in ["tagg", "tm", "tmon"]:
             try:
                 pred = self.predict(descriptors_df, model_name)
@@ -254,7 +255,7 @@ def run_model_inference(descriptor_result: dict, config: dict) -> dict:
 
 
 def _format_predictions(
-    predictions: dict[str, np.ndarray], antibody_name: str
+    predictions: dict[str, np.ndarray | None], antibody_name: str
 ) -> pd.DataFrame:
     """
     Format predictions into a readable DataFrame.
@@ -278,10 +279,12 @@ def _format_predictions(
             # Convert from standardized/scaled value to actual temperature
             # Note: These are still relative values unless you have the original scaling
             target_name = target_names.get(model_name, model_name)
-            results_data[target_name] = [float(pred[0]) if len(pred) > 0 else None]
+            results_data[target_name] = [
+                str(float(pred[0])) if len(pred) > 0 else "N/A"
+            ]
         else:
             target_name = target_names.get(model_name, model_name)
-            results_data[target_name] = [None]
+            results_data[target_name] = ["N/A"]
 
     results_df = pd.DataFrame(results_data)
 
@@ -291,7 +294,9 @@ def _format_predictions(
     return results_df
 
 
-def _save_predictions(results: pd.DataFrame, work_dir: Path, antibody_name: str):
+def _save_predictions(
+    results: pd.DataFrame, work_dir: Path, antibody_name: str
+) -> None:
     """
     Save predictions to files.
 

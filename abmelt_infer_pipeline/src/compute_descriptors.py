@@ -9,6 +9,7 @@ import glob
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -386,7 +387,7 @@ def _compute_order_parameters(
 
     for block_length in block_lengths:
         logger.info(f"Computing order parameters for block_length={block_length}ns...")
-        master_s2_dict = {int(temp): {} for temp in temps}
+        master_s2_dict: dict[int, dict[Any, Any]] = {int(temp): {} for temp in temps}
 
         for temp in temps:
             logger.info(f"  Computing S² for {temp}K, block={block_length}ns...")
@@ -432,7 +433,7 @@ def _compute_core_surface_sasa(
     Returns:
         Dictionary with SASA statistics per temperature
     """
-    sasa_dict = {}
+    sasa_dict: dict[str, dict[str, Any]] = {}
 
     for temp in temps:
         logger.info(f"Computing core/surface SASA for {temp}K...")
@@ -463,7 +464,7 @@ def _compute_lambda_features(
     temps: list[str],
     eq_time: int,
     antibody_name: str,
-) -> dict[float, tuple[dict, dict]]:
+) -> dict[float, tuple[dict[Any, Any] | None, dict[Any, Any] | None]]:
     """
     Compute multi-temperature lambda (order parameter slope) for each block length.
 
@@ -477,7 +478,9 @@ def _compute_lambda_features(
         Dictionary mapping block_length to tuple of (lambda_dict, r_dict) - lambda values and correlation coefficients per residue
     """
     temp_ints = [int(t) for t in temps]
-    all_lambda_features = {}
+    all_lambda_features: dict[
+        float, tuple[dict[Any, Any] | None, dict[Any, Any] | None]
+    ] = {}
 
     for block_length, master_s2_dict in master_s2_dicts.items():
         logger.info(f"Computing lambda features for block_length={block_length}ns...")
@@ -525,9 +528,12 @@ def _aggregate_descriptors_to_dataframe(
     temps: list[str],
     antibody_name: str,
     eq_time: int,
-    master_s2_dicts: dict[float, dict[int, dict]],
-    all_lambda_features: dict[float, tuple[dict, dict]],
-    sasa_dict: dict,
+    master_s2_dicts: dict[float, dict[int, dict[Any, Any]]],
+    all_lambda_features: dict[
+        float, tuple[dict[Any, Any] | None, dict[Any, Any] | None]
+    ]
+    | None,
+    sasa_dict: dict[str, dict[str, Any]],
     core_surface_k: int,
 ) -> pd.DataFrame:
     """

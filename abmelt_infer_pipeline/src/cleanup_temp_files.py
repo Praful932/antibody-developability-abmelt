@@ -189,7 +189,7 @@ def get_intermediate_files(work_dir: Path, temperatures: list[str]) -> set[str]:
     Returns:
         Set of intermediate file paths (absolute)
     """
-    intermediate = set()
+    intermediate: set[str] = set()
 
     # Convert patterns to actual file matches
     for pattern in INTERMEDIATE_PATTERNS:
@@ -319,7 +319,7 @@ def cleanup_temp_directory(
     return stats
 
 
-def main():
+def main() -> None:
     """CLI entry point for cleanup utility."""
     import argparse
 
