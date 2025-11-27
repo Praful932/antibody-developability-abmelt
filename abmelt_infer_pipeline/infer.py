@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -15,7 +16,7 @@ from model_inference import load_existing_predictions, run_model_inference
 from structure_prep import load_existing_structure_files, prepare_structure
 
 
-def main():
+def main() -> dict[str, Any]:
     # Parse command line arguments
     parser = argparse.ArgumentParser(description="AbMelt Inference Pipeline")
 
@@ -38,7 +39,9 @@ def main():
     parser.add_argument(
         "--name", type=str, default="antibody", help="Antibody name/identifier"
     )
-    parser.add_argument("--config", type=str, help="Configuration file path")
+    parser.add_argument(
+        "--config", type=str, required=True, help="Configuration file path (required)"
+    )
     parser.add_argument(
         "--output", type=str, default="results", help="Output directory"
     )
@@ -137,17 +140,17 @@ def main():
     return result
 
 
-def load_config(config_path: str) -> dict:
+def load_config(config_path: str) -> dict[str, Any]:
     """Load configuration from YAML file."""
     try:
         with open(config_path) as f:
-            config = yaml.safe_load(f)
+            config: dict[str, Any] = yaml.safe_load(f)
         return config
     except Exception as e:
         raise Exception(f"Failed to load config: {e}") from e
 
 
-def setup_logging(config: dict):
+def setup_logging(config: dict[str, Any]) -> None:
     """Setup logging configuration."""
     log_level = getattr(logging, config["logging"]["level"].upper())
     log_file = config["logging"]["file"]
@@ -162,7 +165,7 @@ def setup_logging(config: dict):
     )
 
 
-def create_directories(config: dict):
+def create_directories(config: dict[str, Any]) -> None:
     """Create necessary directories."""
     script_directory = Path(__file__).parent.resolve()
     config["paths"]["output_dir"] = (
@@ -186,13 +189,13 @@ def create_directories(config: dict):
 
 
 def run_inference_pipeline(
-    antibody,
-    config,
-    skip_structure=False,
-    skip_md=False,
-    skip_descriptors=False,
-    skip_inference=False,
-):
+    antibody: dict[str, Any],
+    config: dict[str, Any],
+    skip_structure: bool = False,
+    skip_md: bool = False,
+    skip_descriptors: bool = False,
+    skip_inference: bool = False,
+) -> dict[str, Any]:
     """
     Run the complete inference pipeline.
 

@@ -9,8 +9,8 @@ import logging
 import sys
 from pathlib import Path
 
-# Add src to path for imports
-sys.path.append(str(Path(__file__).parent / "src"))
+# Add src to path for imports (go up from tests/ to abmelt_infer_pipeline/, then into src/)
+sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")

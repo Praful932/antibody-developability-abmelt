@@ -14,8 +14,8 @@ def test_imports() -> bool:
     print("Testing imports...")
 
     try:
-        # Add src to path
-        sys.path.append(str(Path(__file__).parent / "src"))
+        # Add src to path (go up from tests/ to abmelt_infer_pipeline/, then into src/)
+        sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
         # Test BioPython
         from Bio.PDB import PDBParser  # noqa: F401
