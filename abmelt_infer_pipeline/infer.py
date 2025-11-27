@@ -12,6 +12,7 @@ from md_simulation import run_md_simulation, load_existing_simulation_results
 from compute_descriptors import compute_descriptors, load_existing_descriptors
 from model_inference import run_model_inference, load_existing_predictions
 from cleanup_temp_files import cleanup_temp_directory
+from reporting import save_benchmark_report
 
 def main():
     # Parse command line arguments
@@ -98,6 +99,18 @@ def main():
         print(f"  MD simulations completed at temperatures: {list(result['simulation_result']['trajectory_files'].keys())}")
         for temp, files in result['simulation_result']['trajectory_files'].items():
             print(f"    {temp}K: {files['final_xtc']}")
+
+        if 'timings' in result['simulation_result']:
+            print(f"\n=== MD BENCHMARK ===")
+            timings = result['simulation_result']['timings']
+            if 'simulation_total' in timings:
+                print(f"  Total MD Simulation Time: {timings['simulation_total']:.2f} s")
+            if 'simulation_details' in timings:
+                for temp, details in timings['simulation_details'].items():
+                    print(f"  Temperature {temp}K:")
+                    print(f"    NVT: {details.get('nvt', 0):.2f} s")
+                    print(f"    NPT: {details.get('npt', 0):.2f} s")
+                    print(f"    Production MD: {details.get('md', 0):.2f} s")
     
     if 'descriptor_result' in result:
         print(f"  Descriptors computed: {result['descriptor_result']['descriptors_df'].shape[1]} features")
@@ -275,6 +288,10 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
                 except Exception as e:
                     logging.warning(f"Cleanup failed (non-fatal): {e}")
         
+        # Save benchmark report if MD simulation was run
+        if not skip_md and 'timings' in simulation_result:
+            save_benchmark_report(antibody, config, simulation_result)
+
         result = {
             "status": "success",
             "structure_files": structure_files,

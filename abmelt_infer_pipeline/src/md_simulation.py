@@ -7,6 +7,7 @@ Handles GROMACS preprocessing, system setup, and multi-temperature MD simulation
 
 import os
 import sys
+import time
 import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -89,27 +90,41 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
                     logger.warning(f"Base MDP file not found: {src_file}")
 
         
+        # Timing dictionary to store duration of each step
+        timings = {}
+
         # Step 1: GROMACS preprocessing
         logger.info("Step 1: GROMACS preprocessing...")
+        start_time = time.time()
         gromacs_files = _preprocess_for_gromacs(pdb_filename, pdb_filepath, config)
+        timings["preprocessing"] = time.time() - start_time
         
         # Step 2: System setup
         logger.info("Step 2: Setting up simulation system...")
+        start_time = time.time()
         system_files = _setup_simulation_system(gromacs_files, config)
+        timings["system_setup"] = time.time() - start_time
         
         # Step 3: Multi-temperature MD simulations
         logger.info("Step 3: Running multi-temperature MD simulations...")
-        trajectory_files = _run_multi_temp_simulations(system_files, config)
+        start_time = time.time()
+        simulation_result = _run_multi_temp_simulations(system_files, config)
+        trajectory_files = simulation_result["trajectory_files"]
+        timings["simulation_total"] = time.time() - start_time
+        timings["simulation_details"] = simulation_result["timings"]
         
         # Step 4: Process trajectories
         logger.info("Step 4: Processing trajectories...")
+        start_time = time.time()
         processed_trajectories = _process_trajectories(trajectory_files, config)
+        timings["postprocessing"] = time.time() - start_time
         
         result = {
             "status": "success",
             "trajectory_files": processed_trajectories,
             "work_dir": str(work_dir),
-            "message": "MD simulations completed successfully"
+            "message": "MD simulations completed successfully",
+            "timings": timings
         }
         
         logger.info("MD simulation workflow completed successfully")
@@ -295,7 +310,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
     }
 
 
-def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> Dict[str, str]:
+def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> Dict[str, Dict]:
     """
     Run multi-temperature MD simulations.
     
@@ -304,7 +319,7 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
         config: Configuration dictionary
         
     Returns:
-        Dictionary containing trajectory files
+        Dictionary containing trajectory files and timing information
     """
     logger.info("Running multi-temperature MD simulations...")
     
@@ -324,6 +339,7 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     temps = [str(temp) for temp in temperatures]
     
     trajectory_files = {}
+    timings = {}
 
     for temp in temps:
         logger.info(f"Running simulation at {temp}K...")
@@ -331,23 +347,32 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
         try:
             # Required temp files are already created
             # Use pre-installed temperature files
-            trajectory_files[temp] = _run_preinstalled_temp_simulation(
+            sim_result = _run_preinstalled_temp_simulation(
                 temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
             )
+
+            # Extract timing and file info
+            timings[temp] = sim_result.pop("timings", {})
+            trajectory_files[temp] = sim_result
 
             # if temp in avail_temps:
             
             # else:
             #     # Create custom temperature files
-            #     trajectory_files[temp] = _run_custom_temp_simulation(
+            #     sim_result = _run_custom_temp_simulation(
             #         temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
             #     )
+            #     timings[temp] = sim_result.pop("timings", {})
+            #     trajectory_files[temp] = sim_result
                 
         except Exception as e:
             logger.error(f"Simulation failed at {temp}K: {e}")
             raise
     
-    return trajectory_files
+    return {
+        "trajectory_files": trajectory_files,
+        "timings": timings
+    }
 
 
 def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str], 
@@ -356,6 +381,9 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     """Run simulation using pre-installed temperature files."""
 
     
+    # Timing dictionary
+    timings = {}
+
     # Get MDP templates
     nvt = gromacs.config.get_templates('nvt_' + temp + '.mdp')
     npt = gromacs.config.get_templates('npt_' + temp + '.mdp')
@@ -363,6 +391,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     
     # NVT equilibration
     logger.info(f"Running NVT equilibration at {temp}K...")
+    start_time = time.time()
     gromacs.grompp(
         f=nvt[0],
         o='nvt_' + temp + '.tpr',
@@ -383,9 +412,11 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
         )
     else:
         gromacs.mdrun(deffnm='nvt_' + temp, ntomp=str(n_threads))
+    timings["nvt"] = time.time() - start_time
     
     # NPT equilibration
     logger.info(f"Running NPT equilibration at {temp}K...")
+    start_time = time.time()
     gromacs.grompp(
         f=npt[0],
         o='npt_' + temp + '.tpr',
@@ -408,9 +439,11 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
         )
     else:
         gromacs.mdrun(deffnm='npt_' + temp, ntomp=str(n_threads))
+    timings["npt"] = time.time() - start_time
     
     # Production MD
     logger.info(f"Running production MD at {temp}K...")
+    start_time = time.time()
     if simulation_time == 100:
         gromacs.grompp(
             f=md[0],
@@ -460,11 +493,20 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             )
         else:
             gromacs.mdrun(deffnm='md_' + temp + '_' + str(simulation_time), ntomp=str(n_threads))
+    timings["md"] = time.time() - start_time
     
+    # Determine log file name based on simulation time
+    if simulation_time == 100:
+        log_file = f"md_{temp}.log"
+    else:
+        log_file = f"md_{temp}_{simulation_time}.log"
+
     return {
         "tpr_file": f"md_{temp}.tpr",
         "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro"
+        "gro_file": f"md_{temp}.gro",
+        "log_file": log_file,
+        "timings": timings
     }
 
 
@@ -473,6 +515,9 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
                               n_threads: int, gpu_id: int) -> Dict[str, str]:
     """Run simulation with custom temperature by modifying MDP files."""    
     
+    # Timing dictionary
+    timings = {}
+
     # Create custom MDP files
     nvt_mdp = 'nvt_' + temp + '.mdp'
     npt_mdp = 'npt_' + temp + '.mdp'
@@ -490,6 +535,7 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
     
     # Run simulations (similar to preinstalled but with custom MDPs)
     # NVT
+    start_time = time.time()
     gromacs.grompp(
         f=new_nvt[0],
         o='nvt_' + temp + '.tpr',
@@ -510,8 +556,10 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
         )
     else:
         gromacs.mdrun(deffnm='nvt_' + temp, ntomp=str(n_threads))
+    timings["nvt"] = time.time() - start_time
     
     # NPT
+    start_time = time.time()
     gromacs.grompp(
         f=new_npt[0],
         o='npt_' + temp + '.tpr',
@@ -534,8 +582,10 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
         )
     else:
         gromacs.mdrun(deffnm='npt_' + temp, ntomp=str(n_threads))
+    timings["npt"] = time.time() - start_time
     
     # Production MD
+    start_time = time.time()
     if simulation_time == 100:
         gromacs.grompp(
             f=new_md[0],
@@ -584,11 +634,20 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
             )
         else:
             gromacs.mdrun(deffnm='md_' + temp + '_' + str(simulation_time), ntomp=str(n_threads))
+    timings["md"] = time.time() - start_time
     
+    # Determine log file name based on simulation time
+    if simulation_time == 100:
+        log_file = f"md_{temp}.log"
+    else:
+        log_file = f"md_{temp}_{simulation_time}.log"
+
     return {
         "tpr_file": f"md_{temp}.tpr",
         "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro"
+        "gro_file": f"md_{temp}.gro",
+        "log_file": log_file,
+        "timings": timings
     }
 
 
