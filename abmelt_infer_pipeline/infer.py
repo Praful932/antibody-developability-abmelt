@@ -12,6 +12,7 @@ from md_simulation import run_md_simulation, load_existing_simulation_results
 from compute_descriptors import compute_descriptors, load_existing_descriptors
 from model_inference import run_model_inference, load_existing_predictions
 from cleanup_temp_files import cleanup_temp_directory
+from timing import get_timing_report, reset_timing_report, time_step
 
 def main():
     # Parse command line arguments
@@ -43,6 +44,10 @@ def main():
     parser.add_argument('--skip-inference', action='store_true',
                        help='Skip model inference step (load existing predictions)')
     
+    # Timing options
+    parser.add_argument('--timing-report', type=str, metavar='PATH',
+                       help='Save timing report to JSON file (also prints summary to console)')
+    
     args = parser.parse_args()
     
     # Validate arguments
@@ -57,6 +62,11 @@ def main():
     # 2. Setup logging and directories
     setup_logging(config)
     create_directories(config)
+
+    # Initialize timing report
+    reset_timing_report()
+    timing_report = get_timing_report()
+    timing_report.start()
 
     # 3. Create antibody input based on input type
     if args.pdb:
@@ -76,41 +86,57 @@ def main():
         }
     
     # 4. Run inference pipeline
-    result = run_inference_pipeline(
-        antibody, 
-        config,
-        skip_structure=args.skip_structure,
-        skip_md=args.skip_md,
-        skip_descriptors=args.skip_descriptors,
-        skip_inference=args.skip_inference
-    )
-    
-    print(f"Inference pipeline for {args.name}:")
-    print(f"  Status: {result['status']}")
-    print(f"  Message: {result['message']}")
-    print(f"  PDB file: {result['structure_files']['pdb_file']}")
-    print(f"  Work directory: {result['structure_files']['work_dir']}")
-    
-    if 'chains' in result['structure_files']:
-        print(f"  Chains found: {list(result['structure_files']['chains'].keys())}")
-    
-    if 'simulation_result' in result:
-        print(f"  MD simulations completed at temperatures: {list(result['simulation_result']['trajectory_files'].keys())}")
-        for temp, files in result['simulation_result']['trajectory_files'].items():
-            print(f"    {temp}K: {files['final_xtc']}")
-    
-    if 'descriptor_result' in result:
-        print(f"  Descriptors computed: {result['descriptor_result']['descriptors_df'].shape[1]} features")
-        print(f"  XVG files generated: {len(result['descriptor_result']['xvg_files'])}")
-    
-    if 'inference_result' in result:
-        print(f"\n=== PREDICTIONS ===")
-        predictions = result['inference_result']['predictions']
-        for model_name, pred in predictions.items():
-            if pred is not None:
-                print(f"  {model_name.upper()}: {pred[0]:.3f}")
-            else:
-                print(f"  {model_name.upper()}: FAILED")
+    try:
+        result = run_inference_pipeline(
+            antibody, 
+            config,
+            skip_structure=args.skip_structure,
+            skip_md=args.skip_md,
+            skip_descriptors=args.skip_descriptors,
+            skip_inference=args.skip_inference
+        )
+        
+        print(f"Inference pipeline for {args.name}:")
+        print(f"  Status: {result['status']}")
+        print(f"  Message: {result['message']}")
+        print(f"  PDB file: {result['structure_files']['pdb_file']}")
+        print(f"  Work directory: {result['structure_files']['work_dir']}")
+        
+        if 'chains' in result['structure_files']:
+            print(f"  Chains found: {list(result['structure_files']['chains'].keys())}")
+        
+        if 'simulation_result' in result:
+            print(f"  MD simulations completed at temperatures: {list(result['simulation_result']['trajectory_files'].keys())}")
+            for temp, files in result['simulation_result']['trajectory_files'].items():
+                print(f"    {temp}K: {files['final_xtc']}")
+        
+        if 'descriptor_result' in result:
+            print(f"  Descriptors computed: {result['descriptor_result']['descriptors_df'].shape[1]} features")
+            print(f"  XVG files generated: {len(result['descriptor_result']['xvg_files'])}")
+        
+        if 'inference_result' in result:
+            print(f"\n=== PREDICTIONS ===")
+            predictions = result['inference_result']['predictions']
+            for model_name, pred in predictions.items():
+                if pred is not None:
+                    print(f"  {model_name.upper()}: {pred[0]:.3f}")
+                else:
+                    print(f"  {model_name.upper()}: FAILED")
+        
+        # Add timing data to result
+        result['timing'] = timing_report.to_dict()
+        
+    finally:
+        # Stop timing - always runs even on exception
+        timing_report.stop()
+        
+        # Print timing report - always runs even on exception
+        print(timing_report.format_summary())
+        
+        # Save timing report if requested - always runs even on exception
+        if args.timing_report:
+            timing_report.save_json(args.timing_report)
+            print(f"\nTiming report saved to: {args.timing_report}")
     
     return result
     
@@ -188,14 +214,15 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
     
     try:
         # Step 1: Structure preparation
-        if skip_structure:
-            logging.info("Step 1: Loading existing structure files...")
-            structure_files = load_existing_structure_files(antibody, config)
-            logging.info("Structure files loaded successfully")
-        else:
-            logging.info("Step 1: Preparing structure...")
-            structure_files = prepare_structure(antibody, config)
-            logging.info("Structure preparation completed")
+        with time_step("Structure Preparation"):
+            if skip_structure:
+                logging.info("Step 1: Loading existing structure files...")
+                structure_files = load_existing_structure_files(antibody, config)
+                logging.info("Structure files loaded successfully")
+            else:
+                logging.info("Step 1: Preparing structure...")
+                structure_files = prepare_structure(antibody, config)
+                logging.info("Structure preparation completed")
         
         # Log structure files
         logging.info(f"Structure files:")
@@ -207,14 +234,15 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
             logging.info(f"  chains: {list(structure_files['chains'].keys())}")
         
         # Step 2: MD simulation
-        if skip_md:
-            logging.info("Step 2: Loading existing MD simulation results...")
-            simulation_result = load_existing_simulation_results(structure_files, config)
-            logging.info("MD simulation results loaded successfully")
-        else:
-            logging.info("Step 2: Running MD simulations...")
-            simulation_result = run_md_simulation(structure_files, config)
-            logging.info("MD simulations completed")
+        with time_step("MD Simulation"):
+            if skip_md:
+                logging.info("Step 2: Loading existing MD simulation results...")
+                simulation_result = load_existing_simulation_results(structure_files, config)
+                logging.info("MD simulation results loaded successfully")
+            else:
+                logging.info("Step 2: Running MD simulations...")
+                simulation_result = run_md_simulation(structure_files, config)
+                logging.info("MD simulations completed")
         
         # Log trajectory files
         logging.info(f"Trajectory files:")
@@ -222,14 +250,15 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
             logging.info(f"  {temp}K: {files['final_xtc']}")
         
         # Step 3: Descriptor computation
-        if skip_descriptors:
-            logging.info("Step 3: Loading existing descriptor computation results...")
-            descriptor_result = load_existing_descriptors(simulation_result, config)
-            logging.info("Descriptor computation results loaded successfully")
-        else:
-            logging.info("Step 3: Computing descriptors...")
-            descriptor_result = compute_descriptors(simulation_result, config)
-            logging.info("Descriptor computation completed")
+        with time_step("Descriptor Computation"):
+            if skip_descriptors:
+                logging.info("Step 3: Loading existing descriptor computation results...")
+                descriptor_result = load_existing_descriptors(simulation_result, config)
+                logging.info("Descriptor computation results loaded successfully")
+            else:
+                logging.info("Step 3: Computing descriptors...")
+                descriptor_result = compute_descriptors(simulation_result, config)
+                logging.info("Descriptor computation completed")
         
         # Log descriptor computation results
         logging.info(f"Descriptors:")
@@ -238,15 +267,16 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
         logging.info(f"  XVG files: {len(descriptor_result['xvg_files'])}")
         
         # Step 4: Model inference
-        if skip_inference:
-            logging.info("Step 4: Loading existing model predictions...")
-            work_dir = Path(descriptor_result['work_dir'])
-            inference_result = load_existing_predictions(work_dir, antibody['name'])
-            logging.info("Model predictions loaded successfully")
-        else:
-            logging.info("Step 4: Running model inference...")
-            inference_result = run_model_inference(descriptor_result, config)
-            logging.info("Model inference completed")
+        with time_step("Model Inference"):
+            if skip_inference:
+                logging.info("Step 4: Loading existing model predictions...")
+                work_dir = Path(descriptor_result['work_dir'])
+                inference_result = load_existing_predictions(work_dir, antibody['name'])
+                logging.info("Model predictions loaded successfully")
+            else:
+                logging.info("Step 4: Running model inference...")
+                inference_result = run_model_inference(descriptor_result, config)
+                logging.info("Model inference completed")
         
         # Log prediction results
         logging.info(f"Predictions:")

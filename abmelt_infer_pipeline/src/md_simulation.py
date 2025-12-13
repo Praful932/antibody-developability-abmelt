@@ -18,6 +18,7 @@ sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
 try:
     import gromacs
     from preprocess import protonation_state, canonical_index, edit_mdp
+    from timing import time_step
 except ImportError as e:
     logging.error(f"Failed to import required modules: {e}")
     raise
@@ -90,20 +91,24 @@ def run_md_simulation(structure_files: Dict[str, str], config: Dict) -> Dict[str
 
         
         # Step 1: GROMACS preprocessing
-        logger.info("Step 1: GROMACS preprocessing...")
-        gromacs_files = _preprocess_for_gromacs(pdb_filename, pdb_filepath, config)
+        with time_step("GROMACS Preprocessing", parent="MD Simulation"):
+            logger.info("Step 1: GROMACS preprocessing...")
+            gromacs_files = _preprocess_for_gromacs(pdb_filename, pdb_filepath, config)
         
         # Step 2: System setup
-        logger.info("Step 2: Setting up simulation system...")
-        system_files = _setup_simulation_system(gromacs_files, config)
+        with time_step("System Setup", parent="MD Simulation"):
+            logger.info("Step 2: Setting up simulation system...")
+            system_files = _setup_simulation_system(gromacs_files, config)
         
         # Step 3: Multi-temperature MD simulations
-        logger.info("Step 3: Running multi-temperature MD simulations...")
-        trajectory_files = _run_multi_temp_simulations(system_files, config)
+        with time_step("Multi-Temp Simulations", parent="MD Simulation"):
+            logger.info("Step 3: Running multi-temperature MD simulations...")
+            trajectory_files = _run_multi_temp_simulations(system_files, config)
         
         # Step 4: Process trajectories
-        logger.info("Step 4: Processing trajectories...")
-        processed_trajectories = _process_trajectories(trajectory_files, config)
+        with time_step("Trajectory Processing", parent="MD Simulation"):
+            logger.info("Step 4: Processing trajectories...")
+            processed_trajectories = _process_trajectories(trajectory_files, config)
         
         result = {
             "status": "success",

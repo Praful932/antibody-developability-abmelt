@@ -18,6 +18,7 @@ try:
     import gromacs
     from order_param import order_s2, avg_s2_blocks, get_lambda, order_lambda
     from res_sasa import core_surface, get_core_surface, get_slope
+    from timing import time_step
 except ImportError as e:
     logging.error(f"Failed to import required modules: {e}")
     raise
@@ -64,32 +65,37 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         logger.info(f"Changed to work directory: {work_dir}")
         
         # Step 1: Compute GROMACS-based descriptors
-        logger.info("Step 1: Computing GROMACS descriptors...")
-        xvg_files = _compute_gromacs_descriptors(work_dir, temps, eq_time)
-        logger.info(f"Generated {len(xvg_files)} GROMACS descriptor files")
+        with time_step("GROMACS Descriptors", parent="Descriptor Computation"):
+            logger.info("Step 1: Computing GROMACS descriptors...")
+            xvg_files = _compute_gromacs_descriptors(work_dir, temps, eq_time)
+            logger.info(f"Generated {len(xvg_files)} GROMACS descriptor files")
         
         # Step 2: Compute order parameters
-        logger.info("Step 2: Computing order parameters...")
-        master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name, use_dummy_s2)
+        with time_step("Order Parameters", parent="Descriptor Computation"):
+            logger.info("Step 2: Computing order parameters...")
+            master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name, use_dummy_s2)
         
         # Step 3: Compute core/surface SASA
-        logger.info("Step 3: Computing core/surface SASA...")
-        sasa_dict = _compute_core_surface_sasa(work_dir, temps, eq_time, core_surface_k)
+        with time_step("Core/Surface SASA", parent="Descriptor Computation"):
+            logger.info("Step 3: Computing core/surface SASA...")
+            sasa_dict = _compute_core_surface_sasa(work_dir, temps, eq_time, core_surface_k)
         
         # Step 4: Compute multi-temperature features (lambda)
-        if len(temps) >= 2 and compute_lambda:
-            logger.info("Step 4: Computing multi-temperature lambda...")
-            all_lambda_features = _compute_lambda_features(master_s2_dicts, temps, eq_time, antibody_name)
-        else:
-            logger.warning(f"Skipping lambda computation: need >=2 temperatures, got {len(temps)}")
-            all_lambda_features = None
+        with time_step("Lambda Features", parent="Descriptor Computation"):
+            if len(temps) >= 2 and compute_lambda:
+                logger.info("Step 4: Computing multi-temperature lambda...")
+                all_lambda_features = _compute_lambda_features(master_s2_dicts, temps, eq_time, antibody_name)
+            else:
+                logger.warning(f"Skipping lambda computation: need >=2 temperatures, got {len(temps)}")
+                all_lambda_features = None
         
         # Step 5: Aggregate all descriptors into DataFrame
-        logger.info("Step 5: Aggregating descriptors to DataFrame...")
-        descriptors_df = _aggregate_descriptors_to_dataframe(
-            work_dir, temps, antibody_name, eq_time, master_s2_dicts, 
-            all_lambda_features, sasa_dict, core_surface_k
-        )
+        with time_step("Aggregate to DataFrame", parent="Descriptor Computation"):
+            logger.info("Step 5: Aggregating descriptors to DataFrame...")
+            descriptors_df = _aggregate_descriptors_to_dataframe(
+                work_dir, temps, antibody_name, eq_time, master_s2_dicts, 
+                all_lambda_features, sasa_dict, core_surface_k
+            )
         
         logger.info(f"Descriptor computation completed. DataFrame shape: {descriptors_df.shape}")
         logger.info(f"Features: {list(descriptors_df.columns)}")
