@@ -1,2 +1,0 @@
-- `poetry install`
-- `python /Users/praful/myfiles/repos/working-repo/huggingscience_stuff/abmelt_stuff/abmelt_infer_pipeline/infer_using_descriptors.py`
