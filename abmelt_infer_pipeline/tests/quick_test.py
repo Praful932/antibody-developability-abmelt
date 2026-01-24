@@ -14,7 +14,7 @@ def test_imports():
     
     try:
         # Add src to path
-        sys.path.append(str(Path(__file__).parent / "src"))
+        sys.path.append(str(Path(__file__).parent.parent / "src"))
         
         # Test BioPython
         from Bio.PDB import PDBParser

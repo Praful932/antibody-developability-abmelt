@@ -12,9 +12,6 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
-# Add the original AbMelt src to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
-
 try:
     import gromacs
     from preprocess import protonation_state, canonical_index, edit_mdp

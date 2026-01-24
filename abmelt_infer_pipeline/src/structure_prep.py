@@ -12,9 +12,6 @@ from pathlib import Path
 import numpy as np
 from typing import Dict, List, Optional, Tuple
 
-# Add the original AbMelt src to path for imports
-sys.path.append(str(Path(__file__).parent.parent.parent / "AbMelt" / "src"))
-
 try:
     from structure import immune_builder
     from Bio.PDB import PDBParser
