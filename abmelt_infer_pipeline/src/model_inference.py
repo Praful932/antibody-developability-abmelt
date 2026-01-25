@@ -304,25 +304,6 @@ def _save_predictions(results: pd.DataFrame, work_dir: Path, antibody_name: str)
     csv_path = work_dir / f"{antibody_name}_predictions.csv"
     results.to_csv(csv_path, index=False)
     logger.info(f"Saved predictions to {csv_path}")
-    
-    # Also save to a summary file in the results directory
-    try:
-        results_dir = work_dir.parent.parent / "results"
-        results_dir.mkdir(parents=True, exist_ok=True)
-        
-        summary_path = results_dir / "predictions_summary.csv"
-        
-        # Append to summary file if it exists, otherwise create new
-        if summary_path.exists():
-            existing = pd.read_csv(summary_path)
-            combined = pd.concat([existing, results], ignore_index=True)
-            combined.to_csv(summary_path, index=False)
-            logger.info(f"Appended predictions to {summary_path}")
-        else:
-            results.to_csv(summary_path, index=False)
-            logger.info(f"Created predictions summary at {summary_path}")
-    except Exception as e:
-        logger.warning(f"Could not save to summary file: {e}")
 
 
 def load_existing_predictions(work_dir: Path, antibody_name: str) -> Dict:
