@@ -100,11 +100,6 @@ INTERMEDIATE_PATTERNS = [
     "avg_covar*.pdb",
     "covar_matrix_*.dat",
     
-    # Custom simulation time files (when simulation_time != 100)
-    "md_{temp}_*.gro",  # e.g., md_300_2.gro
-    "md_{temp}_*.xtc",  # e.g., md_300_2.xtc
-    "md_{temp}_*.tpr",  # e.g., md_300_2.tpr
-    
     # Other intermediate files
     "em.trr",  # Energy minimization trajectory
     "hbond.ndx",  # Temporary index file for hydrogen bonds

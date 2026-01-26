@@ -399,69 +399,45 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     
     # Production MD
     logger.info(f"Running production MD at {temp}K...")
+    
+    # Always use md_{temp}.* naming, regardless of simulation_time
+    # If simulation_time != 100, create modified MDP with correct nsteps
     if simulation_time == 100:
-        gromacs.grompp(
-            f=md[0],
-            o='md_' + temp + '.tpr',
-            t='npt_' + temp + '.cpt',
-            c='npt_' + temp + '.gro',
-            p=system_files["topology"]
-        )
-        
-        if gpu_enabled:
-            gromacs.mdrun(
-                deffnm='md_' + temp,
-                ntomp=str(n_threads),
-                nb='gpu',
-                pme='gpu',
-                update='gpu',
-                bonded='cpu',
-                pin='on'
-            )
-        else:
-            gromacs.mdrun(deffnm='md_' + temp, ntomp=str(n_threads))
+        md_file = md[0]
     else:
-        # Custom simulation time
+        # Custom simulation time - create modified MDP file
         new_mdp = 'md_' + temp + '_' + str(simulation_time) + '.mdp'
         template_path = Path(gromacs.config.get_templates('md_' + temp + '.mdp')[0])
         _modify_mdp_nsteps(template_path, new_mdp, int(simulation_time*1000*1000/2))
-        new_md = gromacs.config.get_templates(new_mdp)
-        
-        gromacs.grompp(
-            f=new_md[0],
-            o='md_' + temp + '_' + str(simulation_time) + '.tpr',
-            t='npt_' + temp + '.cpt',
-            c='npt_' + temp + '.gro',
-            p=system_files["topology"]
-        )
-        
-        if gpu_enabled:
-            gromacs.mdrun(
-                deffnm='md_' + temp + '_' + str(simulation_time),
-                ntomp=str(n_threads),
-                nb='gpu',
-                pme='gpu',
-                update='cpu',
-                # update='gpu',
-                bonded='cpu',
-                pin='on'
-            )
-        else:
-            gromacs.mdrun(deffnm='md_' + temp + '_' + str(simulation_time), ntomp=str(n_threads))
+        md_file = gromacs.config.get_templates(new_mdp)[0]
     
-    # Return correct file names based on simulation_time
-    if simulation_time == 100:
-        return {
-            "tpr_file": f"md_{temp}.tpr",
-            "xtc_file": f"md_{temp}.xtc",
-            "gro_file": f"md_{temp}.gro"
-        }
+    gromacs.grompp(
+        f=md_file,
+        o='md_' + temp + '.tpr',
+        t='npt_' + temp + '.cpt',
+        c='npt_' + temp + '.gro',
+        p=system_files["topology"]
+    )
+    
+    if gpu_enabled:
+        gromacs.mdrun(
+            deffnm='md_' + temp,
+            ntomp=str(n_threads),
+            nb='gpu',
+            pme='gpu',
+            update='cpu',
+            bonded='cpu',
+            pin='on'
+        )
     else:
-        return {
-            "tpr_file": f"md_{temp}_{simulation_time}.tpr",
-            "xtc_file": f"md_{temp}_{simulation_time}.xtc",
-            "gro_file": f"md_{temp}_{simulation_time}.gro"
-        }
+        gromacs.mdrun(deffnm='md_' + temp, ntomp=str(n_threads))
+    
+    # Always return md_{temp}.* format
+    return {
+        "tpr_file": f"md_{temp}.tpr",
+        "xtc_file": f"md_{temp}.xtc",
+        "gro_file": f"md_{temp}.gro"
+    }
 
 
 def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: Dict) -> Dict[str, Dict[str, str]]:
@@ -486,75 +462,41 @@ def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: D
         logger.info(f"Processing trajectory at {temp}K...")
         
         try:
-            if simulation_time == 100:
-                # Remove periodic boundary conditions
-                gromacs.trjconv(
-                    f=files["xtc_file"],
-                    s=files["tpr_file"],
-                    pbc='whole',
-                    o='md_whole_' + temp + '.xtc',
-                    input=['0']
-                )
-                
-                gromacs.trjconv(
-                    f='md_whole_' + temp + '.xtc',
-                    s=files["tpr_file"],
-                    pbc='nojump',
-                    o='md_nopbcjump_' + temp + '.xtc',
-                    input=['1']
-                )
-                
-                # Create final trajectory and reference structure
-                gromacs.trjconv(
-                    f='md_nopbcjump_' + temp + '.xtc',
-                    s=files["tpr_file"],
-                    b='0',
-                    e='0',
-                    o='md_final_' + temp + '.gro',
-                    input=['1']
-                )
-                
-                gromacs.trjconv(
-                    f='md_nopbcjump_' + temp + '.xtc',
-                    s=files["tpr_file"],
-                    dt='0',
-                    o='md_final_' + temp + '.xtc',
-                    input=['1']
-                )
-            else:
-                # Custom simulation time
-                gromacs.trjconv(
-                    f=files["xtc_file"],
-                    s=files["tpr_file"],
-                    pbc='whole',
-                    o='md_whole_' + temp + '_' + str(simulation_time) + '.xtc',
-                    input=['0']
-                )
-                
-                gromacs.trjconv(
-                    f='md_whole_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=files["tpr_file"],
-                    pbc='nojump',
-                    o='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
-                    input=['1']
-                )
-                
-                gromacs.trjconv(
-                    f='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=files["tpr_file"],
-                    b='0',
-                    e='0',
-                    o='md_final_' + temp + '.gro',
-                    input=['1']
-                )
-                
-                gromacs.trjconv(
-                    f='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=files["tpr_file"],
-                    dt='0',
-                    o='md_final_' + temp + '.xtc',
-                    input=['1']
-                )
+            # Always use md_{temp}.* naming for intermediate files
+            # Remove periodic boundary conditions
+            gromacs.trjconv(
+                f=files["xtc_file"],
+                s=files["tpr_file"],
+                pbc='whole',
+                o='md_whole_' + temp + '.xtc',
+                input=['0']
+            )
+            
+            gromacs.trjconv(
+                f='md_whole_' + temp + '.xtc',
+                s=files["tpr_file"],
+                pbc='nojump',
+                o='md_nopbcjump_' + temp + '.xtc',
+                input=['1']
+            )
+            
+            # Create final trajectory and reference structure
+            gromacs.trjconv(
+                f='md_nopbcjump_' + temp + '.xtc',
+                s=files["tpr_file"],
+                b='0',
+                e='0',
+                o='md_final_' + temp + '.gro',
+                input=['1']
+            )
+            
+            gromacs.trjconv(
+                f='md_nopbcjump_' + temp + '.xtc',
+                s=files["tpr_file"],
+                dt='0',
+                o='md_final_' + temp + '.xtc',
+                input=['1']
+            )
             
             processed_trajectories[temp] = {
                 "final_xtc": f'md_final_{temp}.xtc',
