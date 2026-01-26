@@ -234,9 +234,12 @@ def run_model_inference(descriptor_result: Dict, config: Dict) -> Dict:
     # Format results
     results = _format_predictions(predictions, antibody_name)
     
+    # Get output directory from config
+    output_dir = config.get("paths", {}).get("output_dir", None)
+    
     # Save predictions
     try:
-        _save_predictions(results, work_dir, antibody_name)
+        _save_predictions(results, work_dir, antibody_name, output_dir)
     except Exception as e:
         logger.warning(f"Failed to save predictions: {e}")
     
@@ -291,19 +294,30 @@ def _format_predictions(predictions: Dict[str, np.ndarray], antibody_name: str) 
     return results_df
 
 
-def _save_predictions(results: pd.DataFrame, work_dir: Path, antibody_name: str):
+def _save_predictions(results: pd.DataFrame, work_dir: Path, antibody_name: str, output_dir = None):
     """
     Save predictions to files.
     
     Args:
         results: DataFrame containing formatted results
-        work_dir: Working directory
+        work_dir: Working directory (temp directory)
         antibody_name: Name of the antibody
+        output_dir: Optional output directory (Path or str) to copy predictions to (results directory)
     """
-    # Save to CSV
+    # Save to CSV in work directory
     csv_path = work_dir / f"{antibody_name}_predictions.csv"
     results.to_csv(csv_path, index=False)
     logger.info(f"Saved predictions to {csv_path}")
+    
+    # Copy to results directory if provided
+    if output_dir is not None:
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        output_csv_path = output_dir / f"{antibody_name}_predictions.csv"
+        
+        import shutil
+        shutil.copy2(csv_path, output_csv_path)
+        logger.info(f"Copied predictions to {output_csv_path}")
 
 
 def load_existing_predictions(work_dir: Path, antibody_name: str) -> Dict:
