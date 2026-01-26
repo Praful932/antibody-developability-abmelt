@@ -331,15 +331,6 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
             trajectory_files[temp] = _run_preinstalled_temp_simulation(
                 temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
             )
-
-            # if temp in avail_temps:
-            
-            # else:
-            #     # Create custom temperature files
-            #     trajectory_files[temp] = _run_custom_temp_simulation(
-            #         temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
-            #     )
-                
         except Exception as e:
             logger.error(f"Simulation failed at {temp}K: {e}")
             raise
@@ -458,17 +449,27 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
         else:
             gromacs.mdrun(deffnm='md_' + temp + '_' + str(simulation_time), ntomp=str(n_threads))
     
-    return {
-        "tpr_file": f"md_{temp}.tpr",
-        "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro"
-    }
+    # Return correct file names based on simulation_time
+    if simulation_time == 100:
+        return {
+            "tpr_file": f"md_{temp}.tpr",
+            "xtc_file": f"md_{temp}.xtc",
+            "gro_file": f"md_{temp}.gro"
+        }
+    else:
+        return {
+            "tpr_file": f"md_{temp}_{simulation_time}.tpr",
+            "xtc_file": f"md_{temp}_{simulation_time}.xtc",
+            "gro_file": f"md_{temp}_{simulation_time}.gro"
+        }
 
 
 def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
                               simulation_time: int, gpu_enabled: bool,
                               n_threads: int, gpu_id: int) -> Dict[str, str]:
-    """Run simulation with custom temperature by modifying MDP files."""    
+    """Run simulation with custom temperature by modifying MDP files.
+    atm not used
+    """    
     
     # Create custom MDP files
     nvt_mdp = 'nvt_' + temp + '.mdp'
@@ -582,11 +583,19 @@ def _run_custom_temp_simulation(temp: str, system_files: Dict[str, str],
         else:
             gromacs.mdrun(deffnm='md_' + temp + '_' + str(simulation_time), ntomp=str(n_threads))
     
-    return {
-        "tpr_file": f"md_{temp}.tpr",
-        "xtc_file": f"md_{temp}.xtc",
-        "gro_file": f"md_{temp}.gro"
-    }
+    # Return correct file names based on simulation_time
+    if simulation_time == 100:
+        return {
+            "tpr_file": f"md_{temp}.tpr",
+            "xtc_file": f"md_{temp}.xtc",
+            "gro_file": f"md_{temp}.gro"
+        }
+    else:
+        return {
+            "tpr_file": f"md_{temp}_{simulation_time}.tpr",
+            "xtc_file": f"md_{temp}_{simulation_time}.xtc",
+            "gro_file": f"md_{temp}_{simulation_time}.gro"
+        }
 
 
 def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: Dict) -> Dict[str, Dict[str, str]]:
@@ -648,12 +657,9 @@ def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: D
                 )
             else:
                 # Custom simulation time
-                xtc_file = f"md_{temp}_{simulation_time}.xtc"
-                tpr_file = f"md_{temp}_{simulation_time}.tpr"
-                
                 gromacs.trjconv(
-                    f=xtc_file,
-                    s=tpr_file,
+                    f=files["xtc_file"],
+                    s=files["tpr_file"],
                     pbc='whole',
                     o='md_whole_' + temp + '_' + str(simulation_time) + '.xtc',
                     input=['0']
@@ -661,7 +667,7 @@ def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: D
                 
                 gromacs.trjconv(
                     f='md_whole_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=tpr_file,
+                    s=files["tpr_file"],
                     pbc='nojump',
                     o='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
                     input=['1']
@@ -669,7 +675,7 @@ def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: D
                 
                 gromacs.trjconv(
                     f='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=tpr_file,
+                    s=files["tpr_file"],
                     b='0',
                     e='0',
                     o='md_final_' + temp + '.gro',
@@ -678,20 +684,16 @@ def _process_trajectories(trajectory_files: Dict[str, Dict[str, str]], config: D
                 
                 gromacs.trjconv(
                     f='md_nopbcjump_' + temp + '_' + str(simulation_time) + '.xtc',
-                    s=tpr_file,
+                    s=files["tpr_file"],
                     dt='0',
                     o='md_final_' + temp + '.xtc',
                     input=['1']
                 )
-                
-                # Rename for consistency
-                os.rename(tpr_file, files["tpr_file"])
             
             processed_trajectories[temp] = {
                 "final_xtc": f'md_final_{temp}.xtc',
                 "final_gro": f'md_final_{temp}.gro',
                 "tpr_file": files["tpr_file"],
-                "log_file": files["log_file"]
             }
             
         except Exception as e:
