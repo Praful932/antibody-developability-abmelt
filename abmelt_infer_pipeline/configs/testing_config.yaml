@@ -13,7 +13,7 @@ simulation:
 
 # Input/Output paths
 paths:
-  run_dir: run_data/run_2/
+  run_dir: run_data/run_1/
   output_dir: "results"
   temp_dir: "temp"
   log_dir: "logs"
@@ -41,7 +41,7 @@ logging:
 
 # Descriptor computation settings
 descriptors:
-  equilibration_time: 1
+  equilibration_time: 20
   block_length: [2.5, 25]                # ns for order parameter blocks
   core_surface_k: 20              # number of residues for core/surface classification
   compute_lambda: true           # requires multiple temps, set false for single-temp tests

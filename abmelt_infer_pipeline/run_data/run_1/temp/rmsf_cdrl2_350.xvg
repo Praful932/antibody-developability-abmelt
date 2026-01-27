@@ -1,0 +1,59 @@
+# This file was created Tue Jan 27 11:45:47 2026
+# Created by:
+#                        :-) GROMACS - gmx rmsf, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Command line:
+#   gmx rmsf -f md_final_350.xtc -s md_final_350.gro -o rmsf_cdrl2_350.xvg -n index.ndx -b 1000
+# gmx rmsf is part of G R O M A C S:
+#
+# Giant Rising Ordinary Mutants for A Clerical Setup
+#
+@    title "RMS fluctuation"
+@    xaxis  label "Atom"
+@    yaxis  label "(nm)"
+@TYPE xy
+  778   0.0312
+  779   0.0412
+  780   0.0253
+  781   0.0316
+  782   0.0342
+  783   0.0662
+  784   0.0714
+  785   0.0303
+  786   0.0788
+  787   0.0665
+  788   0.0977
+  789   0.0904
+  790   0.0191
+  791   0.0254
+  792   0.0170
+  793   0.0243
+  794   0.0115
+  795   0.0176
+  796   0.0217
+  797   0.0325
+  798   0.0345
+  799   0.0454
+  800   0.0319
+  801   0.1051
+  802   0.0982
+  803   0.1013
+  804   0.0131
+  805   0.0289
+  806   0.0168
+  807   0.0307
+  808   0.0178
+  809   0.0302
+  810   0.0228
+  811   0.0331
+  812   0.0370
+  813   0.0292
+  814   0.0684
+  815   0.0813
+  816   0.1236
+  817   0.0954
+  818   0.0236
+  819   0.0380

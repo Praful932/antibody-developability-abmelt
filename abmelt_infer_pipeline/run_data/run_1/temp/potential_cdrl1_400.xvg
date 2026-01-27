@@ -1,0 +1,34 @@
+# This file was created Tue Jan 27 11:46:35 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Command line:
+#   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl1_400.xvg -oc charge_cdrl1_400.xvg -of field_cdrl1_400.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Great Red Owns Many ACres of Sand 
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr1l"
+                   0                     -nan
+  0.7675678133964539       -0.522445023059845
+   1.535135626792908        -1.04489004611969
+   2.302703380584717       -1.393186688423157
+   3.070271253585815        -1.56733500957489
+   3.837839126586914       -1.671823978424072
+   4.605406761169434       -1.741483330726624
+   5.372974872589111       -1.791239976882935
+   6.140542507171631        -1.82855749130249
+    6.90811014175415       -1.857582211494446

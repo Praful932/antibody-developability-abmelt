@@ -329,7 +329,7 @@ hbond.ndx
 **/temp/field_*.xvg
 
 # Run data directories (keep structure, ignore intermediate contents)
-**/run_data/**/temp/*
-!**/run_data/**/temp/.gitkeep
-**/run_data/**/logs/*
-!**/run_data/**/logs/.gitkeep
+# **/run_data/**/temp/*
+# !**/run_data/**/temp/.gitkeep
+# **/run_data/**/logs/*
+# !**/run_data/**/logs/.gitkeep
