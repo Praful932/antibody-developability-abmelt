@@ -1,0 +1,5 @@
+hf jobs ps -a --namespace hugging-science
+hf jobs logs 69720fe757a10a9d296cb050 --namespace hugging-science
+
+goal - run simulation e2e
+minimal e2e test?

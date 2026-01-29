@@ -138,7 +138,7 @@ class AbMeltPredictor:
         
         if missing_features:
             logger.error(f"Missing features for {model_name}: {missing_features}")
-            logger.error(f"Available features: {available_features}")
+            
             raise ValueError(
                 f"Missing required features for {model_name}: {missing_features}"
             )
@@ -148,6 +148,12 @@ class AbMeltPredictor:
         
         logger.info(f"Extracted {len(required_features)} features for {model_name}")
         logger.debug(f"Features: {required_features}")
+        
+        # Print input feature vector
+        logger.info(f"Input feature vector for {model_name} model:")
+        for feature_name in required_features:
+            feature_value = features_df[feature_name].values[0]
+            logger.info(f"  {feature_name}: {feature_value}")
         
         return features_df
     
@@ -167,6 +173,10 @@ class AbMeltPredictor:
         
         # Extract required features
         features_df = self.extract_features(descriptors_df, model_name)
+        
+        # Print feature vector as numpy array for clarity
+        feature_vector = features_df.values[0]
+        logger.info(f"Feature vector (numpy array) for {model_name}: {feature_vector}")
         
         # Make prediction
         logger.info(f"Making prediction with {model_name} model...")

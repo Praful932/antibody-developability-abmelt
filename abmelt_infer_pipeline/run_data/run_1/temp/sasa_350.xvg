@@ -1,10 +1,10 @@
-# This file was created Tue Jan 27 11:45:04 2026
+# This file was created Thu Jan 29 18:04:04 2026
 # Created by:
-#                        :-) GROMACS - gmx sasa, 2024 (-:
+#                  :-) GROMACS - gmx sasa, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx sasa -f md_final_350.xtc -s md_final_350.gro -o sasa_350.xvg
 # gmx sasa is part of G R O M A C S:

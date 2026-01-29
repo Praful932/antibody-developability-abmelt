@@ -1,15 +1,15 @@
-# This file was created Tue Jan 27 11:45:48 2026
+# This file was created Thu Jan 29 18:04:09 2026
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx gyrate -f md_final_350.xtc -s md_final_350.gro -o gyr_cdrl1_350.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Giant Rising Ordinary Mutants for A Clerical Setup
+# Gromacs Runs On Most of All Computer Systems
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -92,7 +92,7 @@
     640.000 0.561601 0.471518 0.429785 0.473019
     650.000 0.560705 0.465218 0.421254 0.484660
     660.000 0.563826 0.468293 0.453279 0.459390
-    670.000 0.568535 0.454631 0.457594 0.479983
+    670.000 0.568536 0.454631 0.457594 0.479983
     680.000 0.566884 0.473366 0.446452 0.468317
     690.000 0.587894 0.486911 0.488292 0.464465
     700.000 0.566539 0.469634 0.437929 0.479160
@@ -148,7 +148,7 @@
    1200.000 0.586350 0.432905 0.515473 0.484246
    1210.000 0.611861 0.454421 0.541930 0.498560
    1220.000 0.593818 0.435391 0.531327 0.483079
-   1230.000 0.582221 0.428277 0.516181 0.477598
+   1230.000 0.582222 0.428277 0.516181 0.477598
    1240.000 0.599344 0.436833 0.534069 0.492313
    1250.000 0.590445 0.415596 0.537306 0.485624
    1260.000 0.593439 0.428616 0.521716 0.498438
@@ -187,7 +187,7 @@
    1590.000 0.585746 0.431741 0.517220 0.481954
    1600.000 0.597535 0.429486 0.524399 0.504623
    1610.000 0.585256 0.420797 0.515396 0.492285
-   1620.000 0.581388 0.413870 0.536769 0.465418
+   1620.000 0.581388 0.413870 0.536769 0.465419
    1630.000 0.588677 0.422852 0.539014 0.473014
    1640.000 0.576328 0.399969 0.520684 0.482929
    1650.000 0.557967 0.397212 0.504494 0.458653

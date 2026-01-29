@@ -1,15 +1,15 @@
-# This file was created Tue Jan 27 11:44:59 2026
+# This file was created Thu Jan 29 18:04:02 2026
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx gyrate -f md_final_300.xtc -s md_final_300.gro -o gyr_cdrh3_300.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
 #
-# Great Red Owns Many ACres of Sand 
+# Glycine aRginine prOline Methionine Alanine Cystine Serine
 #
 @    title "Radius of gyration (total and around axes)"
 @    xaxis  label "Time (ps)"
@@ -29,7 +29,7 @@
      10.000 0.610864 0.488745 0.522601 0.484074
      20.000 0.617989 0.501128 0.523517 0.488490
      30.000 0.614217 0.489169 0.534335 0.479297
-     40.000 0.605329 0.489072 0.517320 0.475431
+     40.000 0.605329 0.489073 0.517320 0.475431
      50.000 0.610547 0.486211 0.525644 0.482527
      60.000 0.612355 0.488583 0.525108 0.485290
      70.000 0.624995 0.498247 0.526304 0.505957
@@ -51,7 +51,7 @@
     230.000 0.615522 0.483647 0.529396 0.493518
     240.000 0.632698 0.513800 0.538594 0.496527
     250.000 0.622961 0.489759 0.538048 0.496790
-    260.000 0.617884 0.492039 0.531886 0.488421
+    260.000 0.617884 0.492039 0.531887 0.488421
     270.000 0.629799 0.508688 0.522219 0.511680
     280.000 0.620719 0.491327 0.532990 0.495080
     290.000 0.620475 0.496728 0.532021 0.490095
@@ -112,7 +112,7 @@
     840.000 0.629034 0.500758 0.545867 0.492583
     850.000 0.633747 0.516551 0.538555 0.496392
     860.000 0.633021 0.501545 0.547902 0.499687
-    870.000 0.622143 0.493520 0.538196 0.490822
+    870.000 0.622143 0.493520 0.538197 0.490822
     880.000 0.623933 0.497265 0.531866 0.498428
     890.000 0.630413 0.503790 0.536602 0.503087
     900.000 0.623752 0.494967 0.525229 0.507224

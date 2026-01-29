@@ -1,15 +1,15 @@
-# This file was created Tue Jan 27 11:45:45 2026
+# This file was created Thu Jan 29 18:04:07 2026
 # Created by:
-#                        :-) GROMACS - gmx rms, 2024 (-:
+#                   :-) GROMACS - gmx rms, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx rms -f md_final_350.xtc -s md_final_350.gro -o rmsd_350.xvg
 # gmx rms is part of G R O M A C S:
 #
-# GROningen MAchine for Chemical Simulation
+# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
 #
 @    title "RMSD"
 @    xaxis  label "Time (ps)"
@@ -63,7 +63,7 @@
  440.0000000    0.1448706
  450.0000000    0.1401612
  460.0000000    0.1407692
- 470.0000000    0.1529826
+ 470.0000000    0.1529827
  480.0000000    0.1590238
  490.0000000    0.1493568
  500.0000000    0.1367478
@@ -99,7 +99,7 @@
  800.0000000    0.1513788
  810.0000000    0.1299305
  820.0000000    0.1423958
- 830.0000000    0.1419604
+ 830.0000000    0.1419605
  840.0000000    0.1572805
  850.0000000    0.1515884
  860.0000000    0.1498154
@@ -115,7 +115,7 @@
  960.0000000    0.1539748
  970.0000000    0.1584881
  980.0000000    0.1481141
- 990.0000000    0.1501743
+ 990.0000000    0.1501742
 1000.0000000    0.1599762
 1010.0000000    0.1481129
 1020.0000000    0.1410223
@@ -146,7 +146,7 @@
 1270.0000000    0.1635014
 1280.0000000    0.1523370
 1290.0000000    0.1413095
-1300.0000000    0.1673838
+1300.0000000    0.1673837
 1310.0000000    0.1605958
 1320.0000000    0.1731868
 1330.0000000    0.1650663
@@ -167,7 +167,7 @@
 1480.0000000    0.1402572
 1490.0000000    0.1745006
 1500.0000000    0.1784756
-1510.0000000    0.1715906
+1510.0000000    0.1715907
 1520.0000000    0.1647815
 1530.0000000    0.1843524
 1540.0000000    0.1393439

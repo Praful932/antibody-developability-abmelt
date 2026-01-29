@@ -1,10 +1,10 @@
-# This file was created Tue Jan 27 11:46:31 2026
+# This file was created Thu Jan 29 18:04:17 2026
 # Created by:
-#                       :-) GROMACS - gmx gyrate, 2024 (-:
+#                 :-) GROMACS - gmx gyrate, 2025.3-Homebrew (-:
 # 
-# Executable:   /usr/local/gromacs/bin/gmx
-# Data prefix:  /usr/local/gromacs
-# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
+# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
+# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx gyrate -f md_final_400.xtc -s md_final_400.gro -o gyr_cdrh1_400.xvg -n index.ndx
 # gmx gyrate is part of G R O M A C S:
@@ -218,7 +218,7 @@
    1900.000 0.630287 0.494355 0.506133 0.542186
    1910.000 0.634816 0.500424 0.523115 0.530951
    1920.000 0.634157 0.482290 0.523678 0.545405
-   1930.000 0.637442 0.486933 0.526267 0.546445
+   1930.000 0.637442 0.486934 0.526267 0.546445
    1940.000 0.639582 0.491217 0.512812 0.560231
    1950.000 0.626874 0.481311 0.509339 0.543006
    1960.000 0.640407 0.478248 0.535516 0.552035
