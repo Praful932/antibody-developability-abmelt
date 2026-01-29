@@ -1,0 +1,34 @@
+# This file was created Thu Jan 29 16:05:10 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_3/temp
+# Command line:
+#   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrl3_300.xvg -oc charge_cdrl3_300.xvg -of field_cdrl3_300.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# GRowing Old MAkes el Chrono Sweat
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr3l"
+                   0                     -nan
+  0.7392343282699585       -1.186728954315186
+   1.478468656539917       -2.373457908630371
+   2.217703104019165       -3.164610624313354
+   2.956937313079834       -3.560186862945557
+   3.696171760559082       -3.797532558441162
+    4.43540620803833       -3.955763101577759
+    5.17464017868042       -4.068785190582275
+   5.913874626159668        -4.15355110168457
+   6.653109073638916       -4.219480514526367

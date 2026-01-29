@@ -1,0 +1,59 @@
+# This file was created Thu Jan 29 14:47:26 2026
+# Created by:
+#                        :-) GROMACS - gmx rmsf, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx rmsf -f md_final_350.xtc -s md_final_350.gro -o rmsf_cdrl2_350.xvg -n index.ndx -b 0
+# gmx rmsf is part of G R O M A C S:
+#
+# Getting the Right Output Means no Artefacts in Calculating Stuff
+#
+@    title "RMS fluctuation"
+@    xaxis  label "Atom"
+@    yaxis  label "(nm)"
+@TYPE xy
+  778   0.0319
+  779   0.0408
+  780   0.0243
+  781   0.0291
+  782   0.0357
+  783   0.0618
+  784   0.0671
+  785   0.0313
+  786   0.0777
+  787   0.0707
+  788   0.1078
+  789   0.0890
+  790   0.0221
+  791   0.0354
+  792   0.0178
+  793   0.0269
+  794   0.0172
+  795   0.0257
+  796   0.0328
+  797   0.1028
+  798   0.0822
+  799   0.1116
+  800   0.0965
+  801   0.1497
+  802   0.1651
+  803   0.1505
+  804   0.0171
+  805   0.0359
+  806   0.0186
+  807   0.0334
+  808   0.0171
+  809   0.0292
+  810   0.0264
+  811   0.0387
+  812   0.0397
+  813   0.0364
+  814   0.1171
+  815   0.1112
+  816   0.1846
+  817   0.1195
+  818   0.0230
+  819   0.0352

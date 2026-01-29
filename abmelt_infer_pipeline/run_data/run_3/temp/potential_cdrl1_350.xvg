@@ -1,0 +1,34 @@
+# This file was created Thu Jan 29 16:06:11 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_3/temp
+# Command line:
+#   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl1_350.xvg -oc charge_cdrl1_350.xvg -of field_cdrl1_350.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Getting the Right Output Means no Artefacts in Calculating Stuff
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr1l"
+                   0                     -nan
+  0.7509471774101257      -0.5556570291519165
+   1.501894354820251       -1.111314058303833
+   2.252841711044312       -1.481752157211304
+   3.003788709640503       -1.666971206665039
+   3.754735946655273        -1.77810263633728
+   4.505683422088623       -1.852190136909485
+   5.256630420684814       -1.905109882354736
+   6.007577419281006       -1.944799661636353
+   6.758524894714355       -1.975669503211975

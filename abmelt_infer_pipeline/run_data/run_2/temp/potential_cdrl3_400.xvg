@@ -1,0 +1,34 @@
+# This file was created Thu Jan 29 14:47:59 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl3_400.xvg -oc charge_cdrl3_400.xvg -of field_cdrl3_400.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gyas ROwers Mature At Cryogenic Speed
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr3l"
+                   0                     -nan
+  0.7673895955085754      -0.7739342451095581
+   1.534779191017151       -1.547868490219116
+   2.302168846130371       -2.063824653625488
+   3.069558382034302       -2.321802854537964
+   3.836947917938232       -2.476589679718018
+   4.604337692260742        -2.57978081703186
+   5.371726989746094       -2.653488874435425
+   6.139116764068604       -2.708769798278809
+   6.906506061553955       -2.751766204833984

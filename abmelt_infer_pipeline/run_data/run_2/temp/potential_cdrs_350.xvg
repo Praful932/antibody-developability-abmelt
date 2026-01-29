@@ -1,0 +1,34 @@
+# This file was created Thu Jan 29 14:47:32 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrs_350.xvg -oc charge_cdrs_350.xvg -of field_cdrs_350.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Green Red Orange Magenta Azure Cyan Skyblue
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdrs"
+                   0                     -nan
+  0.7509985566139221      -0.8810449242591858
+   1.501997113227844       -1.763278722763062
+   2.252995729446411       -2.356076717376709
+   3.003994226455688       -2.658249616622925
+   3.754992723464966       -2.841625452041626
+   4.505991458892822       -2.963875770568848
+     5.2569899559021       -3.051197528839111
+   6.007988452911377       -3.116688966751099
+   6.758986949920654       -3.167626619338989
