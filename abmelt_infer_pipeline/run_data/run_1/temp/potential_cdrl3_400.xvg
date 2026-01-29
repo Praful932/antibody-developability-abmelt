@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:18 2026
+# This file was created Thu Jan 29 17:35:00 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl3_400.xvg -oc charge_cdrl3_400.xvg -of field_cdrl3_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GROup of MAchos and Cynical Suckers
+# GRoups of Organic Molecules in ACtion for Science
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr3l"
-                   0                      nan
-  0.7675678133964539      -0.8944734930992126
-   1.535135626792908       -1.788946986198425
-   2.302703380584717       -2.385262727737427
-   3.070271253585815       -2.683420658111572
-   3.837839126586914        -2.86231517791748
-   4.605406761169434       -2.981578350067139
-   5.372974872589111       -3.066766262054443
-   6.140542507171631       -3.130657434463501
-    6.90811014175415       -3.180350303649902
+                   0                     -nan
+  0.7671684622764587      -0.8812850117683411
+   1.534336924552917       -1.762570023536682
+   2.301505327224731       -2.350093364715576
+   3.068673849105835       -2.643854856491089
+   3.835842132568359       -2.820111989974976
+   4.603010654449463       -2.937616586685181
+   5.370179176330566       -3.021548509597778
+    6.13734769821167       -3.084497451782227
+   6.904516220092773       -3.133457660675049

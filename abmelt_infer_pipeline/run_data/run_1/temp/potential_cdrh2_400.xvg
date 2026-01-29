@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:19 2026
+# This file was created Thu Jan 29 17:35:01 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrh2_400.xvg -oc charge_cdrh2_400.xvg -of field_cdrh2_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gnomes, ROck Monsters And Chili Sauce
+# GROup of MAchos and Cynical Suckers
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr2h"
-                   0                      nan
-  0.7675678133964539       -1.223669171333313
-   1.535135626792908       -2.447338342666626
-   2.302703380584717       -3.263117790222168
-   3.070271253585815       -3.671007633209229
-   3.837839126586914       -3.915741443634033
-   4.605406761169434       -4.078897476196289
-   5.372974872589111       -4.195437431335449
-   6.140542507171631        -4.28284215927124
-    6.90811014175415       -4.350823879241943
+                   0                     -nan
+  0.7671684622764587       -1.518694996833801
+   1.534336924552917       -3.037389993667603
+   2.301505327224731       -4.049853324890137
+   3.068673849105835       -4.556085109710693
+   3.835842132568359       -4.859824180603027
+   4.603010654449463        -5.06231689453125
+   5.370179176330566       -5.206954479217529
+    6.13734769821167       -5.315432548522949
+   6.904516220092773       -5.399804592132568

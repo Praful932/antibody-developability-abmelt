@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:04 2026
+# This file was created Thu Jan 29 17:34:08 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrs_300.xvg -oc charge_cdrs_300.xvg -of field_cdrs_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gromacs Runs On Most of All Computer Systems
+# Great Red Oystrich Makes All Chemists Sane
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdrs"
-                   0                      nan
-  0.7391310334205627        -1.21266496181488
-   1.478262066841125       -2.392892599105835
-   2.217392921447754       -3.152346134185791
-   2.956524133682251       -3.523462533950806
-   3.695655107498169       -3.749176025390625
-   4.434785842895508       -3.899651527404785
-   5.173916816711426       -4.007133960723877
-   5.913048267364502       -4.087746143341064
-    6.65217924118042       -4.150444030761719
+                   0                     -nan
+  0.7392227053642273       -1.277701854705811
+   1.478445410728455       -2.537537097930908
+   2.217668056488037       -3.361875534057617
+   2.956890821456909       -3.768583536148071
+   3.696113586425781       -4.013997554779053
+   4.435336112976074       -4.177606582641602
+   5.174559116363525       -4.294470310211182
+   5.913781642913818       -4.382118225097656
+    6.65300464630127       -4.450288772583008

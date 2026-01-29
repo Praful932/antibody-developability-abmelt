@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:59 2026
+# This file was created Thu Jan 29 18:31:15 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrs_400.xvg -oc charge_cdrs_400.xvg -of field_cdrs_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gyas ROwers Mature At Cryogenic Speed
+# Good gRace! Old Maple Actually Chews Slate
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdrs"
                    0                     -nan
-  0.7673895955085754       -0.952568531036377
-   1.534779191017151       -1.902194499969482
-   2.302168846130371       -2.534090995788574
-   3.069558382034302       -2.851200580596924
-   3.836947917938232       -3.042519092559814
-   4.604337692260742       -3.170064926147461
-   5.371726989746094       -3.261168956756592
-   6.139116764068604       -3.329497098922729
-   6.906506061553955       -3.382641077041626
+  0.7665963172912598      -0.7785388231277466
+    1.53319263458252       -1.598958134651184
+   2.299788951873779       -2.189932823181152
+   3.066385269165039        -2.50958251953125
+   3.832981824874878       -2.702661275863647
+   4.599577903747559       -2.831380367279053
+   5.366174221038818       -2.923322439193726
+   6.132770538330078       -2.992279052734375
+   6.899366855621338       -3.045912027359009

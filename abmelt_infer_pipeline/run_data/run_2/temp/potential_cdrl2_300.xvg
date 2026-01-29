@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:02 2026
+# This file was created Thu Jan 29 18:30:24 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrl2_300.xvg -oc charge_cdrl2_300.xvg -of field_cdrl2_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GROningen MAchine for Chemical Simulation
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdr2l"
                    0                     -nan
-  0.7392029762268066                       -0
-   1.478405952453613                       -0
-    2.21760892868042                       -0
-   2.956811904907227                       -0
-   3.696015119552612                       -0
-    4.43521785736084                       -0
-   5.174420833587646                       -0
-   5.913623809814453                       -0
-   6.652827262878418                       -0
+  0.7393597960472107                       -0
+   1.478719592094421                       -0
+   2.218079328536987                       -0
+   2.957439184188843                       -0
+   3.696798801422119                       -0
+   4.436158657073975                       -0
+    5.17551851272583                       -0
+   5.914878368377686                       -0
+   6.654238224029541                       -0

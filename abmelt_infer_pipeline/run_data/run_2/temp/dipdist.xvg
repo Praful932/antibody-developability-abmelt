@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:59 2026
+# This file was created Thu Jan 29 18:31:15 2026
 # Created by:
 #                      :-) GROMACS - gmx dipoles, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx dipoles -f md_final_400.xtc -s md_400.tpr -o dipole_400.xvg -n index.ndx
 # gmx dipoles is part of G R O M A C S:
 #
-# Gyas ROwers Mature At Cryogenic Speed
+# Good gRace! Old Maple Actually Chews Slate
 #
 @    title "Dipole Moment Distribution"
 @    xaxis  label "mu (Debye)"

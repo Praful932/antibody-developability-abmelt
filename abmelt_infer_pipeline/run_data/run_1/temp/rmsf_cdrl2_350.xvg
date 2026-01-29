@@ -1,59 +1,59 @@
-# This file was created Thu Jan 29 18:04:09 2026
+# This file was created Thu Jan 29 17:34:27 2026
 # Created by:
-#                  :-) GROMACS - gmx rmsf, 2025.3-Homebrew (-:
+#                        :-) GROMACS - gmx rmsf, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx rmsf -f md_final_350.xtc -s md_final_350.gro -o rmsf_cdrl2_350.xvg -n index.ndx -b 0
 # gmx rmsf is part of G R O M A C S:
 #
-# Gromacs Runs On Most of All Computer Systems
+# GROtesk MACabre and Sinister
 #
 @    title "RMS fluctuation"
 @    xaxis  label "Atom"
 @    yaxis  label "(nm)"
 @TYPE xy
-  778   0.0375
-  779   0.0461
-  780   0.0292
-  781   0.0327
-  782   0.0426
-  783   0.0805
-  784   0.0922
-  785   0.0403
-  786   0.1125
-  787   0.0968
-  788   0.1473
-  789   0.1239
-  790   0.0222
-  791   0.0281
-  792   0.0187
-  793   0.0261
-  794   0.0137
-  795   0.0196
-  796   0.0255
-  797   0.0357
-  798   0.0375
-  799   0.0587
-  800   0.0351
-  801   0.1154
-  802   0.1102
-  803   0.1070
-  804   0.0150
-  805   0.0317
-  806   0.0185
-  807   0.0340
-  808   0.0188
-  809   0.0329
-  810   0.0279
-  811   0.0391
-  812   0.0434
-  813   0.0371
-  814   0.0823
-  815   0.1016
-  816   0.1523
-  817   0.1172
-  818   0.0247
-  819   0.0391
+  778   0.0467
+  779   0.0553
+  780   0.0395
+  781   0.0433
+  782   0.0599
+  783   0.1152
+  784   0.1283
+  785   0.0506
+  786   0.1327
+  787   0.0759
+  788   0.1080
+  789   0.1222
+  790   0.0288
+  791   0.0378
+  792   0.0206
+  793   0.0290
+  794   0.0150
+  795   0.0213
+  796   0.0298
+  797   0.0406
+  798   0.0446
+  799   0.0901
+  800   0.0406
+  801   0.1128
+  802   0.1143
+  803   0.1109
+  804   0.0142
+  805   0.0304
+  806   0.0187
+  807   0.0335
+  808   0.0187
+  809   0.0328
+  810   0.0291
+  811   0.0428
+  812   0.0453
+  813   0.0377
+  814   0.0890
+  815   0.1122
+  816   0.1666
+  817   0.1292
+  818   0.0248
+  819   0.0379

@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:32 2026
+# This file was created Thu Jan 29 18:30:50 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl3_350.xvg -oc charge_cdrl3_350.xvg -of field_cdrl3_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Gyas ROwers Mature At Cryogenic Speed
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdr3l"
                    0                     -nan
-  0.7509985566139221      -0.8999870419502258
-   1.501997113227844       -1.799974083900452
-   2.252995729446411       -2.399965524673462
-   3.003994226455688       -2.699961185455322
-   3.754992723464966       -2.879958629608154
-   4.505991458892822       -2.999956846237183
-     5.2569899559021       -3.085669755935669
-   6.007988452911377       -3.149954557418823
-   6.758986949920654       -3.199954032897949
+  0.7510600686073303      -0.9048562049865723
+   1.502120137214661       -1.809712409973145
+   2.253180265426636       -2.412949800491333
+   3.004240274429321       -2.714568614959717
+   3.755300283432007         -2.8955397605896
+   4.506360530853271       -3.016187429428101
+   5.257420539855957       -3.102364063262939
+   6.008480548858643       -3.166996717453003
+   6.759540557861328        -3.21726655960083

@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:19 2026
+# This file was created Thu Jan 29 17:35:01 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrs_400.xvg -oc charge_cdrs_400.xvg -of field_cdrs_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gnomes, ROck Monsters And Chili Sauce
+# GROup of MAchos and Cynical Suckers
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdrs"
-                   0                      nan
-  0.7675678133964539      -0.8479169011116028
-   1.535135626792908       -1.714816331863403
-   2.302703380584717       -2.312981605529785
-   3.070271253585815       -2.623430252075195
-   3.837839126586914       -2.810449361801147
-   4.605406761169434       -2.935128688812256
-   5.372974872589111       -3.024185180664062
-   6.140542507171631       -3.090977668762207
-    6.90811014175415       -3.142927408218384
+                   0                     -nan
+  0.7671684622764587      -0.9100881814956665
+   1.534336924552917       -1.835302472114563
+   2.301505327224731       -2.469760656356812
+   3.068673849105835       -2.798336505889893
+   3.835842132568359       -2.996995210647583
+   4.603010654449463       -3.129434585571289
+   5.370179176330566       -3.224034070968628
+    6.13734769821167       -3.294983625411987
+   6.904516220092773       -3.350166797637939

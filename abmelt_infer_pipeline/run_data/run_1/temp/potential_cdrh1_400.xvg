@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:19 2026
+# This file was created Thu Jan 29 17:35:01 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrh1_400.xvg -oc charge_cdrh1_400.xvg -of field_cdrh1_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gnomes, ROck Monsters And Chili Sauce
+# GROup of MAchos and Cynical Suckers
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr1h"
-                   0                      nan
-  0.7675678133964539     -0.04971830919384956
-   1.535135626792908     -0.09943661838769913
-   2.302703380584717      -0.1325821578502655
-   3.070271253585815      -0.1491549164056778
-   3.837839126586914      -0.1590985804796219
-   4.605406761169434      -0.1657276898622513
-   5.372974872589111      -0.1704627722501755
-   6.140542507171631       -0.174014076590538
-    6.90811014175415      -0.1767762005329132
+                   0                     -nan
+  0.7671684622764587      -0.1731073707342148
+   1.534336924552917      -0.3462147414684296
+   2.301505327224731      -0.4616196751594543
+   3.068673849105835      -0.5193221569061279
+   3.835842132568359      -0.5539435744285583
+   4.603010654449463      -0.5770245790481567
+   5.370179176330566      -0.5935109853744507
+    6.13734769821167      -0.6058757901191711
+   6.904516220092773      -0.6154928803443909

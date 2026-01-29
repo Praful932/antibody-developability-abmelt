@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:32 2026
+# This file was created Thu Jan 29 18:30:51 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrs_350.xvg -oc charge_cdrs_350.xvg -of field_cdrs_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Green Red Orange Magenta Azure Cyan Skyblue
+# Georgetown Riga Oslo Madrid Amsterdam Chisinau Stockholm
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdrs"
                    0                     -nan
-  0.7509985566139221      -0.8810449242591858
-   1.501997113227844       -1.763278722763062
-   2.252995729446411       -2.356076717376709
-   3.003994226455688       -2.658249616622925
-   3.754992723464966       -2.841625452041626
-   4.505991458892822       -2.963875770568848
-     5.2569899559021       -3.051197528839111
-   6.007988452911377       -3.116688966751099
-   6.758986949920654       -3.167626619338989
+  0.7510600686073303        -1.00061571598053
+   1.502120137214661       -1.982994794845581
+   2.253180265426636       -2.621293306350708
+   3.004240274429321         -2.9337477684021
+   3.755300283432007       -3.122189998626709
+   4.506360530853271       -3.247817993164062
+   5.257420539855957       -3.337552309036255
+   6.008480548858643       -3.404853105545044
+   6.759540557861328       -3.457198143005371

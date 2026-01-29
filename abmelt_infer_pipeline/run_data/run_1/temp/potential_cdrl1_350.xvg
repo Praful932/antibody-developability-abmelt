@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:11 2026
+# This file was created Thu Jan 29 17:34:32 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl1_350.xvg -oc charge_cdrl1_350.xvg -of field_cdrl1_350.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Grunge ROck MAChoS
+# Green Red Orange Magenta Azure Cyan Skyblue
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr1l"
-                   0                      nan
-  0.7510112524032593      -0.6187379956245422
-   1.502022504806519       -1.237475991249084
-   2.253033876419067       -1.649968028068542
-   3.004045009613037       -1.856214046478271
-   3.755056381225586       -1.979961633682251
-   4.506067752838135       -2.062459945678711
-   5.257078647613525       -2.121387481689453
-   6.008090019226074        -2.16558313369751
-   6.759101390838623       -2.199957370758057
+                   0                     -nan
+  0.7509618997573853      -0.5990495085716248
+   1.501923799514771        -1.19809901714325
+   2.252885818481445        -1.59746527671814
+   3.003847599029541       -1.797148466110229
+   3.754809617996216       -1.916958451271057
+   4.505771636962891       -1.996831655502319
+   5.256733417510986       -2.053884029388428
+   6.007695198059082       -2.096673250198364
+   6.758656978607178       -2.129953861236572

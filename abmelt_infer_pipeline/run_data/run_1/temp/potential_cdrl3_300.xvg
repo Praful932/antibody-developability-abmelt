@@ -1,15 +1,15 @@
-# This file was created Thu Jan 29 18:04:03 2026
+# This file was created Thu Jan 29 17:34:07 2026
 # Created by:
-#                :-) GROMACS - gmx potential, 2025.3-Homebrew (-:
+#                     :-) GROMACS - gmx potential, 2024 (-:
 # 
-# Executable:   /opt/homebrew/bin/../Cellar/gromacs/2025.3_1/bin/gmx
-# Data prefix:  /opt/homebrew/bin/../Cellar/gromacs/2025.3_1
-# Working dir:  /Users/praful/myfiles/repos/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/antibody-developability-abmelt/abmelt_infer_pipeline/run_data/run_1/temp
 # Command line:
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrl3_300.xvg -oc charge_cdrl3_300.xvg -of field_cdrl3_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GROningen MAchine for Chemical Simulation
+# Grunge ROck MAChoS
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -22,13 +22,13 @@
 @ legend 0.78, 0.8
 @ legend length 2
 @ s0 legend "cdr3l"
-                   0                      nan
-  0.7391310334205627      -0.9116787314414978
-   1.478262066841125       -1.823357462882996
-   2.217392921447754       -2.431143283843994
-   2.956524133682251       -2.735036134719849
-   3.695655107498169        -2.91737174987793
-   4.434785842895508       -3.038928985595703
-   5.173916816711426       -3.125755548477173
-   5.913048267364502        -3.19087553024292
-    6.65217924118042       -3.241524219512939
+                   0                     -nan
+  0.7392227053642273      -0.9368862509727478
+   1.478445410728455       -1.873772501945496
+   2.217668056488037       -2.498363256454468
+   2.956890821456909       -2.810658693313599
+   3.696113586425781       -2.998035907745361
+   4.435336112976074       -3.122954130172729
+   5.174559116363525       -3.212181329727173
+   5.913781642913818       -3.279101848602295
+    6.65300464630127       -3.331151008605957

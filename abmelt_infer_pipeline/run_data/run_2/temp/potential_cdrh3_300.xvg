@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:02 2026
+# This file was created Thu Jan 29 18:30:24 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_300.xtc -s md_300.tpr -spherical -sl 10 -o potential_cdrh3_300.xvg -oc charge_cdrh3_300.xvg -of field_cdrh3_300.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# GROningen MAchine for Chemical Simulation
+# Getting the Right Output Means no Artefacts in Calculating Stuff
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdr3h"
                    0                     -nan
-  0.7392029762268066     -0.05526235699653625
-   1.478405952453613      -0.1105247139930725
-    2.21760892868042      -0.1473662853240967
-   2.956811904907227      -0.1657870709896088
-   3.696015119552612      -0.1768395453691483
-    4.43521785736084      -0.1842078566551208
-   5.174420833587646      -0.1894709467887878
-   5.913623809814453      -0.1934182494878769
-   6.652827262878418      -0.1964883804321289
+  0.7393597960472107     -0.04357519373297691
+   1.478719592094421     -0.08715038746595383
+   2.218079328536987      -0.1162005215883255
+   2.957439184188843      -0.1307255774736404
+   3.696798801422119      -0.1394406259059906
+   4.436158657073975      -0.1452506482601166
+    5.17551851272583      -0.1494006663560867
+   5.914878368377686       -0.152513176202774
+   6.654238224029541      -0.1549340188503265

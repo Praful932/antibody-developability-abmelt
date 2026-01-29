@@ -2,7 +2,7 @@
 ;	File 'topol.top' was generated
 ;	By user: root (0)
 ;	On host: 7efbcf5f8735
-;	At date: Thu Jan 29 13:53:57 2026
+;	At date: Thu Jan 29 17:36:26 2026
 ;
 ;	This is a standalone topology file
 ;
@@ -39,7 +39,7 @@
 
 [ system ]
 ; Name
-Gallium Rubidium Oxygen Manganese Argon Carbon Silicon in water
+Good ROcking Metal Altar for Chronical Sinners in water
 
 [ molecules ]
 ; Compound        #mols

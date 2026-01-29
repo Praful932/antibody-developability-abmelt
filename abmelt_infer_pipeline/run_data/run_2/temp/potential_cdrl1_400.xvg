@@ -1,4 +1,4 @@
-# This file was created Thu Jan 29 14:47:59 2026
+# This file was created Thu Jan 29 18:31:14 2026
 # Created by:
 #                     :-) GROMACS - gmx potential, 2024 (-:
 # 
@@ -9,7 +9,7 @@
 #   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrl1_400.xvg -oc charge_cdrl1_400.xvg -of field_cdrl1_400.xvg -n index.ndx
 # gmx potential is part of G R O M A C S:
 #
-# Gyas ROwers Mature At Cryogenic Speed
+# GROningen Mixture of Alchemy and Childrens' Stories
 #
 @    title "Electrostatic Potential"
 @    xaxis  label "Average coordinate (nm)"
@@ -23,12 +23,12 @@
 @ legend length 2
 @ s0 legend "cdr1l"
                    0                     -nan
-  0.7673895955085754      -0.6201176047325134
-   1.534779191017151       -1.240235209465027
-   2.302168846130371       -1.653646945953369
-   3.069558382034302       -1.860352754592896
-   3.836947917938232       -1.984376311302185
-   4.604337692260742       -2.067058563232422
-   5.371726989746094       -2.126117467880249
-   6.139116764068604       -2.170411586761475
-   6.906506061553955       -2.204862594604492
+  0.7665963172912598      -0.5152212977409363
+    1.53319263458252       -1.030442595481873
+   2.299788951873779       -1.373923420906067
+   3.066385269165039       -1.545663952827454
+   3.832981824874878        -1.64870822429657
+   4.599577903747559       -1.717404365539551
+   5.366174221038818       -1.766473054885864
+   6.132770538330078       -1.803274512290955
+   6.899366855621338       -1.831897974014282

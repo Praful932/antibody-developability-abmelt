@@ -1,8 +1,8 @@
 ;
 ;	File 'topol.top' was generated
 ;	By user: root (0)
-;	On host: 461c13f045b0
-;	At date: Tue Jan 27 10:52:16 2026
+;	On host: 7efbcf5f8735
+;	At date: Thu Jan 29 16:41:17 2026
 ;
 ;	This is a standalone topology file
 ;
@@ -39,7 +39,7 @@
 
 [ system ]
 ; Name
-GROningen Mixture of Alchemy and Childrens' Stories in water
+GROwing Monsters And Cloning Shrimps in water
 
 [ molecules ]
 ; Compound        #mols

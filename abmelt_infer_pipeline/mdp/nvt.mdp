@@ -42,4 +42,4 @@ DispCorr                = no
 ; Velocity generation
 gen_vel                 = yes       ; assign velocities from Maxwell distribution
 gen_temp                = 300       ; temperature for Maxwell distribution
-gen_seed                = -1        ; generate a random seed
+gen_seed                = 42        ; generate a random seed
