@@ -27,7 +27,7 @@ ENV PATH=${MINICONDA_HOME}/bin:${PATH}
 
 RUN echo "=== Downloading and installing Miniconda ===" \
     && mkdir -p ${MINICONDA_HOME} \
-    && wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ${MINICONDA_HOME}/miniconda.sh \
+    && wget -q https://repo.anaconda.com/miniconda/Miniconda3-py312_25.1.1-0-Linux-x86_64.sh -O ${MINICONDA_HOME}/miniconda.sh \
     && bash ${MINICONDA_HOME}/miniconda.sh -b -u -p ${MINICONDA_HOME} \
     && rm -f ${MINICONDA_HOME}/miniconda.sh \
     && conda init bash \
@@ -50,7 +50,7 @@ RUN echo "=== Installing Poetry via pipx ===" \
 SHELL ["/bin/bash", "-lc"]
 
 # ===========================================
-# Multi-stage GROMACS build (optimized)
+# Build GROMACS with GPU support
 # ===========================================
 ARG CUDA_TARGET_COMPUTE=89
 ENV CUDA_TARGET_COMPUTE=${CUDA_TARGET_COMPUTE}
@@ -89,23 +89,25 @@ RUN echo "=== Starting GROMACS build with CUDA compute capability ${CUDA_TARGET_
 ENV PATH=/usr/local/gromacs/bin:${PATH}
 
 # ===========================================
-# Clone repository (cached layer)
+# Copy dependency files only (for Docker cache optimization)
 # ===========================================
 ARG REPO_URL=https://github.com/Praful932/antibody-developability-abmelt
-ARG APP_HOME=/opt/antibody-developability-abmelt
 
-RUN echo "=== Cloning antibody-developability-abmelt repository ===" \
-    && git clone --depth=1 ${REPO_URL} ${APP_HOME} \
-    && echo "=== Repository cloned successfully ==="
+# Temporarily clone repo ONLY to get dependency files
+RUN echo "=== Fetching dependency files ===" \
+    && git clone --depth=1 ${REPO_URL} /tmp/repo-for-deps \
+    && mkdir -p /opt/build \
+    && cp /tmp/repo-for-deps/abmelt_infer_pipeline/envs/abmelt_md_simulation_env/pyproject.toml /opt/build/ \
+    && cp /tmp/repo-for-deps/abmelt_infer_pipeline/envs/abmelt_md_simulation_env/poetry.lock /opt/build/ \
+    && rm -rf /tmp/repo-for-deps \
+    && echo "=== Dependency files copied ==="
 
-WORKDIR ${APP_HOME}/abmelt_infer_pipeline/envs/abmelt_md_simulation_env
+WORKDIR /opt/build
 
 # ===========================================
 # Create conda env and install dependencies (optimized)
 # ===========================================
 RUN echo "=== Setting up conda environment ===" \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main \
-    && conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r \
     && eval "$(conda shell.bash hook)" \
     && conda create -n abmelt-3-11-env python=3.11 -y \
     && conda activate abmelt-3-11-env \
@@ -130,12 +132,110 @@ RUN echo "=== Configuring Poetry and installing dependencies ===" \
     && conda activate abmelt-3-11-env \
     && poetry config virtualenvs.create false \
     && poetry config installer.max-workers 1 \
-    && echo "=== Clearing Poetry cache ===" \
-    && poetry cache clear --all . || true \
-    && rm -rf $(poetry config cache-dir)/artifacts || true \
     && echo "=== Installing dependencies with Poetry ===" \
-    && poetry install -vvv \
+    && poetry install --no-root -vvv \
     && echo "=== Poetry installation completed successfully ==="
+
+# ===========================================
+# Create helper script for git operations (runtime clone)
+# ===========================================
+RUN cat > /clone_repo.sh << 'EOF'
+#!/bin/bash
+set -e
+
+# Activate conda environment
+source /root/miniconda3/etc/profile.d/conda.sh
+conda activate abmelt-3-11-env
+
+# Git repository configuration
+REPO_URL="${REPO_URL:-https://github.com/Praful932/antibody-developability-abmelt}"
+GIT_BRANCH="${GIT_BRANCH:-main}"
+GIT_COMMIT="${GIT_COMMIT:-}"
+WORK_DIR="${WORK_DIR:-/workspace}"
+
+mkdir -p ${WORK_DIR}
+cd ${WORK_DIR}
+
+echo "=== Cloning repository from ${REPO_URL} ==="
+if [ -d "repo/.git" ]; then
+    echo "Repository exists, pulling latest changes..."
+    cd repo
+    git fetch origin
+    if [ -n "${GIT_COMMIT}" ]; then
+        echo "Checking out commit: ${GIT_COMMIT}"
+        git checkout ${GIT_COMMIT}
+    else
+        echo "Checking out branch: ${GIT_BRANCH}"
+        git checkout ${GIT_BRANCH}
+        git pull origin ${GIT_BRANCH}
+    fi
+else
+    if [ -n "${GIT_COMMIT}" ]; then
+        git clone ${REPO_URL} repo
+        cd repo
+        echo "Checking out commit: ${GIT_COMMIT}"
+        git checkout ${GIT_COMMIT}
+    else
+        git clone --depth=1 --branch=${GIT_BRANCH} ${REPO_URL} repo
+        cd repo
+    fi
+fi
+
+echo "=== Repository ready at $(pwd) ==="
+echo "=== Current commit: $(git rev-parse HEAD) ==="
+EOF
+
+RUN chmod +x /clone_repo.sh
+
+# ===========================================
+# Create RunPod-compatible start script
+# ===========================================
+RUN cat > /runpod_start.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "=== RunPod Startup ==="
+
+# Clone/update repository
+/clone_repo.sh
+
+# Start RunPod services (Jupyter, SSH, etc.)
+if [ -f /start.sh ]; then
+    echo "=== Starting RunPod services ==="
+    exec /start.sh
+else
+    echo "⚠️  /start.sh not found, starting bash"
+    exec /bin/bash
+fi
+EOF
+
+RUN chmod +x /runpod_start.sh
+
+# ===========================================
+# Create HF Jobs wrapper script
+# ===========================================
+RUN cat > /hf_job_run.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "=== HF Jobs Execution ==="
+
+# Clone/update repository
+/clone_repo.sh
+
+# Navigate to pipeline directory
+cd ${WORK_DIR:-/workspace}/repo/abmelt_infer_pipeline
+
+# Activate environment
+source /root/miniconda3/etc/profile.d/conda.sh
+conda activate abmelt-3-11-env
+
+# Execute the command
+echo "=== Executing: $@ ==="
+exec "$@"
+EOF
+
+RUN chmod +x /hf_job_run.sh
 
 # ===========================================
 # Final cleanup and success message
@@ -146,7 +246,12 @@ RUN echo "=== Final cleanup ===" \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* \
+    && rm -rf /opt/build \
     && echo "=== Docker build completed successfully! ==="
 
-# Set default command
+# ===========================================
+# Set working directory and default command
+# NO ENTRYPOINT - flexible for both RunPod and HF Jobs
+# ===========================================
+WORKDIR /workspace
 CMD ["/bin/bash"]
