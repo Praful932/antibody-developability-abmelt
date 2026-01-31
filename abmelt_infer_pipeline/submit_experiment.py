@@ -1,0 +1,276 @@
+#!/usr/bin/env python3
+
+"""
+CLI tool for submitting AbMelt inference experiments to Hugging Face Jobs.
+"""
+
+import os
+import sys
+import argparse
+import yaml
+from pathlib import Path
+from typing import Optional
+
+try:
+    from huggingface_hub import run_job, HfApi
+except ImportError:
+    print("Error: huggingface_hub is required. Install with: pip install huggingface_hub")
+    sys.exit(1)
+
+
+def validate_sequences(heavy: str, light: str) -> bool:
+    """Validate that sequences contain only valid amino acid codes."""
+    valid_aa = set("ACDEFGHIKLMNPQRSTVWY")
+    
+    heavy_clean = heavy.upper().replace(" ", "")
+    light_clean = light.upper().replace(" ", "")
+    
+    if not heavy_clean or not light_clean:
+        raise ValueError("Sequences cannot be empty")
+    
+    invalid_heavy = set(heavy_clean) - valid_aa
+    invalid_light = set(light_clean) - valid_aa
+    
+    if invalid_heavy:
+        raise ValueError(f"Invalid amino acids in heavy chain: {invalid_heavy}")
+    if invalid_light:
+        raise ValueError(f"Invalid amino acids in light chain: {invalid_light}")
+    
+    return True
+
+
+def validate_config(config_path: str) -> dict:
+    """Validate and load config file."""
+    config_file = Path(config_path)
+    
+    if not config_file.exists():
+        raise FileNotFoundError(f"Config file not found: {config_path}")
+    
+    try:
+        with open(config_file, 'r') as f:
+            config = yaml.safe_load(f)
+        return config
+    except Exception as e:
+        raise ValueError(f"Failed to load config file: {e}")
+
+
+def get_docker_image() -> str:
+    """Get Docker image name from environment or use default."""
+    return os.environ.get(
+        "ABMELT_DOCKER_IMAGE",
+        "your-dockerhub/abmelt:latest"  # User should set this
+    )
+
+
+def get_repo_url() -> str:
+    """Get repository URL from environment or use default."""
+    return os.environ.get(
+        "REPO_URL",
+        "https://github.com/Praful932/antibody-developability-abmelt"
+    )
+
+
+def get_hf_token() -> str:
+    """Get HF token from environment."""
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        raise ValueError(
+            "HF_TOKEN environment variable is required. "
+            "Set it with: export HF_TOKEN='hf_...'"
+        )
+    return token
+
+
+def submit_experiment(
+    name: str,
+    heavy: str,
+    light: str,
+    config: str,
+    flavor: str = "a100-large",
+    timeout: str = "24h",
+    description: Optional[str] = None,
+    docker_image: Optional[str] = None,
+    repo_url: Optional[str] = None,
+    hf_token: Optional[str] = None,
+    main_dataset: Optional[str] = None,
+    detailed_dataset_prefix: Optional[str] = None,
+    namespace: str = "hugging-science"
+):
+    """
+    Submit an experiment to Hugging Face Jobs.
+    
+    Args:
+        name: Antibody name
+        heavy: Heavy chain sequence
+        light: Light chain sequence
+        config: Path to config file
+        flavor: Hardware flavor (default: a100-large)
+        timeout: Job timeout (e.g., "2h", "90m")
+        description: Optional experiment description
+        namespace: HF Jobs namespace (default: hugging-science)
+        docker_image: Docker image name (defaults to env var or default)
+        repo_url: Repository URL (defaults to env var or default)
+        hf_token: HF token (defaults to HF_TOKEN env var)
+        main_dataset: Main dataset name (defaults to env var)
+        detailed_dataset_prefix: Detailed dataset prefix (defaults to env var)
+    """
+    # Validate inputs
+    print("Validating inputs...")
+    validate_sequences(heavy, light)
+    validate_config(config)
+    
+    # Get defaults
+    if docker_image is None:
+        docker_image = get_docker_image()
+    if repo_url is None:
+        repo_url = get_repo_url()
+    if hf_token is None:
+        hf_token = get_hf_token()
+    
+    # Build command
+    command = [
+        "/hf_job_run.sh",
+        "python", "run_experiment.py",
+        "--name", name,
+        "--heavy", heavy,
+        "--light", light,
+        "--config", config
+    ]
+    
+    # Prepare environment variables
+    env_vars = {
+        "REPO_URL": repo_url,
+    }
+    
+    if description:
+        env_vars["EXPERIMENT_DESCRIPTION"] = description
+    
+    if main_dataset:
+        env_vars["HF_MAIN_DATASET"] = main_dataset
+    
+    if detailed_dataset_prefix:
+        env_vars["HF_DETAILED_DATASET_PREFIX"] = detailed_dataset_prefix
+    
+    # Prepare secrets
+    secrets = {
+        "HF_TOKEN": hf_token
+    }
+    
+    print(f"\nSubmitting experiment to HF Jobs...")
+    print(f"  Antibody: {name}")
+    print(f"  Hardware: {flavor}")
+    print(f"  Timeout: {timeout}")
+    print(f"  Config: {config}")
+    print(f"  Docker Image: {docker_image}")
+    print(f"  Namespace: {namespace}")
+    print()
+    
+    # Submit job
+    try:
+        job = run_job(
+            image=docker_image,
+            command=command,
+            flavor=flavor,
+            timeout=timeout,
+            namespace=namespace,
+            env=env_vars,
+            secrets=secrets
+        )
+        
+        print("=" * 80)
+        print("Job submitted successfully!")
+        print(f"  Job ID: {job.id}")
+        print(f"  Job URL: {job.url}")
+        print("=" * 80)
+        print("\nMonitor your job:")
+        print(f"  python -c \"from huggingface_hub import inspect_job; print(inspect_job('{job.id}'))\"")
+        print(f"\nView logs:")
+        print(f"  python -c \"from huggingface_hub import fetch_job_logs; [print(log) for log in fetch_job_logs('{job.id}')]\"")
+        print()
+        
+        return job
+        
+    except Exception as e:
+        print(f"\nError submitting job: {e}")
+        raise
+
+
+def main():
+    """Main CLI entry point."""
+    parser = argparse.ArgumentParser(
+        description='Submit AbMelt inference experiments to Hugging Face Jobs',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Basic submission
+  python submit_experiment.py \\
+    --name "alemtuzumab" \\
+    --heavy "QVQLQESGPGLVR..." \\
+    --light "DIQMTQSPSSLSA..." \\
+    --config configs/testing_config.yaml
+
+  # With custom hardware and timeout
+  python submit_experiment.py \\
+    --name "test_ab" \\
+    --heavy "QVQLQESGPGLVR..." \\
+    --light "DIQMTQSPSSLSA..." \\
+    --config configs/paper_config.yaml \\
+    --flavor a10g-large \\
+    --timeout 4h \\
+    --description "Testing longer simulation time"
+        """
+    )
+    
+    parser.add_argument('--name', type=str, required=True,
+                       help='Antibody name/identifier')
+    parser.add_argument('--heavy', '--h', type=str, required=True,
+                       help='Heavy chain amino acid sequence')
+    parser.add_argument('--light', '--l', type=str, required=True,
+                       help='Light chain amino acid sequence')
+    parser.add_argument('--config', type=str, required=True,
+                       help='Path to configuration YAML file')
+    
+    parser.add_argument('--flavor', type=str, default='a100-large',
+                       help='Hardware flavor (default: a100-large)')
+    parser.add_argument('--timeout', type=str, default='24h',
+                       help='Job timeout (e.g., "24h", "90m", "3600s") (default: 24h)')
+    parser.add_argument('--description', type=str, default=None,
+                       help='Optional experiment description')
+    
+    parser.add_argument('--namespace', type=str, default='hugging-science',
+                       help='HF Jobs namespace (default: hugging-science)')
+    
+    parser.add_argument('--docker-image', type=str, default=None,
+                       help='Docker image name (defaults to ABMELT_DOCKER_IMAGE env var)')
+    parser.add_argument('--repo-url', type=str, default=None,
+                       help='Repository URL (defaults to REPO_URL env var)')
+    
+    parser.add_argument('--main-dataset', type=str, default=None,
+                       help='Main dataset name (defaults to HF_MAIN_DATASET env var)')
+    parser.add_argument('--detailed-dataset-prefix', type=str, default=None,
+                       help='Detailed dataset prefix (defaults to HF_DETAILED_DATASET_PREFIX env var)')
+    
+    args = parser.parse_args()
+    
+    try:
+        submit_experiment(
+            name=args.name,
+            heavy=args.heavy,
+            light=args.light,
+            config=args.config,
+            flavor=args.flavor,
+            timeout=args.timeout,
+            description=args.description,
+            namespace=args.namespace,
+            docker_image=args.docker_image,
+            repo_url=args.repo_url,
+            main_dataset=args.main_dataset,
+            detailed_dataset_prefix=args.detailed_dataset_prefix
+        )
+    except Exception as e:
+        print(f"\nError: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

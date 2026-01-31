@@ -1,0 +1,213 @@
+# AbMelt Inference Pipeline Configuration - Experiment Template
+# This file documents all trackable parameters for experiments.
+# Use this as a reference when designing experiments.
+#
+# All parameters marked with "TRACKED:" are automatically logged in the experiment dataset.
+
+# ============================================================================
+# SIMULATION PARAMETERS
+# ============================================================================
+simulation:
+  # TRACKED: Simulation temperatures in Kelvin
+  # These temperatures are logged in the main dataset for comparison across experiments
+  # Recommended: [300, 350, 400] for standard runs
+  # Lower temps (e.g., [300, 320, 340]) for faster convergence but less temperature range
+  temperatures: [300, 350, 400]
+  
+  # TRACKED: Total simulation time in nanoseconds
+  # Longer = more accurate but more expensive
+  # Quick test: 2ns (~10 min on A10G, ~5 min on A100)
+  # Production: 100ns (~2 hours on A100)
+  # Very long: 200ns+ for high-precision studies
+  simulation_time: 100
+  
+  # TRACKED: Force field selection
+  # Options: "charmm27" (default, well-tested), "charmm36-jul2022" (newer)
+  # charmm27 is recommended for antibody simulations
+  force_field: "charmm27"
+  
+  # TRACKED: Water model
+  # Options: "tip3p" (default), "tip4p", "tip5p"
+  # tip3p is standard for CHARMM force fields
+  water_model: "tip3p"
+  
+  # TRACKED: Salt concentration in millimolar (mM)
+  # Typical values: 150 (PBS-like), 0 (no salt), 300 (high salt)
+  # Affects electrostatic interactions and protein stability
+  salt_concentration: 150
+  
+  # TRACKED: pH value for protonation state calculation
+  # Typical values: 7.4 (physiological), 5.0-8.0 range
+  # Affects charge states of ionizable residues
+  pH: 7.4
+  
+  # TRACKED: Positive ion type
+  # Options: "NA" (sodium, default), "K" (potassium), "MG" (magnesium), "CA" (calcium)
+  p_salt: "NA"
+  
+  # TRACKED: Negative ion type
+  # Options: "CL" (chloride, default)
+  n_salt: "CL"
+  
+  # TRACKED: GPU acceleration enabled
+  # Set to false for CPU-only runs (slower but cheaper)
+  # GPU is highly recommended for MD simulations
+  gpu_enabled: true
+
+# ============================================================================
+# INPUT/OUTPUT PATHS
+# ============================================================================
+paths:
+  # Working directory for this run
+  # Each experiment gets its own subdirectory
+  run_dir: run_data/run_1/
+  
+  # Output directory for final results
+  output_dir: "results"
+  
+  # Temporary directory for intermediate files
+  temp_dir: "temp"
+  
+  # Log directory
+  log_dir: "logs"
+
+# ============================================================================
+# STRUCTURE PREPARATION SETTINGS
+# ============================================================================
+structure:
+  # Validate PDB structure before processing
+  validate_structure: true
+  
+  # Extract chain sequences from structure
+  extract_sequences: true
+  
+  # Create working directory for this antibody
+  create_work_dir: true
+
+# ============================================================================
+# GROMACS SETTINGS
+# ============================================================================
+gromacs:
+  # GROMACS executable name
+  # Options: "gmx" (default), "gmx_mpi" (for MPI parallel runs)
+  executable: "gmx"
+  
+  # Configuration directory for GROMACS
+  config_dir: "config/gromacs"
+  
+  # MDP template directory
+  mdp_dir: "mdp"
+  
+  # TRACKED: Number of CPU threads
+  # More threads = faster but uses more CPU
+  # Recommended: 4-8 for A100, 2-4 for smaller GPUs
+  n_threads: 8
+  
+  # TRACKED: GPU device ID
+  # Usually 0 for single GPU systems
+  # Set to 0, 1, 2, etc. for multi-GPU systems
+  gpu_id: 0
+
+# ============================================================================
+# LOGGING
+# ============================================================================
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+  
+  # Log file path (relative to run_dir)
+  file: "logs/inference.log"
+  
+  # Maximum log file size before rotation
+  max_size: "10MB"
+  
+  # Number of backup log files to keep
+  backup_count: 5
+
+# ============================================================================
+# DESCRIPTOR COMPUTATION SETTINGS
+# ============================================================================
+descriptors:
+  # TRACKED: Equilibration time in nanoseconds
+  # Data before this time is discarded as equilibration
+  # Recommended: 20ns for 100ns simulations, 0 for quick tests
+  # Set to 0 for testing_config.yaml (short simulations)
+  equilibration_time: 20
+  
+  # TRACKED: Block lengths for order parameter computation (nanoseconds)
+  # List of block sizes for block averaging
+  # Recommended: [2.5, 25] for production, [2.5, 2.5] for quick tests
+  # Longer blocks = better statistics but fewer samples
+  block_length: [2.5, 25]
+  
+  # TRACKED: k value for core/surface classification
+  # Number of residues used to define core vs surface
+  # Typical values: 20 (default), 10 (more surface), 30 (more core)
+  core_surface_k: 20
+  
+  # TRACKED: Compute multi-temperature lambda features
+  # Requires at least 2 temperatures
+  # Set to false for single-temperature runs
+  compute_lambda: true
+  
+  # TRACKED: Use dummy S2 values for testing
+  # Set to true only for quick tests with very short trajectories
+  # Production runs should use false
+  use_dummy_s2: false
+
+# ============================================================================
+# PERFORMANCE SETTINGS
+# ============================================================================
+performance:
+  # Number of parallel jobs (future use)
+  parallel_jobs: 4
+  
+  # TRACKED: Clean up temporary files after completion
+  # Saves significant disk space (80-95% reduction)
+  # Set to false if you need intermediate files for debugging
+  cleanup_temp: true
+  
+  # TRACKED: When to cleanup temporary files
+  # Options: "descriptors" (after descriptor computation), "inference" (after predictions)
+  # "inference" is recommended to keep files available if inference fails
+  cleanup_after: "inference"
+  
+  # TRACKED: Delete order parameter CSV files during cleanup
+  # Set to true to save more space, false to keep for debugging
+  delete_order_params: false
+  
+  # TRACKED: Save MD trajectories
+  # Trajectories are very large (GBs) - set to true only if needed
+  # Usually false - descriptors are extracted and trajectories can be deleted
+  save_trajectories: false
+
+# ============================================================================
+# EXPERIMENT DESIGN RECOMMENDATIONS
+# ============================================================================
+#
+# Quick Test (2ns, ~10 min on A100):
+#   - simulation_time: 2
+#   - equilibration_time: 0
+#   - block_length: [2.5, 2.5]
+#   - use_dummy_s2: true
+#   - cleanup_temp: true
+#
+# Standard Production (100ns, ~2 hours on A100):
+#   - simulation_time: 100
+#   - equilibration_time: 20
+#   - block_length: [2.5, 25]
+#   - use_dummy_s2: false
+#   - cleanup_temp: true
+#
+# High Precision (200ns+, ~4+ hours on A100):
+#   - simulation_time: 200
+#   - equilibration_time: 40
+#   - block_length: [5, 50]
+#   - use_dummy_s2: false
+#   - cleanup_temp: false (keep trajectories for analysis)
+#
+# Parameter Sweeps:
+#   - Salt concentration: [0, 150, 300] mM
+#   - pH: [5.0, 6.0, 7.4, 8.0]
+#   - Temperature ranges: [300, 350, 400] vs [300, 320, 340]
+#   - Force fields: charmm27 vs charmm36-jul2022

@@ -1,0 +1,383 @@
+#!/usr/bin/env python3
+
+"""
+Dataset utilities for uploading AbMelt experiment results to Hugging Face datasets.
+Handles both main predictions dataset (one row per experiment) and detailed results datasets.
+"""
+
+import os
+import json
+import hashlib
+import logging
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Optional, Any
+import pandas as pd
+import numpy as np
+
+try:
+    from datasets import Dataset, load_dataset
+    from huggingface_hub import HfApi, upload_file, login
+    from huggingface_hub.utils import HfHubHTTPError
+except ImportError as e:
+    logging.error(f"Failed to import required libraries: {e}")
+    logging.error("Please install: pip install datasets huggingface_hub")
+    raise
+
+logger = logging.getLogger(__name__)
+
+
+def get_hf_token() -> Optional[str]:
+    """Get HF token from environment variable."""
+    token = os.environ.get("HF_TOKEN")
+    if not token:
+        logger.warning("HF_TOKEN not found in environment. Dataset uploads will fail.")
+    return token
+
+
+def login_to_hf(token: Optional[str] = None):
+    """Login to Hugging Face Hub."""
+    if token is None:
+        token = get_hf_token()
+    if token:
+        try:
+            login(token=token)
+            logger.info("Successfully logged in to Hugging Face Hub")
+        except Exception as e:
+            logger.error(f"Failed to login to Hugging Face Hub: {e}")
+            raise
+    else:
+        raise ValueError("HF_TOKEN is required for dataset uploads")
+
+
+def compute_config_hash(config: Dict) -> str:
+    """Compute MD5 hash of config dictionary for quick comparison."""
+    config_str = json.dumps(config, sort_keys=True)
+    return hashlib.md5(config_str.encode()).hexdigest()
+
+
+def extract_trackable_params(config: Dict) -> Dict[str, Any]:
+    """
+    Extract all trackable parameters from config and flatten them.
+    
+    Returns a flat dictionary with all parameters that should be tracked in the dataset.
+    """
+    params = {}
+    
+    # Simulation parameters
+    sim = config.get("simulation", {})
+    params["temperatures"] = json.dumps(sim.get("temperatures", []))
+    params["simulation_time"] = sim.get("simulation_time", None)
+    params["force_field"] = sim.get("force_field", None)
+    params["water_model"] = sim.get("water_model", None)
+    params["salt_concentration"] = sim.get("salt_concentration", None)
+    params["pH"] = sim.get("pH", None)
+    params["p_salt"] = sim.get("p_salt", None)
+    params["n_salt"] = sim.get("n_salt", None)
+    params["gpu_enabled"] = sim.get("gpu_enabled", False)
+    
+    # GROMACS parameters
+    gromacs = config.get("gromacs", {})
+    params["gpu_id"] = gromacs.get("gpu_id", None)
+    params["n_threads"] = gromacs.get("n_threads", None)
+    
+    # Descriptor parameters
+    descriptors = config.get("descriptors", {})
+    params["equilibration_time"] = descriptors.get("equilibration_time", None)
+    params["block_length"] = json.dumps(descriptors.get("block_length", []))
+    params["core_surface_k"] = descriptors.get("core_surface_k", None)
+    params["compute_lambda"] = descriptors.get("compute_lambda", False)
+    params["use_dummy_s2"] = descriptors.get("use_dummy_s2", False)
+    
+    # Performance parameters
+    performance = config.get("performance", {})
+    params["cleanup_temp"] = performance.get("cleanup_temp", False)
+    params["cleanup_after"] = performance.get("cleanup_after", None)
+    params["delete_order_params"] = performance.get("delete_order_params", False)
+    params["save_trajectories"] = performance.get("save_trajectories", False)
+    
+    return params
+
+
+def create_main_dataset_if_not_exists(
+    dataset_name: str,
+    token: Optional[str] = None
+) -> bool:
+    """
+    Create the main predictions dataset if it doesn't exist.
+    
+    Args:
+        dataset_name: Full dataset name (e.g., "username/abmelt-experiments")
+        token: HF token (optional, will use HF_TOKEN env var if not provided)
+        
+    Returns:
+        True if dataset was created, False if it already exists
+    """
+    if token is None:
+        token = get_hf_token()
+    
+    if not token:
+        raise ValueError("HF_TOKEN is required")
+    
+    login_to_hf(token)
+    
+    try:
+        # Try to load the dataset
+        _ = load_dataset(dataset_name, split="train")
+        logger.info(f"Dataset {dataset_name} already exists")
+        return False
+    except Exception:
+        # Dataset doesn't exist, create it with empty data
+        logger.info(f"Creating new dataset: {dataset_name}")
+        
+        # Define schema with empty data
+        empty_data = {
+            "experiment_id": [],
+            "antibody_name": [],
+            "timestamp": [],
+            "heavy_chain": [],
+            "light_chain": [],
+            "tagg": [],
+            "tm": [],
+            "tmon": [],
+            "job_id": [],
+            "status": [],
+            "duration_seconds": [],
+            "config_hash": [],
+            "error_message": [],
+            # Config parameters
+            "temperatures": [],
+            "simulation_time": [],
+            "force_field": [],
+            "water_model": [],
+            "salt_concentration": [],
+            "pH": [],
+            "p_salt": [],
+            "n_salt": [],
+            "equilibration_time": [],
+            "block_length": [],
+            "core_surface_k": [],
+            "compute_lambda": [],
+            "use_dummy_s2": [],
+            "cleanup_temp": [],
+            "cleanup_after": [],
+            "delete_order_params": [],
+            "save_trajectories": [],
+            "gpu_enabled": [],
+            "gpu_id": [],
+            "n_threads": [],
+        }
+        
+        dataset = Dataset.from_dict(empty_data)
+        dataset.push_to_hub(dataset_name, token=token)
+        logger.info(f"Successfully created dataset: {dataset_name}")
+        return True
+
+
+def upload_to_main_predictions_dataset(
+    experiment_id: str,
+    antibody_name: str,
+    heavy_chain: str,
+    light_chain: str,
+    predictions: Dict[str, Optional[np.ndarray]],
+    config: Dict,
+    job_id: str,
+    status: str,
+    duration_seconds: int,
+    error_message: Optional[str] = None,
+    dataset_name: Optional[str] = None,
+    token: Optional[str] = None
+):
+    """
+    Upload a single experiment result to the main predictions dataset.
+    
+    Args:
+        experiment_id: Unique experiment identifier
+        antibody_name: Name of the antibody
+        heavy_chain: Heavy chain sequence
+        light_chain: Light chain sequence
+        predictions: Dictionary with keys "tagg", "tm", "tmon" (values are numpy arrays or None)
+        config: Configuration dictionary used for this experiment
+        job_id: HF Jobs ID
+        status: "success", "failed", or "timeout"
+        duration_seconds: Total runtime in seconds
+        error_message: Optional error message if status is "failed"
+        dataset_name: Full dataset name (defaults to HF_MAIN_DATASET env var or "username/abmelt-experiments")
+        token: HF token (optional, will use HF_TOKEN env var if not provided)
+    """
+    if token is None:
+        token = get_hf_token()
+    
+    if not token:
+        raise ValueError("HF_TOKEN is required")
+    
+    if dataset_name is None:
+        dataset_name = os.environ.get("HF_MAIN_DATASET", "username/abmelt-experiments")
+    
+    login_to_hf(token)
+    
+    # Create dataset if it doesn't exist
+    create_main_dataset_if_not_exists(dataset_name, token)
+    
+    # Extract trackable parameters
+    config_params = extract_trackable_params(config)
+    config_hash = compute_config_hash(config)
+    
+    # Extract predictions
+    tagg = float(predictions.get("tagg", [None])[0]) if predictions.get("tagg") is not None else None
+    tm = float(predictions.get("tm", [None])[0]) if predictions.get("tm") is not None else None
+    tmon = float(predictions.get("tmon", [None])[0]) if predictions.get("tmon") is not None else None
+    
+    # Prepare row data
+    row_data = {
+        "experiment_id": experiment_id,
+        "antibody_name": antibody_name,
+        "timestamp": datetime.now().isoformat(),
+        "heavy_chain": heavy_chain,
+        "light_chain": light_chain,
+        "tagg": tagg,
+        "tm": tm,
+        "tmon": tmon,
+        "job_id": job_id,
+        "status": status,
+        "duration_seconds": duration_seconds,
+        "config_hash": config_hash,
+        "error_message": error_message or "",
+        **config_params
+    }
+    
+    # Load existing dataset
+    try:
+        dataset = load_dataset(dataset_name, split="train")
+        logger.info(f"Loaded existing dataset with {len(dataset)} rows")
+    except Exception as e:
+        logger.error(f"Failed to load dataset: {e}")
+        raise
+    
+    # Convert to pandas, append row, convert back
+    df = dataset.to_pandas()
+    new_row = pd.DataFrame([row_data])
+    df = pd.concat([df, new_row], ignore_index=True)
+    
+    # Convert back to Dataset and push
+    new_dataset = Dataset.from_pandas(df)
+    new_dataset.push_to_hub(dataset_name, token=token)
+    
+    logger.info(f"Successfully uploaded experiment {experiment_id} to {dataset_name}")
+
+
+def upload_to_detailed_results_dataset(
+    experiment_id: str,
+    descriptors_df: pd.DataFrame,
+    config: Dict,
+    log_file: Optional[str] = None,
+    metadata: Optional[Dict] = None,
+    dataset_prefix: Optional[str] = None,
+    token: Optional[str] = None
+):
+    """
+    Upload detailed results (descriptors, config, logs) to a per-experiment dataset.
+    
+    Args:
+        experiment_id: Unique experiment identifier
+        descriptors_df: DataFrame with all computed descriptors
+        config: Configuration dictionary used for this experiment
+        log_file: Path to log file (optional)
+        metadata: Additional metadata dictionary (optional)
+        dataset_prefix: Dataset prefix (defaults to HF_DETAILED_DATASET_PREFIX env var)
+        token: HF token (optional, will use HF_TOKEN env var if not provided)
+    """
+    if token is None:
+        token = get_hf_token()
+    
+    if not token:
+        raise ValueError("HF_TOKEN is required")
+    
+    if dataset_prefix is None:
+        dataset_prefix = os.environ.get(
+            "HF_DETAILED_DATASET_PREFIX",
+            "username/abmelt-experiments-"
+        )
+    
+    dataset_name = f"{dataset_prefix}{experiment_id}"
+    login_to_hf(token)
+    
+    api = HfApi(token=token)
+    
+    # Create a temporary directory for files to upload
+    import tempfile
+    import shutil
+    
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_path = Path(temp_dir)
+        
+        # Save descriptors as CSV
+        descriptors_csv = temp_path / "descriptors.csv"
+        descriptors_df.to_csv(descriptors_csv, index=False)
+        logger.info(f"Saved descriptors CSV: {descriptors_csv}")
+        
+        # Save descriptors as pickle
+        descriptors_pkl = temp_path / "descriptors.pkl"
+        descriptors_df.to_pickle(descriptors_pkl)
+        logger.info(f"Saved descriptors pickle: {descriptors_pkl}")
+        
+        # Save config as YAML
+        import yaml
+        config_yaml = temp_path / "config.yaml"
+        with open(config_yaml, 'w') as f:
+            yaml.dump(config, f, default_flow_style=False)
+        logger.info(f"Saved config YAML: {config_yaml}")
+        
+        # Copy log file if provided
+        log_dest = None
+        if log_file and Path(log_file).exists():
+            log_dest = temp_path / "inference.log"
+            shutil.copy2(log_file, log_dest)
+            logger.info(f"Copied log file: {log_file} -> {log_dest}")
+        
+        # Save metadata JSON
+        if metadata is None:
+            metadata = {}
+        metadata_json = temp_path / "run_metadata.json"
+        with open(metadata_json, 'w') as f:
+            json.dump(metadata, f, indent=2)
+        logger.info(f"Saved metadata JSON: {metadata_json}")
+        
+        # Upload all files
+        files_to_upload = [
+            (descriptors_csv, "descriptors.csv"),
+            (descriptors_pkl, "descriptors.pkl"),
+            (config_yaml, "config.yaml"),
+            (metadata_json, "run_metadata.json"),
+        ]
+        
+        if log_dest:
+            files_to_upload.append((log_dest, "inference.log"))
+        
+        # Create repo if it doesn't exist
+        try:
+            api.create_repo(
+                repo_id=dataset_name,
+                repo_type="dataset",
+                exist_ok=True,
+                token=token
+            )
+        except Exception as e:
+            logger.warning(f"Could not create repo (may already exist): {e}")
+        
+        # Upload files
+        for file_path, filename in files_to_upload:
+            try:
+                upload_file(
+                    path_or_fileobj=str(file_path),
+                    path_in_repo=filename,
+                    repo_id=dataset_name,
+                    repo_type="dataset",
+                    token=token
+                )
+                logger.info(f"Uploaded {filename} to {dataset_name}")
+            except Exception as e:
+                logger.error(f"Failed to upload {filename}: {e}")
+                raise
+    
+    logger.info(f"Successfully uploaded detailed results to {dataset_name}")
