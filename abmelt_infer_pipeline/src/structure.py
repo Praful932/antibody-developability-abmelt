@@ -33,7 +33,7 @@ import torch
 # immune builder structure prediciton (similar to igfold, AF2, etc.)
 def immune_builder(sequence, output="mAb.pdb"):
     from ImmuneBuilder import ABodyBuilder2
-    predictor = ABodyBuilder2()
+    predictor = ABodyBuilder2(weights_dir="/opt/immunebuilder_weights")
     antibody = predictor.predict(sequence)
     antibody.save(output)
     

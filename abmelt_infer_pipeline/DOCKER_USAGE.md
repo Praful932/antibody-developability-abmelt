@@ -8,10 +8,10 @@ This document explains how to use the AbMelt Docker image for both RunPod and Hu
 cd abmelt_infer_pipeline
 
 # Build with default CUDA compute capability (89 for RTX 4090, A100, H100)
-docker build -t yourusername/abmelt:latest .
+docker build -t praful932/abmelt-pipeline:latest .
 
 # Build for specific GPU architecture
-docker build --build-arg CUDA_TARGET_COMPUTE=75 -t yourusername/abmelt:latest .
+docker build --build-arg CUDA_TARGET_COMPUTE=75 -t praful932/abmelt-pipeline:latest .
 ```
 
 **CUDA Compute Capabilities:**
@@ -24,11 +24,11 @@ docker build --build-arg CUDA_TARGET_COMPUTE=75 -t yourusername/abmelt:latest .
 
 ```bash
 docker login
-docker push yourusername/abmelt:latest
+docker push praful932/abmelt-pipeline:latest
 
 # Also tag with version
-docker tag yourusername/abmelt:latest yourusername/abmelt:v1.0
-docker push yourusername/abmelt:v1.0
+docker tag praful932/abmelt-pipeline:latest praful932/abmelt-pipeline:v1.0
+docker push praful932/abmelt-pipeline:v1.0
 ```
 
 ## Usage: RunPod
@@ -36,7 +36,7 @@ docker push yourusername/abmelt:v1.0
 ### 1. Create RunPod Template
 
 In RunPod console:
-- **Container Image**: `yourusername/abmelt:latest`
+- **Container Image**: `praful932/abmelt-pipeline:latest`
 - **Container Start Command**: `/runpod_start.sh`
 - **Environment Variables**:
   ```
@@ -87,7 +87,7 @@ huggingface-cli login
 from huggingface_hub import run_job
 
 job = run_job(
-    image="yourusername/abmelt:latest",
+    image="praful932/abmelt-pipeline:latest",
     command=[
         "/hf_job_run.sh",
         "python", "infer.py",
@@ -183,20 +183,20 @@ Test the image locally:
 docker run --rm -it \
   -e REPO_URL=https://github.com/Praful932/antibody-developability-abmelt \
   -e GIT_BRANCH=main \
-  yourusername/abmelt:latest \
+  praful932/abmelt-pipeline:latest \
   /runpod_start.sh
 
 # Test HF Jobs execution
 docker run --rm -it \
   -e REPO_URL=https://github.com/Praful932/antibody-developability-abmelt \
   -e GIT_BRANCH=main \
-  yourusername/abmelt:latest \
+  praful932/abmelt-pipeline:latest \
   /hf_job_run.sh python infer.py --help
 
 # Test with GPU
 docker run --rm -it --gpus all \
   -e REPO_URL=https://github.com/Praful932/antibody-developability-abmelt \
-  yourusername/abmelt:latest \
+  praful932/abmelt-pipeline:latest \
   /hf_job_run.sh python -c "import torch; print(torch.cuda.is_available())"
 ```
 

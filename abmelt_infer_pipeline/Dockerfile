@@ -137,6 +137,35 @@ RUN echo "=== Configuring Poetry and installing dependencies ===" \
     && echo "=== Poetry installation completed successfully ==="
 
 # ===========================================
+# Pre-download ImmuneBuilder antibody weights
+# ===========================================
+RUN echo "=== Downloading ImmuneBuilder antibody weights ===" \
+    && mkdir -p /opt/immunebuilder_weights \
+    && cd /opt/immunebuilder_weights \
+    && wget -q --show-progress \
+        "https://zenodo.org/record/7258553/files/antibody_model_1?download=1" \
+        -O antibody_model_1 \
+    && wget -q --show-progress \
+        "https://zenodo.org/record/7258553/files/antibody_model_2?download=1" \
+        -O antibody_model_2 \
+    && wget -q --show-progress \
+        "https://zenodo.org/record/7258553/files/antibody_model_3?download=1" \
+        -O antibody_model_3 \
+    && wget -q --show-progress \
+        "https://zenodo.org/record/7258553/files/antibody_model_4?download=1" \
+        -O antibody_model_4 \
+    && echo "=== Verifying downloaded weights ===" \
+    && for model in antibody_model_*; do \
+        if [ ! -s "$model" ]; then \
+            echo "ERROR: $model is empty or missing"; \
+            exit 1; \
+        fi; \
+        echo "✓ $model: $(stat -c%s "$model" 2>/dev/null || stat -f%z "$model") bytes"; \
+    done \
+    && chmod -R 755 /opt/immunebuilder_weights \
+    && echo "=== Antibody weights downloaded successfully ==="
+
+# ===========================================
 # Create helper script for git operations (runtime clone)
 # ===========================================
 RUN cat > /clone_repo.sh << 'EOF'
