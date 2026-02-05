@@ -52,7 +52,7 @@ SHELL ["/bin/bash", "-lc"]
 # ===========================================
 # Build GROMACS with GPU support
 # ===========================================
-ARG CUDA_TARGET_COMPUTE=89
+ARG CUDA_TARGET_COMPUTE=80
 ENV CUDA_TARGET_COMPUTE=${CUDA_TARGET_COMPUTE}
 
 RUN echo "=== Starting GROMACS build with CUDA compute capability ${CUDA_TARGET_COMPUTE} ===" \
