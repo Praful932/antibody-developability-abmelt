@@ -1,0 +1,34 @@
+# This file was created Thu Feb  5 18:36:08 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/repo/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_400.xtc -s md_400.tpr -spherical -sl 10 -o potential_cdrs_400.xvg -oc charge_cdrs_400.xvg -of field_cdrs_400.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gallium Rubidium Oxygen Manganese Argon Carbon Silicon
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdrs"
+                   0                     -nan
+  0.6588369607925415       -1.678057551383972
+   1.317673921585083       -3.586853742599487
+   1.976510882377625       -5.090255260467529
+   2.635347843170166       -5.953299999237061
+   3.294184923171997       -6.464447975158691
+   3.953021764755249        -6.80239725112915
+    4.61185884475708       -7.043789863586426
+   5.270695686340332       -7.224833965301514
+   5.929532527923584       -7.365646362304688

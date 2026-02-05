@@ -1,0 +1,80 @@
+# This file was created Thu Feb  5 18:36:04 2026
+# Created by:
+#                        :-) GROMACS - gmx rmsf, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/repo/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx rmsf -f md_final_400.xtc -s md_final_400.gro -o rmsf_cdrl2_400.xvg -n index.ndx -b 0
+# gmx rmsf is part of G R O M A C S:
+#
+# Gravel Rubs Often Many Awfully Cauterized Sores
+#
+@    title "RMS fluctuation"
+@    xaxis  label "Atom"
+@    yaxis  label "(nm)"
+@TYPE xy
+  762   0.0471
+  763   0.0537
+  764   0.0336
+  765   0.0429
+  766   0.0338
+  767   0.0521
+  768   0.0532
+  769   0.0280
+  770   0.1153
+  771   0.2014
+  772   0.1192
+  773   0.1989
+  774   0.0780
+  775   0.1029
+  776   0.1179
+  777   0.1974
+  778   0.1343
+  779   0.2195
+  780   0.0293
+  781   0.0429
+  782   0.0257
+  783   0.0357
+  784   0.0218
+  785   0.0288
+  786   0.0271
+  787   0.0380
+  788   0.0444
+  789   0.1098
+  790   0.1163
+  791   0.1093
+  792   0.0355
+  793   0.0555
+  794   0.0571
+  795   0.0525
+  796   0.1203
+  797   0.1217
+  798   0.1185
+  799   0.0226
+  800   0.0374
+  801   0.0248
+  802   0.0354
+  803   0.0288
+  804   0.0358
+  805   0.0389
+  806   0.0477
+  807   0.0551
+  808   0.0465
+  809   0.0726
+  810   0.0698
+  811   0.0576
+  812   0.1013
+  813   0.1063
+  814   0.0358
+  815   0.0652
+  816   0.0639
+  817   0.0914
+  818   0.1011
+  819   0.1262
+  820   0.1075
+  821   0.1185
+  822   0.1388
+  823   0.0384
+  824   0.0459
