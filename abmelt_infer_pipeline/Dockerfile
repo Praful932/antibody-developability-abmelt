@@ -87,6 +87,7 @@ RUN echo "=== Starting GROMACS build with CUDA compute capability ${CUDA_TARGET_
     && echo "=== GROMACS build completed successfully ==="
 
 ENV PATH=/usr/local/gromacs/bin:${PATH}
+ENV PYTHONUNBUFFERED=1
 
 # ===========================================
 # Copy dependency files only (for Docker cache optimization)
@@ -258,6 +259,9 @@ cd ${WORK_DIR:-/workspace}/repo/abmelt_infer_pipeline
 # Activate environment
 source /root/miniconda3/etc/profile.d/conda.sh
 conda activate abmelt-3-11-env
+
+# Ensure Python output is unbuffered
+export PYTHONUNBUFFERED=1
 
 # Execute the command
 echo "=== Executing: $@ ==="
