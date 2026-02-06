@@ -78,7 +78,12 @@ def run_experiment(
     heavy_chain: str,
     light_chain: str,
     config_path: str,
-    hf_token: Optional[str] = None
+    hf_token: Optional[str] = None,
+    skip_structure: bool = False,
+    skip_md: bool = False,
+    skip_descriptors: bool = False,
+    skip_inference: bool = False,
+    results_dir: Optional[str] = None
 ) -> Dict:
     """
     Run a complete inference experiment and upload results to HF datasets.
@@ -122,6 +127,12 @@ def run_experiment(
     setup_logging(config)
     create_directories(config)
     
+    # Override temp_dir with results_dir if specified (for debugging with skip flags)
+    # Do this AFTER create_directories() so absolute paths aren't modified
+    if results_dir:
+        logger.info(f"Using pre-computed results from: {results_dir}")
+        config["paths"]["temp_dir"] = results_dir
+    
     # Prepare antibody input
     antibody = {
         "name": antibody_name,
@@ -140,7 +151,14 @@ def run_experiment(
     
     try:
         logger.info("Running inference pipeline...")
-        result = run_inference_pipeline(antibody, config)
+        result = run_inference_pipeline(
+            antibody, 
+            config,
+            skip_structure=skip_structure,
+            skip_md=skip_md,
+            skip_descriptors=skip_descriptors,
+            skip_inference=skip_inference
+        )
         
         # Extract results
         if "inference_result" in result:
@@ -284,6 +302,17 @@ def main():
     parser.add_argument('--config', type=str, required=True,
                        help='Configuration file path')
     
+    parser.add_argument('--skip-structure', action='store_true',
+                       help='Skip structure preparation step')
+    parser.add_argument('--skip-md', action='store_true',
+                       help='Skip MD simulation step')
+    parser.add_argument('--skip-descriptors', action='store_true',
+                       help='Skip descriptor computation step')
+    parser.add_argument('--skip-inference', action='store_true',
+                       help='Skip model inference step')
+    parser.add_argument('--results-dir', type=str, default=None,
+                       help='Path to pre-computed results directory (for debugging with skip flags)')
+    
     args = parser.parse_args()
     
     # Run experiment
@@ -292,7 +321,12 @@ def main():
             antibody_name=args.name,
             heavy_chain=args.heavy,
             light_chain=args.light,
-            config_path=args.config
+            config_path=args.config,
+            skip_structure=args.skip_structure,
+            skip_md=args.skip_md,
+            skip_descriptors=args.skip_descriptors,
+            skip_inference=args.skip_inference,
+            results_dir=args.results_dir
         )
         
         # Exit with appropriate code

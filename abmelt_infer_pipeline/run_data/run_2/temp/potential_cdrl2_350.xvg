@@ -1,0 +1,34 @@
+# This file was created Thu Feb  5 18:35:56 2026
+# Created by:
+#                     :-) GROMACS - gmx potential, 2024 (-:
+# 
+# Executable:   /usr/local/gromacs/bin/gmx
+# Data prefix:  /usr/local/gromacs
+# Working dir:  /workspace/repo/abmelt_infer_pipeline/run_data/run_2/temp
+# Command line:
+#   gmx potential -f md_final_350.xtc -s md_350.tpr -spherical -sl 10 -o potential_cdrl2_350.xvg -oc charge_cdrl2_350.xvg -of field_cdrl2_350.xvg -n index.ndx
+# gmx potential is part of G R O M A C S:
+#
+# Gromacs Runs On Most of All Computer Systems
+#
+@    title "Electrostatic Potential"
+@    xaxis  label "Average coordinate (nm)"
+@    yaxis  label "Potential (V)"
+@TYPE xy
+@ view 0.15, 0.15, 0.75, 0.85
+@ legend on
+@ legend box on
+@ legend loctype view
+@ legend 0.78, 0.8
+@ legend length 2
+@ s0 legend "cdr2l"
+                   0                     -nan
+  0.6452746391296387      -0.2063812762498856
+   1.290549278259277      -0.4127625524997711
+   1.935824036598206      -0.5503500699996948
+   2.581098556518555      -0.6191438436508179
+   3.226373434066772      -0.6604200601577759
+   3.871648073196411      -0.6879375576972961
+   4.516922473907471      -0.7075929641723633
+   5.162197113037109      -0.7223344445228577
+   5.807472229003906      -0.7338001132011414

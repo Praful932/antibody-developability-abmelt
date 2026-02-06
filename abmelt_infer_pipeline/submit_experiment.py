@@ -94,7 +94,12 @@ def submit_experiment(
     hf_token: Optional[str] = None,
     main_dataset: Optional[str] = None,
     detailed_dataset_prefix: Optional[str] = None,
-    namespace: str = "hugging-science"
+    namespace: str = "hugging-science",
+    skip_structure: bool = False,
+    skip_md: bool = False,
+    skip_descriptors: bool = False,
+    skip_inference: bool = False,
+    results_dir: Optional[str] = None
 ):
     """
     Submit an experiment to Hugging Face Jobs.
@@ -136,6 +141,18 @@ def submit_experiment(
         "--light", light,
         "--config", config
     ]
+    
+    # Add skip flags if specified
+    if skip_structure:
+        command.append("--skip-structure")
+    if skip_md:
+        command.append("--skip-md")
+    if skip_descriptors:
+        command.append("--skip-descriptors")
+    if skip_inference:
+        command.append("--skip-inference")
+    if results_dir:
+        command.extend(["--results-dir", results_dir])
     
     # Prepare environment variables
     env_vars = {
@@ -250,6 +267,20 @@ Examples:
     parser.add_argument('--detailed-dataset-prefix', type=str, default=None,
                        help='Detailed dataset prefix (defaults to HF_DETAILED_DATASET_PREFIX env var)')
     
+    # Skip step flags
+    parser.add_argument('--skip-structure', action='store_true',
+                       help='Skip structure preparation step')
+    parser.add_argument('--skip-md', action='store_true',
+                       help='Skip MD simulation step')
+    parser.add_argument('--skip-descriptors', action='store_true',
+                       help='Skip descriptor computation step')
+    parser.add_argument('--skip-inference', action='store_true',
+                       help='Skip model inference step')
+    
+    # Debug/results directory
+    parser.add_argument('--results-dir', type=str, default=None,
+                       help='Path to pre-computed results directory (for debugging with skip flags)')
+    
     args = parser.parse_args()
     
     try:
@@ -265,7 +296,12 @@ Examples:
             docker_image=args.docker_image,
             repo_url=args.repo_url,
             main_dataset=args.main_dataset,
-            detailed_dataset_prefix=args.detailed_dataset_prefix
+            detailed_dataset_prefix=args.detailed_dataset_prefix,
+            skip_structure=args.skip_structure,
+            skip_md=args.skip_md,
+            skip_descriptors=args.skip_descriptors,
+            skip_inference=args.skip_inference,
+            results_dir=args.results_dir
         )
     except Exception as e:
         print(f"\nError: {e}")

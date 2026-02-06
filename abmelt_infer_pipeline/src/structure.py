@@ -25,6 +25,7 @@
 
 """preprocessing script to generate structures using ImmuneBuilder"""
 
+import os
 import numpy as np
 from sys import stdout
 import torch
@@ -33,7 +34,15 @@ import torch
 # immune builder structure prediciton (similar to igfold, AF2, etc.)
 def immune_builder(sequence, output="mAb.pdb"):
     from ImmuneBuilder import ABodyBuilder2
-    predictor = ABodyBuilder2(weights_dir="/opt/immunebuilder_weights")
+    # Get weights directory from environment variable
+    # Default: /opt/immunebuilder_weights (bundled in Docker)
+    # Set to empty string to use ImmuneBuilder's default (package location)
+    weights_dir_env = os.environ.get("IMMUNEBUILDER_WEIGHTS_DIR", "/opt/immunebuilder_weights")
+    
+    # If empty string, use None to let ImmuneBuilder use its default path
+    weights_dir = None if weights_dir_env == "" else weights_dir_env
+    
+    predictor = ABodyBuilder2(weights_dir=weights_dir)
     antibody = predictor.predict(sequence)
     antibody.save(output)
     
