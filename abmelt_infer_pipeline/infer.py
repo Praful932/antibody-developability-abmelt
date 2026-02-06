@@ -42,6 +42,8 @@ def main():
                        help='Skip descriptor computation step (load existing descriptors)')
     parser.add_argument('--skip-inference', action='store_true',
                        help='Skip model inference step (load existing predictions)')
+    parser.add_argument('--results-dir', type=str, default=None,
+                       help='Path to pre-computed results directory (overrides temp_dir from config)')
     
     args = parser.parse_args()
     
@@ -57,6 +59,12 @@ def main():
     # 2. Setup logging and directories
     setup_logging(config)
     create_directories(config)
+    
+    # Override temp_dir with results_dir if specified (for debugging with skip flags)
+    # Do this AFTER create_directories() so absolute paths aren't modified
+    if args.results_dir:
+        logging.info(f"Using pre-computed results from: {args.results_dir}")
+        config["paths"]["temp_dir"] = args.results_dir
 
     # 3. Create antibody input based on input type
     if args.pdb:
