@@ -2,7 +2,7 @@
 # Simulation parameters (for future use)
 simulation:
   temperatures: [300, 350, 400]  # Kelvin
-  simulation_time: 2           # nanoseconds
+  simulation_time: 0.001           # nanoseconds
   force_field: "charmm27"        # or "charmm36-jul2022"
   water_model: "tip3p"
   salt_concentration: 150        # mM (PBS-like)
