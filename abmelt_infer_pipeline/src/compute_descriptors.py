@@ -172,98 +172,31 @@ def _compute_gromacs_descriptors(work_dir: Path, temps: List[str], eq_time: int)
                 logger.error('CDR-specific features will be skipped')
         
         try:
-            # Global features
-            logger.debug(f"  Computing global SASA...")
-            gromacs.sasa(f=final_xtc, s=final_gro, o=f'sasa_{temp}.xvg', input=['1'])
-            xvg_files.append(f'sasa_{temp}.xvg')
+            # Only compute the 4 essential XVG files required by the models
+            eq_time_ps = str(eq_time * 1000)
             
+            # 1. Bonds (contacts column needed for bonds_contacts_std_350)
             logger.debug(f"  Computing hydrogen bonds and contacts...")
-            # Use legacy hbond to get both hydrogen bonds AND contacts in one file
             gromacs.hbond_legacy(f=final_xtc, s=tpr_file, num=f'bonds_{temp}.xvg', input=['1', '1'])
             xvg_files.append(f'bonds_{temp}.xvg')
             
-            logger.debug(f"  Computing RMSD...")
-            gromacs.rms(f=final_xtc, s=final_gro, o=f'rmsd_{temp}.xvg', input=['3', '3'])
-            xvg_files.append(f'rmsd_{temp}.xvg')
+            # 2. CDR-L1 RMSF (needed for rmsf_cdrl1_std_350)
+            logger.debug(f"  Computing CDR-L1 RMSF...")
+            gromacs.rmsf(f=final_xtc, s=final_gro, o=f'rmsf_cdrl1_{temp}.xvg',
+                        n=index_file, b=eq_time_ps, input=['12', '12'])
+            xvg_files.append(f'rmsf_cdrl1_{temp}.xvg')
             
-            logger.debug(f"  Computing gyration radius...")
-            gromacs.gyrate(f=final_xtc, s=final_gro, o=f'gyr_{temp}.xvg', n=index_file, input=['1'])
-            xvg_files.append(f'gyr_{temp}.xvg')
+            # 3. Combined CDRs RMSF (needed for rmsf_cdrs_mu_400)
+            logger.debug(f"  Computing combined CDRs RMSF...")
+            gromacs.rmsf(f=final_xtc, s=final_gro, o=f'rmsf_cdrs_{temp}.xvg',
+                        n=index_file, b=eq_time_ps, input=['18', '18'])
+            xvg_files.append(f'rmsf_cdrs_{temp}.xvg')
             
-            # CDR-specific features
-            cdr_regions = {
-                'cdrl1': '12',
-                'cdrl2': '13',
-                'cdrl3': '14',
-                'cdrh1': '15',
-                'cdrh2': '16',
-                'cdrh3': '17',
-                'cdrs': '18'
-            }
-            
-            # SASA for each CDR
-            logger.debug(f"  Computing CDR SASA...")
-            for cdr_name, index_group in cdr_regions.items():
-                gromacs.sasa(f=final_xtc, s=final_gro, o=f'sasa_{cdr_name}_{temp}.xvg', 
-                           n=index_file, input=[index_group])
-                xvg_files.append(f'sasa_{cdr_name}_{temp}.xvg')
-            
-            # H-bonds between light and heavy chains
-            logger.debug(f"  Computing light-heavy bonds...")
-            gromacs.hbond(f=final_xtc, s=tpr_file, num=f'bonds_lh_{temp}.xvg', 
-                         n=index_file, input=['10', '11'])
-            xvg_files.append(f'bonds_lh_{temp}.xvg')
-            
-            # RMSF for each CDR
-            logger.debug(f"  Computing CDR RMSF...")
-            eq_time_ps = str(eq_time * 1000)
-            for cdr_name, index_group in cdr_regions.items():
-                gromacs.rmsf(f=final_xtc, s=final_gro, o=f'rmsf_{cdr_name}_{temp}.xvg',
-                           n=index_file, b=eq_time_ps, input=[index_group, index_group])
-                xvg_files.append(f'rmsf_{cdr_name}_{temp}.xvg')
-            
-            # Gyration radius for each CDR
-            logger.debug(f"  Computing CDR gyration...")
-            for cdr_name, index_group in cdr_regions.items():
-                gromacs.gyrate(f=final_xtc, s=final_gro, o=f'gyr_{cdr_name}_{temp}.xvg',
-                             n=index_file, input=[index_group])
-                xvg_files.append(f'gyr_{cdr_name}_{temp}.xvg')
-            
-            # Conformational entropy (S_conf)
-            logger.debug(f"  Computing conformational entropy...")
-            try:
-                gromacs.trjconv(f=final_xtc, s=tpr_file, dt='0', fit='rot+trans', 
-                             n=index_file, o=f'md_final_covar_{temp}.xtc', input=['1','1'])
-                gromacs.covar(f=f'md_final_covar_{temp}.xtc', s=tpr_file, n=index_file,
-                            o=f'covar_{temp}.xvg', av=f'avg_covar{temp}.pdb',
-                            ascii=f'covar_matrix_{temp}.dat', v=f'covar_{temp}.trr',
-                            input=['4', '4'])
-                # Note: anaeig output goes to log file via shell redirection
-                # The original implementation uses shell redirection in input parameter
-                gromacs.anaeig(f=f'md_final_covar_{temp}.xtc', v=f'covar_{temp}.trr',
-                             entropy=True, temp=temp, s=tpr_file, nevskip='6',
-                             n=index_file, b=eq_time_ps, input=[f'> sconf_{temp}.log'])
-            except Exception as e:
-                logger.warning(f"Conformational entropy computation failed for {temp}K: {e}")
-            
-            # Electrostatic potential for each CDR
-            logger.debug(f"  Computing CDR electrostatic potential...")
-            for cdr_name, index_group in cdr_regions.items():
-                try:
-                    gromacs.potential(f=final_xtc, s=tpr_file, spherical=True, sl='10',
-                                   o=f'potential_{cdr_name}_{temp}.xvg',
-                                   oc=f'charge_{cdr_name}_{temp}.xvg',
-                                   of=f'field_{cdr_name}_{temp}.xvg',
-                                   n=index_file, input=[index_group])
-                    xvg_files.append(f'potential_{cdr_name}_{temp}.xvg')
-                except Exception as e:
-                    logger.warning(f"Potential computation failed for {cdr_name} at {temp}K: {e}")
-            
-            # Dipole moment
-            logger.debug(f"  Computing dipole moment...")
-            gromacs.dipoles(f=final_xtc, s=tpr_file, o=f'dipole_{temp}.xvg',
-                          n=index_file, input=['1'])
-            xvg_files.append(f'dipole_{temp}.xvg')
+            # 4. Combined CDRs gyration (needed for gyr_cdrs_Rg_std_350 and gyr_cdrs_Rg_std_400)
+            logger.debug(f"  Computing combined CDRs gyration...")
+            gromacs.gyrate(f=final_xtc, s=final_gro, o=f'gyr_cdrs_{temp}.xvg',
+                          n=index_file, input=['18'])
+            xvg_files.append(f'gyr_cdrs_{temp}.xvg')
             
         except Exception as e:
             logger.error(f"Failed to compute GROMACS descriptors for {temp}K: {e}")
@@ -431,10 +364,15 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
     """
     descriptor_dict = {}
     
-    # Parse all .xvg files
+    # Parse only the required .xvg files (4 types per temperature)
+    # Required files: bonds_{temp}.xvg, rmsf_cdrl1_{temp}.xvg, rmsf_cdrs_{temp}.xvg, gyr_cdrs_{temp}.xvg
+    required_xvg_patterns = ['bonds_', 'rmsf_cdrl1_', 'rmsf_cdrs_', 'gyr_cdrs_']
     xvg_files = glob.glob('*.xvg')
     
     for xvg_file in xvg_files:
+        # Skip files that don't match required patterns
+        if not any(pattern in xvg_file for pattern in required_xvg_patterns):
+            continue
         try:
             metric_name = Path(xvg_file).stem
             
@@ -476,121 +414,43 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                     mu = np.mean(equilibrated_data)
                     std = np.std(equilibrated_data)
                     
-                    # Create feature names based on metric type
-                    # Match exact naming conventions from training data
-                    if 'bonds' in metric_name:
-                        if 'lh' in metric_name:
-                            descriptor_dict[f'bonds_lh_mu_{temp}'] = mu
-                            descriptor_dict[f'bonds_lh_std_{temp}'] = std
-                        else:
-                            # bonds file has hbonds and contacts - handled in 2D case
-                            descriptor_dict[f'bonds_hbonds_mu_{temp}'] = mu
-                            descriptor_dict[f'bonds_hbonds_std_{temp}'] = std
-                    elif 'sasa' in metric_name:
-                        region = metric_name.replace('sasa_', '').replace(f'_{temp}', '')
-                        descriptor_dict[f'sasa_{region}_mu_{temp}'] = mu
-                        descriptor_dict[f'sasa_{region}_std_{temp}'] = std
-                    elif 'rmsd' in metric_name:
-                        descriptor_dict[f'rmsd_mu_{temp}'] = mu
-                        descriptor_dict[f'rmsd_std_{temp}'] = std
-                    elif 'rmsf' in metric_name:
-                        region = metric_name.replace('rmsf_', '').replace(f'_{temp}', '')
-                        # Some models use mu, some use std - include both
-                        descriptor_dict[f'rmsf_{region}_mu_{temp}'] = mu
-                        descriptor_dict[f'rmsf_{region}_std_{temp}'] = std
-                    elif 'gyr' in metric_name:
+                    # Only handle required features - skip others
+                    if 'rmsf' in metric_name:
+                        # RMSF files: only cdrl1 and cdrs are needed
+                        if 'cdrl1' in metric_name or 'cdrs' in metric_name:
+                            region = metric_name.replace('rmsf_', '').replace(f'_{temp}', '')
+                            # Extract std for cdrl1 (needed at 350K), mu for cdrs (needed at 400K)
+                            descriptor_dict[f'rmsf_{region}_mu_{temp}'] = mu
+                            descriptor_dict[f'rmsf_{region}_std_{temp}'] = std
+                    elif 'gyr' in metric_name and 'cdrs' in metric_name:
+                        # Only cdrs gyration is needed
                         region = metric_name.replace('gyr_', '').replace(f'_{temp}', '')
-                        # Training data shows: gyr_cdrs_Rg_std_350, gyr_cdrs_Rg_std_400
                         descriptor_dict[f'gyr_{region}_Rg_mu_{temp}'] = mu
                         descriptor_dict[f'gyr_{region}_Rg_std_{temp}'] = std
-                    elif 'potential' in metric_name:
-                        # Potential features should NOT use time-series mean
-                        # They need specific radius index extraction (handled in 2D case below)
-                        # This 1D case should not happen for potential files
-                        pass
-                    elif 'dipole' in metric_name:
-                        # Dipole files should have 4 columns, handled in 2D case
-                        # This 1D case should not happen for dipole files
-                        # But if it does, use the mean
-                        descriptor_dict[f'dipole_mu_{temp}'] = mu
-                        descriptor_dict[f'dipole_std_{temp}'] = std
+                    # bonds files are handled in 2D case below
                 
                 elif equilibrated_data.ndim == 2:
-                    # Multi-column data (e.g., gyration with Rg, Rx, Ry, Rz, potential with multiple radii)
+                    # Multi-column data (e.g., gyration with Rg, Rx, Ry, Rz, bonds with hbonds and contacts)
                     
-                    # Handle potential files (multiple radii/slices)
-                    if 'potential' in metric_name:
-                        region = metric_name.replace('potential_', '').replace(f'_{temp}', '')
-                        # Potential is measured at specific radius indices
-                        # Original code uses radius index based on region type
-                        if region in ['cdrl1', 'cdrl2', 'cdrl3', 'cdrh1', 'cdrh2', 'cdrh3']:
-                            # Individual CDRs use radius index 2
-                            radius_idx = 2
-                        elif region == 'cdrs':
-                            # Combined CDRs use radius index 5
-                            radius_idx = 5
-                        else:
-                            # Default to radius index 2
-                            radius_idx = 2
-                        
-                        # Extract value at specific radius (column 1 is potential value, column 0 is radius)
-                        if equilibrated_data.shape[0] > radius_idx:
-                            # Potential files have 2 columns: [radius, potential]
-                            # We need the potential value (column 1) at the specific radius index (row)
-                            descriptor_dict[f'potential_{region}_mu_{temp}'] = equilibrated_data[radius_idx, 1]
-                            # Original code sets std to 0 for potential
-                            descriptor_dict[f'potential_{region}_std_{temp}'] = 0
-                        else:
-                            logger.warning(f"Not enough radii in potential file for {region} (need idx {radius_idx}, have {equilibrated_data.shape[0]} rows)")
-                    
-                    elif equilibrated_data.shape[1] >= 4:
-                        # Gyration radius components
-                        if 'gyr' in metric_name:
+                    if equilibrated_data.shape[1] >= 4:
+                        # Gyration radius components (only cdrs is needed)
+                        if 'gyr' in metric_name and 'cdrs' in metric_name:
                             region = metric_name.replace('gyr_', '').replace(f'_{temp}', '')
                             r_values = equilibrated_data[:, 0]  # Rg
-                            x_values = equilibrated_data[:, 1]  # Rx
-                            y_values = equilibrated_data[:, 2]  # Ry
-                            z_values = equilibrated_data[:, 3]  # Rz
                             
-                            # Match training data format: gyr_cdrs_Rg_std_350
+                            # Match training data format: gyr_cdrs_Rg_std_350, gyr_cdrs_Rg_std_400
                             descriptor_dict[f'gyr_{region}_Rg_mu_{temp}'] = np.mean(r_values)
                             descriptor_dict[f'gyr_{region}_Rg_std_{temp}'] = np.std(r_values)
-                            descriptor_dict[f'gyr_{region}_Rx_mu_{temp}'] = np.mean(x_values)
-                            descriptor_dict[f'gyr_{region}_Rx_std_{temp}'] = np.std(x_values)
-                            descriptor_dict[f'gyr_{region}_Ry_mu_{temp}'] = np.mean(y_values)
-                            descriptor_dict[f'gyr_{region}_Ry_std_{temp}'] = np.std(y_values)
-                            descriptor_dict[f'gyr_{region}_Rz_mu_{temp}'] = np.mean(z_values)
-                            descriptor_dict[f'gyr_{region}_Rz_std_{temp}'] = np.std(z_values)
                     
                     elif equilibrated_data.shape[1] == 2:
-                        # Two-column data (e.g., bonds with hbonds and contacts)
+                        # Two-column data: bonds with hbonds and contacts
                         if 'bonds' in metric_name:
-                            hbonds = equilibrated_data[:, 0]
-                            contacts = equilibrated_data[:, 1]
+                            contacts = equilibrated_data[:, 1]  # Contacts column
                             
                             # Match training data format: bonds_contacts_std_350
-                            descriptor_dict[f'bonds_hbonds_mu_{temp}'] = np.mean(hbonds)
-                            descriptor_dict[f'bonds_hbonds_std_{temp}'] = np.std(hbonds)
+                            # Only extract contacts (column 1), not hbonds
                             descriptor_dict[f'bonds_contacts_mu_{temp}'] = np.mean(contacts)
                             descriptor_dict[f'bonds_contacts_std_{temp}'] = np.std(contacts)
-                    
-                    elif equilibrated_data.shape[1] == 3:
-                        # Three-column data (e.g., dipole with Mx, My, Mz)
-                        if 'dipole' in metric_name:
-                            # Dipole files have columns: Mx, My, Mz(magnitude), [|Mtot|]
-                            # Original code uses Z (Mz, the magnitude) = column index 2
-                            dipole_z = equilibrated_data[:, 2]  # Mz column
-                            descriptor_dict[f'dipole_mu_{temp}'] = np.mean(dipole_z)
-                            descriptor_dict[f'dipole_std_{temp}'] = np.std(dipole_z)
-                    
-                    elif equilibrated_data.shape[1] == 4:
-                        # Four-column data (e.g., dipole with Mx, My, Mz, |Mtot|)
-                        if 'dipole' in metric_name:
-                            # Dipole files have 4 columns: Mx, My, Mz(magnitude), |Mtot|
-                            # Original code uses Z (Mz) = column index 2
-                            dipole_z = equilibrated_data[:, 2]  # Mz column
-                            descriptor_dict[f'dipole_mu_{temp}'] = np.mean(dipole_z)
-                            descriptor_dict[f'dipole_std_{temp}'] = np.std(dipole_z)
         
         except Exception as e:
             logger.warning(f"Failed to parse {xvg_file}: {e}")
@@ -641,26 +501,7 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
             for key, slope in sasa_slopes.items():
                 descriptor_dict[f'all-temp-sasa_{key}_k={core_surface_k}_eq={eq_time}'] = slope
     
-    # Parse conformational entropy from log files
-    for temp in temps:
-        log_file = f'sconf_{temp}.log'
-        if os.path.exists(log_file):
-            try:
-                with open(log_file, 'r') as f:
-                    for line in f:
-                        if 'Entropy' in line and 'J/mol K' in line:
-                            if 'Schlitter' in line:
-                                parts = line.split()
-                                if len(parts) > 8:
-                                    entropy = float(parts[8])
-                                    descriptor_dict[f'sconf_schlitter_{temp}'] = entropy
-                            elif 'Quasiharmonic' in line:
-                                parts = line.split()
-                                if len(parts) > 8:
-                                    entropy = float(parts[8])
-                                    descriptor_dict[f'sconf_quasiharmonic_{temp}'] = entropy
-            except Exception as e:
-                logger.warning(f"Failed to parse entropy log {log_file}: {e}")
+    # Conformational entropy parsing removed - not used by any model
     
     # Create DataFrame
     df = pd.DataFrame([descriptor_dict])
