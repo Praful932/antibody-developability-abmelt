@@ -11,6 +11,7 @@ This file contains the antibody sequences, experimental values, and feature valu
 - [Running Predictions](#running-predictions)
 - [Expected Results](#expected-results)
 - [Data Sources](#data-sources)
+- [Simulation Time Requirements](#simulation-time-requirements)
 - [Notes](#notes)
 
 ---
@@ -127,6 +128,30 @@ The pipeline should predict Tm, Tagg, and Tmon values that match the experimenta
 - Feature values: `AbMelt/data/{tm,tagg,tmon}/holdout.csv`
 - PDB structures: `data/abmelt/public_pdbs/`
 - Variable region sequences: From the holdout dataset
+
+## Simulation Time Requirements
+
+### Features by Minimum Simulation Time
+
+**Short simulations (~5-10ns)**: 6 features can be computed
+- All 3 Tm features: `gyr_cdrs_Rg_std_350`, `bonds_contacts_std_350`, `rmsf_cdrl1_std_350`
+- 2 Tagg features: `rmsf_cdrs_mu_400`, `gyr_cdrs_Rg_std_400`
+- Models affected: **Tm** (complete), **Tagg** (partial)
+
+**Longer simulations (45-100ns)**: All 9 features require equilibration
+- 1 Tagg feature: `all-temp_lamda_b=25_eq=20` (needs 45ns: 20ns eq + 25ns block)
+- 3 Tmon features: All require 20ns+ equilibration
+  - `all-temp-sasa_core_mean_k=20_eq=20` (20ns min)
+  - `all-temp-sasa_core_std_k=20_eq=20` (20ns min)
+  - `r-lamda_b=2.5_eq=20` (22.5ns: 20ns eq + 2.5ns block)
+- Models affected: **Tagg** (complete), **Tmon** (complete)
+
+**Recommended**: 100ns per temperature (paper_config) for production-quality predictions
+
+### Configuration Impact
+
+- `testing_config.yaml` (2ns, eq=0): Can compute **6/9 features** - Cannot make full Tagg or Tmon predictions
+- `paper_config.yaml` (100ns, eq=20): Can compute **9/9 features** - Full predictions for all models
 
 ## Notes
 
