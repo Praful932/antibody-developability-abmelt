@@ -20,3 +20,5 @@ rvdw-switch     = 1.0
 rvdw                = 1.2                   ; long range Van der Waals cut-off
 pbc             = xyz               ; Periodic Boundary Conditions
 DispCorr        = no
+gen-seed                = 42        ; use a fixed seed
+ld-seed                 = 42

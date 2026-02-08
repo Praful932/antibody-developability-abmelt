@@ -13,3 +13,5 @@ coulombtype     = cutoff    ; Treatment of long range electrostatic interactions
 rcoulomb        = 1.0       ; Short-range electrostatic cut-off
 rvdw            = 1.0       ; Short-range Van der Waals cut-off
 pbc             = xyz       ; Periodic Boundary Conditions in all 3 dimensions
+gen-seed                = 42        ; use a fixed seed
+ld-seed                 = 42

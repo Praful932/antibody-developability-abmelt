@@ -269,7 +269,8 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
         nname=n_salt,
         conc=salt_concentration/1000,
         neutral=True,
-        input=['13']
+        input=['13'],
+        seed=42,
     )
     
     # Step 4: Energy minimization
@@ -348,6 +349,18 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     nvt = gromacs.config.get_templates('nvt_' + temp + '.mdp')
     npt = gromacs.config.get_templates('npt_' + temp + '.mdp')
     md = gromacs.config.get_templates('md_' + temp + '.mdp')
+
+    # TODO assert seed is present
+    # Assert that "gen-seed" and "ld-seed" are present in the NVT, NPT, and MD MDP templates
+    def _check_seed_keywords(mdp_file):
+        with open(mdp_file, 'r') as f:
+            mdp_content = f.read()
+            if "gen-seed" not in mdp_content or "ld-seed" not in mdp_content:
+                raise ValueError(f'MDP file {mdp_file} missing required "gen-seed" and/or "ld-seed" keywords.')
+
+    _check_seed_keywords(nvt[0])
+    _check_seed_keywords(npt[0])
+    _check_seed_keywords(md[0])
     
     # NVT equilibration
     logger.info(f"Running NVT equilibration at {temp}K...")

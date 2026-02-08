@@ -46,3 +46,5 @@ pbc                     = xyz       ; 3-D PBC
 DispCorr                = no
 ; Velocity generation
 gen_vel                 = no        ; velocity generation off after NVT
+gen-seed                = 42        ; use a fixed seed
+ld-seed                 = 42

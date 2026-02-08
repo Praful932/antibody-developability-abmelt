@@ -43,3 +43,5 @@ pbc                     = xyz       ; 3-D PBC
 DispCorr                = EnerPres
 ; Velocity generation
 gen_vel                 = no        ; continuing from NPT equilibration
+gen-seed                = 42        ; use a fixed seed
+ld-seed                 = 42
