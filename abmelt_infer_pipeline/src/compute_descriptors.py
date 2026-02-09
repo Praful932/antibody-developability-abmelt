@@ -362,6 +362,27 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
     Returns:
         Single-row DataFrame with all descriptors
     """
+    # Define required features based on model_inference.py
+    # Only compute features that are actually used by the models
+    REQUIRED_FEATURES = {
+        # T_agg model features
+        "rmsf_cdrs_mu_400",
+        "gyr_cdrs_Rg_std_400",
+        f"all-temp_lamda_b=25_eq={eq_time}",
+        # T_m model features
+        "gyr_cdrs_Rg_std_350",
+        "bonds_contacts_std_350",
+        "rmsf_cdrl1_std_350",
+        # T_m_onset model features
+        "bonds_contacts_std_350",  # duplicate, but that's ok
+        f"all-temp-sasa_core_mean_k={core_surface_k}_eq={eq_time}",
+        f"all-temp-sasa_core_std_k={core_surface_k}_eq={eq_time}",
+        f"r-lamda_b=2.5_eq={eq_time}",
+    }
+    
+    logger.info(f"Only computing {len(REQUIRED_FEATURES)} required features for models")
+    logger.debug(f"Required features: {REQUIRED_FEATURES}")
+    
     descriptor_dict = {}
     
     # Parse only the required .xvg files (4 types per temperature)
@@ -419,14 +440,22 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                         # RMSF files: only cdrl1 and cdrs are needed
                         if 'cdrl1' in metric_name or 'cdrs' in metric_name:
                             region = metric_name.replace('rmsf_', '').replace(f'_{temp}', '')
-                            # Extract std for cdrl1 (needed at 350K), mu for cdrs (needed at 400K)
-                            descriptor_dict[f'rmsf_{region}_mu_{temp}'] = mu
-                            descriptor_dict[f'rmsf_{region}_std_{temp}'] = std
+                            # Only compute features that are required
+                            mu_key = f'rmsf_{region}_mu_{temp}'
+                            std_key = f'rmsf_{region}_std_{temp}'
+                            if mu_key in REQUIRED_FEATURES:
+                                descriptor_dict[mu_key] = mu
+                            if std_key in REQUIRED_FEATURES:
+                                descriptor_dict[std_key] = std
                     elif 'gyr' in metric_name and 'cdrs' in metric_name:
                         # Only cdrs gyration is needed
                         region = metric_name.replace('gyr_', '').replace(f'_{temp}', '')
-                        descriptor_dict[f'gyr_{region}_Rg_mu_{temp}'] = mu
-                        descriptor_dict[f'gyr_{region}_Rg_std_{temp}'] = std
+                        mu_key = f'gyr_{region}_Rg_mu_{temp}'
+                        std_key = f'gyr_{region}_Rg_std_{temp}'
+                        if mu_key in REQUIRED_FEATURES:
+                            descriptor_dict[mu_key] = mu
+                        if std_key in REQUIRED_FEATURES:
+                            descriptor_dict[std_key] = std
                     # bonds files are handled in 2D case below
                 
                 elif equilibrated_data.ndim == 2:
@@ -438,73 +467,106 @@ def _aggregate_descriptors_to_dataframe(work_dir: Path, temps: List[str],
                             region = metric_name.replace('gyr_', '').replace(f'_{temp}', '')
                             r_values = equilibrated_data[:, 0]  # Rg
                             
-                            # Match training data format: gyr_cdrs_Rg_std_350, gyr_cdrs_Rg_std_400
-                            descriptor_dict[f'gyr_{region}_Rg_mu_{temp}'] = np.mean(r_values)
-                            descriptor_dict[f'gyr_{region}_Rg_std_{temp}'] = np.std(r_values)
+                            # Only compute required features
+                            mu_key = f'gyr_{region}_Rg_mu_{temp}'
+                            std_key = f'gyr_{region}_Rg_std_{temp}'
+                            if mu_key in REQUIRED_FEATURES:
+                                descriptor_dict[mu_key] = np.mean(r_values)
+                            if std_key in REQUIRED_FEATURES:
+                                descriptor_dict[std_key] = np.std(r_values)
                     
                     elif equilibrated_data.shape[1] == 2:
                         # Two-column data: bonds with hbonds and contacts
                         if 'bonds' in metric_name:
                             contacts = equilibrated_data[:, 1]  # Contacts column
                             
-                            # Match training data format: bonds_contacts_std_350
-                            # Only extract contacts (column 1), not hbonds
-                            descriptor_dict[f'bonds_contacts_mu_{temp}'] = np.mean(contacts)
-                            descriptor_dict[f'bonds_contacts_std_{temp}'] = np.std(contacts)
+                            # Only compute required features
+                            mu_key = f'bonds_contacts_mu_{temp}'
+                            std_key = f'bonds_contacts_std_{temp}'
+                            if mu_key in REQUIRED_FEATURES:
+                                descriptor_dict[mu_key] = np.mean(contacts)
+                            if std_key in REQUIRED_FEATURES:
+                                descriptor_dict[std_key] = np.std(contacts)
         
         except Exception as e:
             logger.warning(f"Failed to parse {xvg_file}: {e}")
             continue
     
-    # Add order parameter features for each block length
+    # Add order parameter features for each block length (only if required)
     for block_length, master_s2_dict in master_s2_dicts.items():
         for temp_int, s2_values in master_s2_dict.items():
             if s2_values and len(s2_values) > 0:
                 temp_str = str(temp_int)
                 s2_mean = np.mean(list(s2_values.values()))
                 s2_std = np.std(list(s2_values.values()))
-                # Include block length in feature name for clarity (optional)
-                descriptor_dict[f'order_s2_{temp_str}_b={block_length}_mu'] = s2_mean
-                descriptor_dict[f'order_s2_{temp_str}_b={block_length}_std'] = s2_std
+                # Only add if required
+                mu_key = f'order_s2_{temp_str}_b={block_length}_mu'
+                std_key = f'order_s2_{temp_str}_b={block_length}_std'
+                if mu_key in REQUIRED_FEATURES:
+                    descriptor_dict[mu_key] = s2_mean
+                if std_key in REQUIRED_FEATURES:
+                    descriptor_dict[std_key] = s2_std
     
-    # Add lambda features for each block length
+    # Add lambda features for each block length (only if required)
     if all_lambda_features:
         for block_length, (lambda_dict, r_dict) in all_lambda_features.items():
             if lambda_dict and r_dict:
                 lambda_mean = np.mean(list(lambda_dict.values()))
                 r_mean = np.mean(list(r_dict.values()))
                 
-                # Generate features with correct values
-                descriptor_dict[f'all-temp_lamda_b={block_length}_eq={eq_time}'] = lambda_mean
-                descriptor_dict[f'r-lamda_b={block_length}_eq={eq_time}'] = r_mean  # FIX: was lambda_mean
-                descriptor_dict[f'all-temp_lamda_r_b={block_length}_eq={eq_time}'] = r_mean
+                # Only add required features
+                lambda_key = f'all-temp_lamda_b={block_length}_eq={eq_time}'
+                r_lambda_key = f'r-lamda_b={block_length}_eq={eq_time}'
+                lambda_r_key = f'all-temp_lamda_r_b={block_length}_eq={eq_time}'
+                
+                if lambda_key in REQUIRED_FEATURES:
+                    descriptor_dict[lambda_key] = lambda_mean
+                if r_lambda_key in REQUIRED_FEATURES:
+                    descriptor_dict[r_lambda_key] = r_mean
+                if lambda_r_key in REQUIRED_FEATURES:
+                    descriptor_dict[lambda_r_key] = r_mean
     
-    # Add core/surface SASA features
+    # Add core/surface SASA features (only if required)
     if sasa_dict:
-        # Per-temperature SASA features
+        # Per-temperature SASA features (only if required)
         for temp, sasa_data in sasa_dict.items():
             if isinstance(sasa_data, dict):
                 for key, value in sasa_data.items():
-                    descriptor_dict[f'sasa_{key}_{temp}'] = value
+                    feature_key = f'sasa_{key}_{temp}'
+                    if feature_key in REQUIRED_FEATURES:
+                        descriptor_dict[feature_key] = value
         
-        # Cross-temperature SASA slopes
+        # Cross-temperature SASA slopes (only if required)
         if len(temps) >= 2:
             temp_ints = sorted([int(t) for t in temps])
             sasa_slopes = {}
             
             for key in ['total_mean', 'core_mean', 'surface_mean', 'total_std', 'core_std', 'surface_std']:
-                data_points = [(int(t), sasa_dict[t][key]) for t in temps if t in sasa_dict and key in sasa_dict[t]]
-                if len(data_points) >= 2:
-                    slope = get_slope(data_points)
-                    sasa_slopes[key] = slope
-            
-            for key, slope in sasa_slopes.items():
-                descriptor_dict[f'all-temp-sasa_{key}_k={core_surface_k}_eq={eq_time}'] = slope
+                # Check if this slope feature is required before computing
+                slope_key = f'all-temp-sasa_{key}_k={core_surface_k}_eq={eq_time}'
+                if slope_key in REQUIRED_FEATURES:
+                    data_points = [(int(t), sasa_dict[t][key]) for t in temps if t in sasa_dict and key in sasa_dict[t]]
+                    if len(data_points) >= 2:
+                        slope = get_slope(data_points)
+                        descriptor_dict[slope_key] = slope
     
     # Conformational entropy parsing removed - not used by any model
     
     # Create DataFrame
     df = pd.DataFrame([descriptor_dict])
+    
+    # Log summary of computed features
+    computed_features = set(df.columns)
+    missing_features = REQUIRED_FEATURES - computed_features
+    extra_features = computed_features - REQUIRED_FEATURES
+    
+    logger.info(f"Feature computation summary:")
+    logger.info(f"  Required features: {len(REQUIRED_FEATURES)}")
+    logger.info(f"  Computed features: {len(computed_features)}")
+    if missing_features:
+        logger.warning(f"  Missing required features: {missing_features}")
+    if extra_features:
+        logger.debug(f"  Extra features computed: {extra_features}")
     
     return df
 
