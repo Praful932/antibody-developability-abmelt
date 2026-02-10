@@ -344,7 +344,14 @@ def load_existing_predictions(work_dir: Path, antibody_name: str) -> Dict:
     csv_path = work_dir / f"{antibody_name}_predictions.csv"
     
     if not csv_path.exists():
-        raise FileNotFoundError(f"Predictions file not found: {csv_path}")
+        logger.error(f"Predictions file not found: {csv_path}")
+        return {
+            "status": "skipped",
+            "predictions": {"tagg": None, "tm": None, "tmon": None},
+            "results": None,
+            "work_dir": str(work_dir),
+            "message": "Predictions file not found - skipped inference step"
+        }
     
     logger.info(f"Loading existing predictions from {csv_path}")
     results_df = pd.read_csv(csv_path)

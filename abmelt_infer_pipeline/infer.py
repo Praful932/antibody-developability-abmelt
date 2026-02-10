@@ -114,11 +114,16 @@ def main():
     if 'inference_result' in result:
         print(f"\n=== PREDICTIONS ===")
         predictions = result['inference_result']['predictions']
-        for model_name, pred in predictions.items():
-            if pred is not None:
-                print(f"  {model_name.upper()}: {pred[0]:.3f}")
-            else:
-                print(f"  {model_name.upper()}: FAILED")
+        # Check if all predictions are None (inference was skipped)
+        all_none = all(pred is None for pred in predictions.values())
+        if all_none:
+            print(f"  Predictions: Not available (skipped)")
+        else:
+            for model_name, pred in predictions.items():
+                if pred is not None:
+                    print(f"  {model_name.upper()}: {pred[0]:.3f}")
+                else:
+                    print(f"  {model_name.upper()}: FAILED")
     
     return result
     
@@ -250,7 +255,10 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
             logging.info("Step 4: Loading existing model predictions...")
             work_dir = Path(descriptor_result['work_dir'])
             inference_result = load_existing_predictions(work_dir, antibody['name'])
-            logging.info("Model predictions loaded successfully")
+            if inference_result['status'] == 'skipped':
+                logging.info("Model predictions not found - inference step skipped")
+            else:
+                logging.info("Model predictions loaded successfully")
         else:
             logging.info("Step 4: Running model inference...")
             inference_result = run_model_inference(descriptor_result, config)
@@ -262,7 +270,7 @@ def run_inference_pipeline(antibody, config, skip_structure=False, skip_md=False
             if pred is not None:
                 logging.info(f"  {model_name}: {pred[0]:.3f}")
             else:
-                logging.info(f"  {model_name}: FAILED")
+                logging.info(f"  {model_name}: Not available")
         
         # Cleanup intermediate files if configured
         cleanup_config = config.get("performance", {})
