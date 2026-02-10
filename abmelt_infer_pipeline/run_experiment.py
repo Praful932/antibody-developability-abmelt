@@ -83,7 +83,8 @@ def run_experiment(
     skip_md: bool = False,
     skip_descriptors: bool = False,
     skip_inference: bool = False,
-    results_dir: Optional[str] = None
+    results_dir: Optional[str] = None,
+    simulation_time: Optional[float] = None
 ) -> Dict:
     """
     Run a complete inference experiment and upload results to HF datasets.
@@ -94,6 +95,7 @@ def run_experiment(
         light_chain: Light chain amino acid sequence
         config_path: Path to configuration YAML file
         hf_token: HF token (optional, will use HF_TOKEN env var if not provided)
+        simulation_time: Override simulation_time from config (in nanoseconds)
         
     Returns:
         Dictionary with experiment results and status
@@ -122,6 +124,11 @@ def run_experiment(
     except Exception as e:
         logger.error(f"Failed to load config: {e}")
         raise
+    
+    # Override simulation_time if specified
+    if simulation_time is not None:
+        logger.info(f"Overriding simulation_time: {config['simulation']['simulation_time']}ns -> {simulation_time}ns")
+        config["simulation"]["simulation_time"] = simulation_time
     
     # Setup logging and directories
     setup_logging(config)
@@ -313,6 +320,9 @@ def main():
     parser.add_argument('--results-dir', type=str, default=None,
                        help='Path to pre-computed results directory (for debugging with skip flags)')
     
+    parser.add_argument('--simulation-time', type=float, default=None,
+                       help='Override simulation_time from config (in nanoseconds)')
+    
     args = parser.parse_args()
     
     # Run experiment
@@ -326,7 +336,8 @@ def main():
             skip_md=args.skip_md,
             skip_descriptors=args.skip_descriptors,
             skip_inference=args.skip_inference,
-            results_dir=args.results_dir
+            results_dir=args.results_dir,
+            simulation_time=args.simulation_time
         )
         
         # Exit with appropriate code

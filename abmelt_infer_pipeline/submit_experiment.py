@@ -99,7 +99,8 @@ def submit_experiment(
     skip_md: bool = False,
     skip_descriptors: bool = False,
     skip_inference: bool = False,
-    results_dir: Optional[str] = None
+    results_dir: Optional[str] = None,
+    simulation_time: Optional[float] = None
 ):
     """
     Submit an experiment to Hugging Face Jobs.
@@ -118,6 +119,7 @@ def submit_experiment(
         hf_token: HF token (defaults to HF_TOKEN env var)
         main_dataset: Main dataset name (defaults to env var)
         detailed_dataset_prefix: Detailed dataset prefix (defaults to env var)
+        simulation_time: Override simulation_time from config (in nanoseconds)
     """
     # Validate inputs
     print("Validating inputs...")
@@ -153,6 +155,10 @@ def submit_experiment(
         command.append("--skip-inference")
     if results_dir:
         command.extend(["--results-dir", results_dir])
+    
+    # Add simulation_time override if specified
+    if simulation_time is not None:
+        command.extend(["--simulation-time", str(simulation_time)])
     
     # Prepare environment variables
     env_vars = {
@@ -281,6 +287,10 @@ Examples:
     parser.add_argument('--results-dir', type=str, default=None,
                        help='Path to pre-computed results directory (for debugging with skip flags)')
     
+    # Config overrides
+    parser.add_argument('--simulation-time', type=float, default=None,
+                       help='Override simulation_time from config (in nanoseconds, e.g., 0.5, 1, 2, 100). Minimum: ~0.1ns, Practical minimum: 1-2ns')
+    
     args = parser.parse_args()
     
     try:
@@ -301,7 +311,8 @@ Examples:
             skip_md=args.skip_md,
             skip_descriptors=args.skip_descriptors,
             skip_inference=args.skip_inference,
-            results_dir=args.results_dir
+            results_dir=args.results_dir,
+            simulation_time=args.simulation_time
         )
     except Exception as e:
         print(f"\nError: {e}")

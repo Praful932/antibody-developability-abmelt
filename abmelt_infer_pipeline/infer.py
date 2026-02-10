@@ -45,6 +45,9 @@ def main():
     parser.add_argument('--results-dir', type=str, default=None,
                        help='Path to pre-computed results directory (overrides temp_dir from config)')
     
+    parser.add_argument('--simulation-time', type=float, default=None,
+                       help='Override simulation_time from config (in nanoseconds, e.g., 0.5, 1, 2, 100). Minimum: ~0.1ns, Practical minimum: 1-2ns')
+    
     args = parser.parse_args()
     
     # Validate arguments
@@ -55,6 +58,11 @@ def main():
     
     # 1. Load configuration
     config = load_config(args.config)
+    
+    # Override simulation_time if specified
+    if args.simulation_time is not None:
+        logging.info(f"Overriding simulation_time: {config['simulation']['simulation_time']}ns -> {args.simulation_time}ns")
+        config["simulation"]["simulation_time"] = args.simulation_time
     
     # 2. Setup logging and directories
     setup_logging(config)
