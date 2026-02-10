@@ -27,13 +27,25 @@
 
 import os
 import numpy as np
-from sys import stdout
 import torch
+import logging
+
+# Note: ImmuneBuilder calls logging.disable(CRITICAL) which breaks all logging
+# We fix this in the immune_builder() function below
 
 
 # immune builder structure prediciton (similar to igfold, AF2, etc.)
 def immune_builder(sequence, output="mAb.pdb"):
+    import logging
+    import sys
+    
+    # Import ImmuneBuilder (this calls logging.disable(CRITICAL) which breaks all logging)
     from ImmuneBuilder import ABodyBuilder2
+    
+    # CRITICAL FIX: ImmuneBuilder calls logging.disable(CRITICAL) which globally disables all logging!
+    # Re-enable logging immediately after import
+    logging.disable(logging.NOTSET)
+    
     # Get weights directory from environment variable
     # Default: /opt/immunebuilder_weights (bundled in Docker)
     # Set to empty string to use ImmuneBuilder's default (package location)
