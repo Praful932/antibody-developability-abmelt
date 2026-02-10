@@ -71,44 +71,62 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
         # Step 2: Compute order parameters
         logger.info("Step 2: Computing order parameters...")
         master_s2_dicts = _compute_order_parameters(work_dir, temps, eq_time, block_lengths, antibody_name, use_dummy_s2)
+        logger.info("Step 2: Order parameters computation COMPLETED")
+        logger.info(f"Step 2: master_s2_dicts keys: {list(master_s2_dicts.keys())}")
         
         # Step 3: Compute core/surface SASA
-        logger.info("Step 3: Computing core/surface SASA...")
+        logger.info("Step 3: Starting core/surface SASA computation...")
+        logger.info(f"Step 3: Parameters - temps={temps}, eq_time={eq_time}, core_surface_k={core_surface_k}")
         sasa_dict = _compute_core_surface_sasa(work_dir, temps, eq_time, core_surface_k)
+        logger.info("Step 3: Core/surface SASA computation COMPLETED")
+        logger.info(f"Step 3: sasa_dict keys: {list(sasa_dict.keys()) if sasa_dict else 'None'}")
         
         # Step 4: Compute multi-temperature features (lambda)
         if len(temps) >= 2 and compute_lambda:
-            logger.info("Step 4: Computing multi-temperature lambda...")
+            logger.info("Step 4: Starting multi-temperature lambda computation...")
+            logger.info(f"Step 4: Number of temperatures: {len(temps)}")
             all_lambda_features = _compute_lambda_features(master_s2_dicts, temps, eq_time, antibody_name)
+            logger.info("Step 4: Lambda computation COMPLETED")
+            logger.info(f"Step 4: all_lambda_features keys: {list(all_lambda_features.keys()) if all_lambda_features else 'None'}")
         else:
             logger.warning(f"Skipping lambda computation: need >=2 temperatures, got {len(temps)}")
             all_lambda_features = None
         
         # Step 5: Aggregate all descriptors into DataFrame
-        logger.info("Step 5: Aggregating descriptors to DataFrame...")
+        logger.info("Step 5: Starting descriptor aggregation to DataFrame...")
+        logger.info(f"Step 5: Aggregating data from {len(temps)} temperatures")
         descriptors_df = _aggregate_descriptors_to_dataframe(
             work_dir, temps, antibody_name, eq_time, master_s2_dicts, 
             all_lambda_features, sasa_dict, core_surface_k
         )
+        logger.info("Step 5: Aggregation COMPLETED")
         
         logger.info(f"Descriptor computation completed. DataFrame shape: {descriptors_df.shape}")
         logger.info(f"Features: {list(descriptors_df.columns)}")
         
         # Save descriptors to file for future use
+        logger.info("Starting to save descriptors to files...")
         try:
             descriptors_csv = work_dir / "descriptors.csv"
             descriptors_pkl = work_dir / "descriptors.pkl"
+            logger.info(f"Saving descriptors to: {descriptors_csv}")
             
             descriptors_df.to_csv(descriptors_csv, index=False)
-            logger.info(f"Saved descriptors to {descriptors_csv}")
+            logger.info(f"SUCCESS: Saved descriptors CSV to {descriptors_csv}")
             
+            logger.info(f"Saving descriptors pickle to: {descriptors_pkl}")
             import pickle
             with open(descriptors_pkl, 'wb') as f:
                 pickle.dump(descriptors_df, f)
+            logger.info(f"SUCCESS: Saved descriptors pickle to {descriptors_pkl}")
             logger.info(f"Saved descriptors to {descriptors_pkl}")
         except Exception as e:
             logger.warning(f"Failed to save descriptors to file: {e}")
             logger.warning("Continuing without saving descriptors")
+        
+        logger.info("=" * 80)
+        logger.info("DESCRIPTOR COMPUTATION FULLY COMPLETED - RETURNING RESULTS")
+        logger.info("=" * 80)
         
         result = {
             "status": "success",
@@ -118,6 +136,7 @@ def compute_descriptors(simulation_result: Dict, config: Dict) -> Dict:
             "message": "Descriptor computation completed successfully"
         }
         
+        logger.info(f"Returning result with keys: {list(result.keys())}")
         return result
         
     except Exception as e:
@@ -241,16 +260,21 @@ def _compute_order_parameters(work_dir: Path, temps: List[str], eq_time: int,
                 continue
             
             try:
+                logger.info(f"  Calling order_s2() for {temp}K...")
                 s2_blocks_dict = order_s2(mab=antibody_name, temp=temp, 
                                         block_length=block_length, start=eq_time, use_dummy=use_dummy_s2)
+                logger.info(f"  order_s2() returned for {temp}K, calling avg_s2_blocks()...")
                 master_s2_dict[int(temp)] = avg_s2_blocks(s2_blocks_dict)
-                logger.info(f"  Order parameters computed for {temp}K")
+                logger.info(f"  Order parameters computed for {temp}K - DONE")
             except Exception as e:
                 logger.warning(f"Order parameter computation failed for {temp}K: {e}")
                 logger.warning("This is common with short trajectories. Continuing...")
         
+        logger.info(f"Completed order parameters for block_length={block_length}ns")
         all_master_s2_dicts[block_length] = master_s2_dict
+        logger.info(f"Stored results for block_length={block_length}ns in all_master_s2_dicts")
     
+    logger.info(f"_compute_order_parameters: Returning all_master_s2_dicts with {len(all_master_s2_dicts)} block lengths")
     return all_master_s2_dicts
 
 
@@ -269,21 +293,28 @@ def _compute_core_surface_sasa(work_dir: Path, temps: List[str], eq_time: int, k
     """
     sasa_dict = {}
     
+    logger.info(f"_compute_core_surface_sasa: Starting SASA computation for {len(temps)} temperatures")
+    
     for temp in temps:
-        logger.info(f"Computing core/surface SASA for {temp}K...")
+        logger.info(f"SASA: Processing temperature {temp}K...")
         
         final_xtc = f'md_final_{temp}.xtc'
         final_gro = f'md_final_{temp}.gro'
         
+        logger.info(f"SASA: Checking for trajectory files: {final_xtc}, {final_gro}")
+        
         if not os.path.exists(final_xtc) or not os.path.exists(final_gro):
-            logger.warning(f"Trajectory files not found for {temp}K, skipping SASA")
+            logger.warning(f"SASA: Trajectory files not found for {temp}K, skipping")
             continue
         
+        logger.info(f"SASA: Trajectory files found, calling core_surface() for {temp}K...")
         try:
             # Compute residue-level SASA
             core_surface(temp)
+            logger.info(f"SASA: core_surface() completed for {temp}K")
             
             # Aggregate statistics
+            logger.info(f"SASA: Starting aggregation for {temp}K...")
             sasa_dict[temp] = {}
             sasa_dict = get_core_surface(sasa_dict, temp, k=k, start=eq_time)
             logger.info(f"Core/surface SASA computed for {temp}K")
