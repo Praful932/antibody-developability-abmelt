@@ -213,6 +213,7 @@ def upload_to_main_predictions_dataset(
     
     if dataset_name is None:
         dataset_name = os.environ.get("HF_MAIN_DATASET", "username/abmelt-experiments")
+    logger.info(f"Main dataset name - {dataset_name}")
     
     login_to_hf(token)
     
