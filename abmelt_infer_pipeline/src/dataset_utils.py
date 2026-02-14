@@ -106,6 +106,11 @@ def create_main_dataset_if_not_exists(
     """
     Create the main predictions dataset if it doesn't exist.
     
+    Best practice: First create the repo, then push data to it.
+    This follows the recommended HuggingFace workflow:
+    1. api.create_repo() to create the repository
+    2. dataset.push_to_hub() to upload data
+    
     Args:
         dataset_name: Full dataset name (e.g., "username/abmelt-experiments")
         token: HF token (optional, will use HF_TOKEN env var if not provided)
@@ -121,6 +126,9 @@ def create_main_dataset_if_not_exists(
     
     login_to_hf(token)
     
+    # Initialize HfApi for repo operations
+    api = HfApi(token=token)
+    
     try:
         # Try to load the dataset
         _ = load_dataset(dataset_name, split="train")
@@ -130,7 +138,22 @@ def create_main_dataset_if_not_exists(
         # Dataset doesn't exist, create it with empty data
         logger.info(f"Creating new dataset: {dataset_name}")
         
-        # Define schema with empty data
+        # STEP 1: Create the repository first (REQUIRED!)
+        # This is the key fix - create_repo before push_to_hub
+        try:
+            logger.info(f"Step 1: Creating repository {dataset_name}...")
+            api.create_repo(
+                repo_id=dataset_name,
+                repo_type="dataset",
+                private=False,
+                exist_ok=True  # Don't fail if somehow already exists
+            )
+            logger.info(f"Repository created successfully")
+        except Exception as e:
+            logger.error(f"Failed to create repository: {e}")
+            raise
+        
+        # STEP 2: Define schema with empty data
         empty_data = {
             "experiment_id": [],
             "antibody_name": [],
@@ -168,6 +191,8 @@ def create_main_dataset_if_not_exists(
             "n_threads": [],
         }
         
+        # STEP 3: Push data to the repository
+        logger.info(f"Step 2: Pushing initial data to {dataset_name}...")
         dataset = Dataset.from_dict(empty_data)
         dataset.push_to_hub(dataset_name, token=token)
         logger.info(f"Successfully created dataset: {dataset_name}")
@@ -212,12 +237,29 @@ def upload_to_main_predictions_dataset(
         raise ValueError("HF_TOKEN is required")
     
     if dataset_name is None:
-        dataset_name = os.environ.get("HF_MAIN_DATASET", "praful932/abmelt-experiments")
+        dataset_name = os.environ.get("HF_MAIN_DATASET", "Praful932/abmelt-experiments")
     logger.info(f"Main dataset name - {dataset_name}")
     
     login_to_hf(token)
     
-    # Create dataset if it doesn't exist
+    # Initialize HfApi for repo operations
+    api = HfApi(token=token)
+    
+    # Ensure repository exists (best practice: always call this before push)
+    try:
+        logger.info(f"Ensuring repository exists: {dataset_name}")
+        api.create_repo(
+            repo_id=dataset_name,
+            repo_type="dataset",
+            private=False,
+            exist_ok=True  # Don't fail if already exists
+        )
+        logger.info(f"Repository confirmed/created")
+    except Exception as e:
+        logger.warning(f"Could not ensure repo exists: {e}")
+        # Continue anyway - it might already exist
+    
+    # Create dataset if it doesn't exist (this will also create if needed)
     create_main_dataset_if_not_exists(dataset_name, token)
     
     # Extract trackable parameters
@@ -297,7 +339,7 @@ def upload_to_detailed_results_dataset(
     if dataset_prefix is None:
         dataset_prefix = os.environ.get(
             "HF_DETAILED_DATASET_PREFIX",
-            "praful932/abmelt-experiments-"
+            "Praful932/abmelt-experiments-"
         )
     
     dataset_name = f"{dataset_prefix}{experiment_id}"
@@ -355,16 +397,20 @@ def upload_to_detailed_results_dataset(
         if log_dest:
             files_to_upload.append((log_dest, "inference.log"))
         
-        # Create repo if it doesn't exist
+        # Create repo if it doesn't exist (REQUIRED before uploading files!)
         try:
+            logger.info(f"Creating repository {dataset_name}...")
             api.create_repo(
                 repo_id=dataset_name,
                 repo_type="dataset",
-                exist_ok=True,
-                token=token
+                exist_ok=True,  # Don't fail if already exists
+                token=token,
+                private=False
             )
+            logger.info(f"Repository created/confirmed")
         except Exception as e:
             logger.warning(f"Could not create repo (may already exist): {e}")
+            # Continue anyway - might already exist
         
         # Upload files
         for file_path, filename in files_to_upload:
