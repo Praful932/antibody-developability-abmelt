@@ -212,7 +212,7 @@ def upload_to_main_predictions_dataset(
         raise ValueError("HF_TOKEN is required")
     
     if dataset_name is None:
-        dataset_name = os.environ.get("HF_MAIN_DATASET", "username/abmelt-experiments")
+        dataset_name = os.environ.get("HF_MAIN_DATASET", "praful932/abmelt-experiments")
     logger.info(f"Main dataset name - {dataset_name}")
     
     login_to_hf(token)
@@ -297,7 +297,7 @@ def upload_to_detailed_results_dataset(
     if dataset_prefix is None:
         dataset_prefix = os.environ.get(
             "HF_DETAILED_DATASET_PREFIX",
-            "username/abmelt-experiments-"
+            "praful932/abmelt-experiments-"
         )
     
     dataset_name = f"{dataset_prefix}{experiment_id}"
