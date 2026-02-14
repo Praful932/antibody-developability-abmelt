@@ -27,6 +27,27 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 
+def _convert_paths_to_str(obj):
+    """
+    Recursively convert Path objects to strings for JSON serialization.
+    
+    Args:
+        obj: Object to convert (can be dict, list, Path, or any JSON-serializable type)
+        
+    Returns:
+        Object with all Path instances converted to strings
+    """
+    if isinstance(obj, Path):
+        return str(obj)
+    elif isinstance(obj, dict):
+        return {k: _convert_paths_to_str(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_convert_paths_to_str(v) for v in obj]
+    elif isinstance(obj, tuple):
+        return tuple(_convert_paths_to_str(v) for v in obj)
+    return obj
+
+
 def get_hf_token() -> Optional[str]:
     """Get HF token from environment variable."""
     token = os.environ.get("HF_TOKEN")
@@ -52,7 +73,9 @@ def login_to_hf(token: Optional[str] = None):
 
 def compute_config_hash(config: Dict) -> str:
     """Compute MD5 hash of config dictionary for quick comparison."""
-    config_str = json.dumps(config, sort_keys=True)
+    # Convert Path objects to strings for JSON serialization
+    serializable_config = _convert_paths_to_str(config)
+    config_str = json.dumps(serializable_config, sort_keys=True)
     return hashlib.md5(config_str.encode()).hexdigest()
 
 
@@ -66,7 +89,7 @@ def extract_trackable_params(config: Dict) -> Dict[str, Any]:
     
     # Simulation parameters
     sim = config.get("simulation", {})
-    params["temperatures"] = json.dumps(sim.get("temperatures", []))
+    params["temperatures"] = json.dumps(_convert_paths_to_str(sim.get("temperatures", [])))
     params["simulation_time"] = sim.get("simulation_time", None)
     params["force_field"] = sim.get("force_field", None)
     params["water_model"] = sim.get("water_model", None)
@@ -84,7 +107,7 @@ def extract_trackable_params(config: Dict) -> Dict[str, Any]:
     # Descriptor parameters
     descriptors = config.get("descriptors", {})
     params["equilibration_time"] = descriptors.get("equilibration_time", None)
-    params["block_length"] = json.dumps(descriptors.get("block_length", []))
+    params["block_length"] = json.dumps(_convert_paths_to_str(descriptors.get("block_length", [])))
     params["core_surface_k"] = descriptors.get("core_surface_k", None)
     params["compute_lambda"] = descriptors.get("compute_lambda", False)
     params["use_dummy_s2"] = descriptors.get("use_dummy_s2", False)
