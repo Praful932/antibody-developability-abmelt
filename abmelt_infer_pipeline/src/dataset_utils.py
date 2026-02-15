@@ -316,12 +316,21 @@ def upload_to_main_predictions_dataset(
     try:
         dataset = load_dataset(dataset_name, split="train")
         logger.info(f"Loaded existing dataset with {len(dataset)} rows")
+        df = dataset.to_pandas()
+    except ValueError as e:
+        # Handle empty dataset (0 rows) - "Instruction 'train' corresponds to no data!"
+        if "corresponds to no data" in str(e):
+            logger.warning(f"Dataset exists but is empty (0 rows), starting with empty DataFrame")
+            # Create empty DataFrame with the proper schema
+            df = pd.DataFrame(columns=list(row_data.keys()))
+        else:
+            logger.error(f"Failed to load dataset: {e}")
+            raise
     except Exception as e:
         logger.error(f"Failed to load dataset: {e}")
         raise
     
-    # Convert to pandas, append row, convert back
-    df = dataset.to_pandas()
+    # Append new row
     new_row = pd.DataFrame([row_data])
     df = pd.concat([df, new_row], ignore_index=True)
     
