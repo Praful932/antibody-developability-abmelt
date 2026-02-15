@@ -83,6 +83,7 @@ def run_experiment(
     skip_md: bool = False,
     skip_descriptors: bool = False,
     skip_inference: bool = False,
+    skip_detailed_dataset: bool = False,
     results_dir: Optional[str] = None,
     simulation_time: Optional[float] = None
 ) -> Dict:
@@ -226,7 +227,8 @@ def run_experiment(
             status=status,
             duration_seconds=duration_seconds,
             error_message=error_message,
-            token=hf_token
+            token=hf_token,
+            descriptors_df=descriptors_df
         )
         logger.info("Successfully uploaded to main predictions dataset")
     except Exception as e:
@@ -234,8 +236,8 @@ def run_experiment(
         logger.error(traceback.format_exc())
         # Don't raise - we want to try uploading detailed results even if main fails
     
-    # Upload to detailed results dataset (only if we have descriptors)
-    if descriptors_df is not None:
+    # Upload to detailed results dataset (only if we have descriptors and not skipped)
+    if not skip_detailed_dataset and descriptors_df is not None:
         try:
             logger.info("Uploading to detailed results dataset...")
             
@@ -322,10 +324,14 @@ def main():
     
     parser.add_argument('--simulation-time', type=float, default=None,
                        help='Override simulation_time from config (in nanoseconds)')
+    parser.add_argument('--no-detailed-dataset', action='store_true',
+                       help='Skip creating per-experiment detailed dataset')
     
     args = parser.parse_args()
     
-    # Run experiment
+    # Run experiment (skip_detailed_dataset from CLI or SKIP_DETAILED_DATASET env)
+    skip_detailed_dataset = args.no_detailed_dataset or (os.environ.get("SKIP_DETAILED_DATASET", "0") == "1")
+    
     try:
         result = run_experiment(
             antibody_name=args.name,
@@ -336,6 +342,7 @@ def main():
             skip_md=args.skip_md,
             skip_descriptors=args.skip_descriptors,
             skip_inference=args.skip_inference,
+            skip_detailed_dataset=skip_detailed_dataset,
             results_dir=args.results_dir,
             simulation_time=args.simulation_time
         )

@@ -99,6 +99,7 @@ def submit_experiment(
     skip_md: bool = False,
     skip_descriptors: bool = False,
     skip_inference: bool = False,
+    skip_detailed_dataset: bool = False,
     results_dir: Optional[str] = None,
     simulation_time: Optional[float] = None
 ):
@@ -173,6 +174,9 @@ def submit_experiment(
     
     if detailed_dataset_prefix:
         env_vars["HF_DETAILED_DATASET_PREFIX"] = detailed_dataset_prefix
+    
+    if skip_detailed_dataset:
+        env_vars["SKIP_DETAILED_DATASET"] = "1"
     
     # Prepare secrets
     secrets = {
@@ -274,6 +278,8 @@ Examples:
                        help='Detailed dataset prefix (defaults to HF_DETAILED_DATASET_PREFIX env var)')
     
     # Skip step flags
+    parser.add_argument('--no-detailed-dataset', action='store_true',
+                       help='Skip creating per-experiment detailed dataset')
     parser.add_argument('--skip-structure', action='store_true',
                        help='Skip structure preparation step')
     parser.add_argument('--skip-md', action='store_true',
@@ -311,6 +317,7 @@ Examples:
             skip_md=args.skip_md,
             skip_descriptors=args.skip_descriptors,
             skip_inference=args.skip_inference,
+            skip_detailed_dataset=args.no_detailed_dataset,
             results_dir=args.results_dir,
             simulation_time=args.simulation_time
         )

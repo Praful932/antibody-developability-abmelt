@@ -26,6 +26,19 @@ except ImportError as e:
 
 logger = logging.getLogger(__name__)
 
+# Canonical descriptor columns from features_used.md (9 unique features across all models)
+DESCRIPTOR_COLUMNS = [
+    "gyr_cdrs_Rg_std_350",           # Tm
+    "bonds_contacts_std_350",       # Tm, Tmon
+    "rmsf_cdrl1_std_350",           # Tm
+    "rmsf_cdrs_mu_400",             # Tagg
+    "gyr_cdrs_Rg_std_400",          # Tagg
+    "all-temp_lamda_b=25_eq=20",    # Tagg
+    "all-temp-sasa_core_mean_k=20_eq=20",  # Tmon
+    "all-temp-sasa_core_std_k=20_eq=20",   # Tmon
+    "r-lamda_b=2.5_eq=20",          # Tmon
+]
+
 
 def _convert_paths_to_str(obj):
     """
@@ -213,7 +226,10 @@ def create_main_dataset_if_not_exists(
             "gpu_id": [],
             "n_threads": [],
         }
-        
+        # Descriptor columns from features_used.md
+        for col in DESCRIPTOR_COLUMNS:
+            empty_data[col] = []
+
         # STEP 3: Push data to the repository
         logger.info(f"Step 2: Pushing initial data to {dataset_name}...")
         dataset = Dataset.from_dict(empty_data)
@@ -234,7 +250,8 @@ def upload_to_main_predictions_dataset(
     duration_seconds: int,
     error_message: Optional[str] = None,
     dataset_name: Optional[str] = None,
-    token: Optional[str] = None
+    token: Optional[str] = None,
+    descriptors_df: Optional[pd.DataFrame] = None
 ):
     """
     Upload a single experiment result to the main predictions dataset.
@@ -252,6 +269,7 @@ def upload_to_main_predictions_dataset(
         error_message: Optional error message if status is "failed"
         dataset_name: Full dataset name (defaults to HF_MAIN_DATASET env var or "username/abmelt-experiments")
         token: HF token (optional, will use HF_TOKEN env var if not provided)
+        descriptors_df: DataFrame with computed descriptors (optional; missing features will be None)
     """
     if token is None:
         token = get_hf_token()
@@ -311,6 +329,13 @@ def upload_to_main_predictions_dataset(
         "error_message": error_message or "",
         **config_params
     }
+    # Add descriptor columns (use value from descriptors_df if present, else None)
+    for col in DESCRIPTOR_COLUMNS:
+        if descriptors_df is not None and col in descriptors_df.columns and len(descriptors_df) > 0:
+            val = descriptors_df[col].iloc[0]
+            row_data[col] = None if pd.isna(val) else float(val)
+        else:
+            row_data[col] = None
     
     # Load existing dataset
     try:
