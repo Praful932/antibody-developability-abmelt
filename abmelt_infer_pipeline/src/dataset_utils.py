@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np
 
 try:
-    from datasets import Dataset, load_dataset
+    from datasets import Dataset, Features, load_dataset, Value
     from huggingface_hub import HfApi, upload_file, login
     from huggingface_hub.utils import HfHubHTTPError
 except ImportError as e:
@@ -230,9 +230,47 @@ def create_main_dataset_if_not_exists(
         for col in DESCRIPTOR_COLUMNS:
             empty_data[col] = []
 
+        # Define Features schema with float32 for numeric and descriptor columns
+        features = Features({
+            "experiment_id": Value("string"),
+            "antibody_name": Value("string"),
+            "timestamp": Value("string"),
+            "heavy_chain": Value("string"),
+            "light_chain": Value("string"),
+            "tagg": Value("float32"),
+            "tm": Value("float32"),
+            "tmon": Value("float32"),
+            "job_id": Value("string"),
+            "status": Value("string"),
+            "duration_seconds": Value("float32"),
+            "config_hash": Value("string"),
+            "error_message": Value("string"),
+            "temperatures": Value("string"),
+            "simulation_time": Value("float32"),
+            "force_field": Value("string"),
+            "water_model": Value("string"),
+            "salt_concentration": Value("float32"),
+            "pH": Value("float32"),
+            "p_salt": Value("string"),
+            "n_salt": Value("string"),
+            "equilibration_time": Value("float32"),
+            "block_length": Value("string"),
+            "core_surface_k": Value("float32"),
+            "compute_lambda": Value("bool"),
+            "use_dummy_s2": Value("bool"),
+            "cleanup_temp": Value("bool"),
+            "cleanup_after": Value("string"),
+            "delete_order_params": Value("bool"),
+            "save_trajectories": Value("bool"),
+            "gpu_enabled": Value("bool"),
+            "gpu_id": Value("float32"),
+            "n_threads": Value("float32"),
+            **{col: Value("float32") for col in DESCRIPTOR_COLUMNS},
+        })
+
         # STEP 3: Push data to the repository
         logger.info(f"Step 2: Pushing initial data to {dataset_name}...")
-        dataset = Dataset.from_dict(empty_data)
+        dataset = Dataset.from_dict(empty_data, features=features)
         dataset.push_to_hub(dataset_name, token=token)
         logger.info(f"Successfully created dataset: {dataset_name}")
         return True
@@ -358,6 +396,11 @@ def upload_to_main_predictions_dataset(
     # Append new row
     new_row = pd.DataFrame([row_data])
     df = pd.concat([df, new_row], ignore_index=True)
+
+    # Cast descriptor columns to float32 for schema consistency
+    for col in DESCRIPTOR_COLUMNS:
+        if col in df.columns:
+            df[col] = df[col].astype(np.float32)
     
     # Convert back to Dataset and push
     new_dataset = Dataset.from_pandas(df)
