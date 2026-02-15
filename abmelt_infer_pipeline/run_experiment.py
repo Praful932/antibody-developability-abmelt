@@ -228,7 +228,8 @@ def run_experiment(
             duration_seconds=duration_seconds,
             error_message=error_message,
             token=hf_token,
-            descriptors_df=descriptors_df
+            descriptors_df=descriptors_df,
+            description=get_experiment_description()
         )
         logger.info("Successfully uploaded to main predictions dataset")
     except Exception as e:

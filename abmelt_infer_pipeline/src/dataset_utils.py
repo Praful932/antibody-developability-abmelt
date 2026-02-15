@@ -204,6 +204,7 @@ def create_main_dataset_if_not_exists(
             "duration_seconds": [],
             "config_hash": [],
             "error_message": [],
+            "description": [],
             # Config parameters
             "temperatures": [],
             "simulation_time": [],
@@ -245,6 +246,7 @@ def create_main_dataset_if_not_exists(
             "duration_seconds": Value("float32"),
             "config_hash": Value("string"),
             "error_message": Value("string"),
+            "description": Value("string"),
             "temperatures": Value("string"),
             "simulation_time": Value("float32"),
             "force_field": Value("string"),
@@ -289,7 +291,8 @@ def upload_to_main_predictions_dataset(
     error_message: Optional[str] = None,
     dataset_name: Optional[str] = None,
     token: Optional[str] = None,
-    descriptors_df: Optional[pd.DataFrame] = None
+    descriptors_df: Optional[pd.DataFrame] = None,
+    description: Optional[str] = None
 ):
     """
     Upload a single experiment result to the main predictions dataset.
@@ -308,6 +311,7 @@ def upload_to_main_predictions_dataset(
         dataset_name: Full dataset name (defaults to HF_MAIN_DATASET env var or "username/abmelt-experiments")
         token: HF token (optional, will use HF_TOKEN env var if not provided)
         descriptors_df: DataFrame with computed descriptors (optional; missing features will be None)
+        description: Optional experiment description (from --description / EXPERIMENT_DESCRIPTION)
     """
     if token is None:
         token = get_hf_token()
@@ -365,6 +369,7 @@ def upload_to_main_predictions_dataset(
         "duration_seconds": duration_seconds,
         "config_hash": config_hash,
         "error_message": error_message or "",
+        "description": description or "",
         **config_params
     }
     # Add descriptor columns (use value from descriptors_df if present, else None)
