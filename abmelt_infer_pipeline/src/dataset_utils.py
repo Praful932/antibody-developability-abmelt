@@ -426,7 +426,9 @@ def upload_to_detailed_results_dataset(
     log_file: Optional[str] = None,
     metadata: Optional[Dict] = None,
     dataset_prefix: Optional[str] = None,
-    token: Optional[str] = None
+    token: Optional[str] = None,
+    gromacs_work_dir: Optional[str] = None,
+    temperatures: Optional[list] = None,
 ):
     """
     Upload detailed results (descriptors, config, logs) to a per-experiment dataset.
@@ -439,6 +441,8 @@ def upload_to_detailed_results_dataset(
         metadata: Additional metadata dictionary (optional)
         dataset_prefix: Dataset prefix (defaults to HF_DETAILED_DATASET_PREFIX env var)
         token: HF token (optional, will use HF_TOKEN env var if not provided)
+        gromacs_work_dir: Path to GROMACS working directory containing trajectory files (optional)
+        temperatures: List of simulation temperatures; used to find per-temperature GROMACS files (optional)
     """
     if token is None:
         token = get_hf_token()
@@ -506,7 +510,22 @@ def upload_to_detailed_results_dataset(
         
         if log_dest:
             files_to_upload.append((log_dest, "inference.log"))
-        
+
+        # Append GROMACS trajectory files if work_dir and temperatures are provided
+        if gromacs_work_dir and temperatures:
+            gromacs_path = Path(gromacs_work_dir)
+            for temp in temperatures:
+                for filename, dest in [
+                    (f"md_final_{temp}.xtc", f"gromacs/md_final_{temp}.xtc"),
+                    (f"md_final_{temp}.gro", f"gromacs/md_final_{temp}.gro"),
+                    (f"md_{temp}.tpr",        f"gromacs/md_{temp}.tpr"),
+                ]:
+                    fpath = gromacs_path / filename
+                    if fpath.exists():
+                        files_to_upload.append((fpath, dest))
+                    else:
+                        logger.warning(f"GROMACS file not found, skipping: {fpath}")
+
         # Create repo if it doesn't exist (REQUIRED before uploading files!)
         try:
             logger.info(f"Creating repository {dataset_name}...")

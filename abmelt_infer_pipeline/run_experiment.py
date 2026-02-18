@@ -156,6 +156,7 @@ def run_experiment(
     predictions = None
     descriptors_df = None
     log_file = None
+    gromacs_work_dir = None
     
     try:
         logger.info("Running inference pipeline...")
@@ -179,6 +180,7 @@ def run_experiment(
         if "descriptor_result" in result:
             descriptors_df = result["descriptor_result"]["descriptors_df"]
             logger.info(f"Successfully obtained descriptors: {descriptors_df.shape}")
+            gromacs_work_dir = result["descriptor_result"].get("work_dir", None)
         else:
             logger.warning("No descriptor result found")
             descriptors_df = None
@@ -266,7 +268,9 @@ def run_experiment(
                 config=config,
                 log_file=log_file,
                 metadata=metadata,
-                token=hf_token
+                token=hf_token,
+                gromacs_work_dir=gromacs_work_dir,
+                temperatures=config.get("simulation", {}).get("temperatures"),
             )
             logger.info("Successfully uploaded to detailed results dataset")
         except Exception as e:
