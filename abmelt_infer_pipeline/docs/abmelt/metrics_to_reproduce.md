@@ -4,9 +4,7 @@ This file contains the antibody sequences, experimental values, and feature valu
 
 ## Table of Contents
 - [Expected Holdout Test Performance](#expected-holdout-test-performance-original-6-sample-set)
-- [Tm (Melting Temperature) Model - Features & Targets](#tm-melting-temperature-model---features--targets)
-- [Tagg (Aggregation Temperature) Model - Features & Targets](#tagg-aggregation-temperature-model---features--targets)
-- [Tmon (Onset Melting Temperature) Model - Features & Targets](#tmon-onset-melting-temperature-model---features--targets)
+- [Features & Targets](#features--targets)
 - [Antibody Sequences](#antibody-sequences)
 - [Running Predictions](#running-predictions)
 - [Expected Results](#expected-results)
@@ -28,32 +26,14 @@ These performance metrics were obtained from the original AbMelt study using jac
 
 **Note**: Original metrics computed on the complete 6-antibody holdout set. Reproduction using the 4 public antibodies below may show different performance values due to the smaller sample size.
 
-## Tm (Melting Temperature) Model - Features & Targets
+## Features & Targets
 
-| ID | Antibody | Tm (°C) | PDB File | gyr_cdrs_Rg_std_350 | bonds_contacts_std_350 | rmsf_cdrl1_std_350 |
-|----|----------|---------|----------|---------------------|------------------------|--------------------|
-| DAB006808 | daclizumab | 69.84 | `data/abmelt/public_pdbs/daclizumab.pdb` | 0.0200 | 14.7060 | 0.0528 |
-| DAB006768 | sirukumab | 67.90 | `data/abmelt/public_pdbs/sirukumab.pdb` | 0.0174 | 14.2404 | 0.0624 |
-| DAB005027 | epratuzumab | 64.30 | `data/abmelt/public_pdbs/epratuzumab.pdb` | 0.0274 | 14.1147 | 0.0666 |
-| DAB006766 | sifalimumab | 65.95 | `data/abmelt/public_pdbs/sifalimumab.pdb` | 0.0180 | 13.9916 | 0.0563 |
-
-## Tagg (Aggregation Temperature) Model - Features & Targets
-
-| ID | Antibody | Tagg (°C) | PDB File | rmsf_cdrs_mu_400 | gyr_cdrs_Rg_std_400 | all-temp_lamda_b=25_eq=20 |
-|----|----------|-----------|----------|------------------|---------------------|---------------------------|
-| DAB006808 | daclizumab | 94.64 | `data/abmelt/public_pdbs/daclizumab.pdb` | 0.1694 | 0.0292 | 0.9350 |
-| DAB006768 | sirukumab | 66.00 | `data/abmelt/public_pdbs/sirukumab.pdb` | 0.2189 | 0.0274 | 1.4331 |
-| DAB005027 | epratuzumab | 78.39 | `data/abmelt/public_pdbs/epratuzumab.pdb` | 0.1522 | 0.0315 | 0.8980 |
-| DAB006766 | sifalimumab | 79.14 | `data/abmelt/public_pdbs/sifalimumab.pdb` | 0.2206 | 0.0427 | 1.4279 |
-
-## Tmon (Onset Melting Temperature) Model - Features & Targets
-
-| ID | Antibody | Tmon (°C) | PDB File | bonds_contacts_std_350 | all-temp-sasa_core_mean_k=20_eq=20 | all-temp-sasa_core_std_k=20_eq=20 | r-lamda_b=2.5_eq=20 |
-|----|----------|-----------|----------|------------------------|-------------------------------------|-----------------------------------|---------------------|
-| DAB006808 | daclizumab | 54.07 | `data/abmelt/public_pdbs/daclizumab.pdb` | 14.7060 | 0.0709 | 0.2059 | 0.8219 |
-| DAB006768 | sirukumab | 62.66 | `data/abmelt/public_pdbs/sirukumab.pdb` | 14.2404 | 0.0942 | 0.0632 | 0.8549 |
-| DAB005027 | epratuzumab | 59.48 | `data/abmelt/public_pdbs/epratuzumab.pdb` | 14.1147 | 0.0547 | 0.1270 | 0.8595 |
-| DAB006766 | sifalimumab | 61.46 | `data/abmelt/public_pdbs/sifalimumab.pdb` | 13.9916 | -0.1362 | -0.3937 | 0.8033 |
+| ID | Antibody | PDB File | Tm (°C) | Tagg (°C) | Tmon (°C) | gyr_cdrs_Rg_std_350 | bonds_contacts_std_350 | rmsf_cdrl1_std_350 | rmsf_cdrs_mu_400 | gyr_cdrs_Rg_std_400 | all-temp_lamda_b=25_eq=20 | all-temp-sasa_core_mean_k=20_eq=20 | all-temp-sasa_core_std_k=20_eq=20 | r-lamda_b=2.5_eq=20 |
+|----|----------|----------|---------|-----------|-----------|---------------------|------------------------|--------------------|------------------|---------------------|---------------------------|-------------------------------------|-----------------------------------|---------------------|
+| DAB006808 | daclizumab | `data/abmelt/public_pdbs/daclizumab.pdb` | 69.84 | 94.64 | 54.07 | 0.0200 | 14.7060 | 0.0528 | 0.1694 | 0.0292 | 0.9350 | 0.0709 | 0.2059 | 0.8219 |
+| DAB006768 | sirukumab | `data/abmelt/public_pdbs/sirukumab.pdb` | 67.90 | 66.00 | 62.66 | 0.0174 | 14.2404 | 0.0624 | 0.2189 | 0.0274 | 1.4331 | 0.0942 | 0.0632 | 0.8549 |
+| DAB005027 | epratuzumab | `data/abmelt/public_pdbs/epratuzumab.pdb` | 64.30 | 78.39 | 59.48 | 0.0274 | 14.1147 | 0.0666 | 0.1522 | 0.0315 | 0.8980 | 0.0547 | 0.1270 | 0.8595 |
+| DAB006766 | sifalimumab | `data/abmelt/public_pdbs/sifalimumab.pdb` | 65.95 | 79.14 | 61.46 | 0.0180 | 13.9916 | 0.0563 | 0.2206 | 0.0427 | 1.4279 | -0.1362 | -0.3937 | 0.8033 |
 
 ---
 
