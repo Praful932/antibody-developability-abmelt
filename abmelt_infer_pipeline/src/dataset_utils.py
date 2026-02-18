@@ -203,6 +203,7 @@ def create_main_dataset_if_not_exists(
             "status": [],
             "duration_seconds": [],
             "config_hash": [],
+            "git_commit": [],
             "error_message": [],
             "description": [],
             # Config parameters
@@ -245,6 +246,7 @@ def create_main_dataset_if_not_exists(
             "status": Value("string"),
             "duration_seconds": Value("float32"),
             "config_hash": Value("string"),
+            "git_commit": Value("string"),
             "error_message": Value("string"),
             "description": Value("string"),
             "temperatures": Value("string"),
@@ -292,7 +294,8 @@ def upload_to_main_predictions_dataset(
     dataset_name: Optional[str] = None,
     token: Optional[str] = None,
     descriptors_df: Optional[pd.DataFrame] = None,
-    description: Optional[str] = None
+    description: Optional[str] = None,
+    git_commit: Optional[str] = None
 ):
     """
     Upload a single experiment result to the main predictions dataset.
@@ -312,6 +315,7 @@ def upload_to_main_predictions_dataset(
         token: HF token (optional, will use HF_TOKEN env var if not provided)
         descriptors_df: DataFrame with computed descriptors (optional; missing features will be None)
         description: Optional experiment description (from --description / EXPERIMENT_DESCRIPTION)
+        git_commit: Git commit hash of the code used for this experiment
     """
     if token is None:
         token = get_hf_token()
@@ -368,6 +372,7 @@ def upload_to_main_predictions_dataset(
         "status": status,
         "duration_seconds": duration_seconds,
         "config_hash": config_hash,
+        "git_commit": git_commit or "",
         "error_message": error_message or "",
         "description": description or "",
         **config_params

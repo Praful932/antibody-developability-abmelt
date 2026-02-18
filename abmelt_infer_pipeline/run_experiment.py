@@ -214,6 +214,7 @@ def run_experiment(
     logger.info(f"Experiment duration: {duration_seconds} seconds")
     
     # Upload to main predictions dataset
+    git_info = get_git_info()
     try:
         logger.info("Uploading to main predictions dataset...")
         upload_to_main_predictions_dataset(
@@ -229,7 +230,8 @@ def run_experiment(
             error_message=error_message,
             token=hf_token,
             descriptors_df=descriptors_df,
-            description=get_experiment_description()
+            description=get_experiment_description(),
+            git_commit=git_info["git_commit"]
         )
         logger.info("Successfully uploaded to main predictions dataset")
     except Exception as e:
@@ -252,7 +254,7 @@ def run_experiment(
                 "end_time": end_time.isoformat(),
                 "duration_seconds": duration_seconds,
                 "description": get_experiment_description(),
-                **get_git_info()
+                **git_info
             }
             
             if error_message:
