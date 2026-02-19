@@ -83,9 +83,10 @@ def get_hf_token() -> str:
 
 def submit_experiment(
     name: str,
-    heavy: str,
-    light: str,
     config: str,
+    heavy: Optional[str] = None,
+    light: Optional[str] = None,
+    pdb: Optional[str] = None,
     flavor: str = "a100-large",
     timeout: str = "24h",
     description: Optional[str] = None,
@@ -105,12 +106,13 @@ def submit_experiment(
 ):
     """
     Submit an experiment to Hugging Face Jobs.
-    
+
     Args:
         name: Antibody name
-        heavy: Heavy chain sequence
-        light: Light chain sequence
         config: Path to config file
+        heavy: Heavy chain sequence (required if pdb not provided)
+        light: Light chain sequence (required if pdb not provided)
+        pdb: Path to PDB file (alternative to heavy/light sequences)
         flavor: Hardware flavor (default: a100-large)
         timeout: Job timeout (e.g., "2h", "90m")
         description: Optional experiment description
@@ -124,9 +126,18 @@ def submit_experiment(
     """
     # Validate inputs
     print("Validating inputs...")
-    validate_sequences(heavy, light)
+    if pdb is not None:
+        pdb_path = Path(pdb)
+        if not pdb_path.exists():
+            raise FileNotFoundError(f"PDB file not found: {pdb}")
+        if not pdb_path.is_file():
+            raise ValueError(f"PDB path is not a file: {pdb}")
+    elif heavy is not None and light is not None:
+        validate_sequences(heavy, light)
+    else:
+        raise ValueError("Either --pdb or both --heavy and --light must be provided")
     validate_config(config)
-    
+
     # Get defaults
     if docker_image is None:
         docker_image = get_docker_image()
@@ -134,16 +145,35 @@ def submit_experiment(
         repo_url = get_repo_url()
     if hf_token is None:
         hf_token = get_hf_token()
-    
+
     # Build command
     command = [
         "/hf_job_run.sh",
         "python", "run_experiment.py",
         "--name", name,
-        "--heavy", heavy,
-        "--light", light,
         "--config", config
     ]
+
+    # Add sequence or PDB args
+    if pdb is not None:
+        staging_repo = f"{namespace}/abmelt-inputs"
+        pdb_hub_filename = f"{name}.pdb"
+        print(f"  Uploading PDB to HF Hub: {staging_repo}/{pdb_hub_filename}")
+        api = HfApi(token=hf_token)
+        api.create_repo(repo_id=staging_repo, repo_type="dataset", exist_ok=True, private=False)
+        if not api.file_exists(repo_id=staging_repo, filename=pdb_hub_filename, repo_type="dataset"):
+            api.upload_file(
+                path_or_fileobj=pdb,
+                path_in_repo=pdb_hub_filename,
+                repo_id=staging_repo,
+                repo_type="dataset"
+            )
+            print(f"  Uploaded PDB to {staging_repo}/{pdb_hub_filename}")
+        else:
+            print(f"  PDB already exists in {staging_repo}/{pdb_hub_filename}, reusing.")
+        command.extend(["--pdb-hub-repo", staging_repo, "--pdb-hub-file", pdb_hub_filename])
+    else:
+        command.extend(["--heavy", heavy, "--light", light])
     
     # Add skip flags if specified
     if skip_structure:
@@ -250,12 +280,17 @@ Examples:
     
     parser.add_argument('--name', type=str, required=True,
                        help='Antibody name/identifier')
-    parser.add_argument('--heavy', '--h', type=str, required=True,
-                       help='Heavy chain amino acid sequence')
-    parser.add_argument('--light', '--l', type=str, required=True,
-                       help='Light chain amino acid sequence')
     parser.add_argument('--config', type=str, required=True,
                        help='Path to configuration YAML file')
+
+    input_group = parser.add_mutually_exclusive_group(required=True)
+    input_group.add_argument('--pdb', type=str, default=None,
+                             help='Path to PDB file (alternative to --heavy/--light)')
+    input_group.add_argument('--heavy', '--h', type=str, default=None,
+                             help='Heavy chain amino acid sequence (requires --light)')
+
+    parser.add_argument('--light', '--l', type=str, default=None,
+                       help='Light chain amino acid sequence (required when --heavy is used)')
     
     parser.add_argument('--flavor', type=str, default='a100-large',
                        help='Hardware flavor (default: a100-large)')
@@ -298,12 +333,17 @@ Examples:
                        help='Override simulation_time from config (in nanoseconds, e.g., 0.5, 1, 2, 100). Minimum: ~0.1ns, Practical minimum: 1-2ns')
     
     args = parser.parse_args()
-    
+
+    # Validate: --heavy requires --light
+    if args.heavy is not None and args.light is None:
+        parser.error("--light is required when --heavy is provided")
+
     try:
         submit_experiment(
             name=args.name,
             heavy=args.heavy,
             light=args.light,
+            pdb=args.pdb,
             config=args.config,
             flavor=args.flavor,
             timeout=args.timeout,

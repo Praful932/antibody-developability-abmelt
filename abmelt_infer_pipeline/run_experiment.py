@@ -75,9 +75,11 @@ def get_git_info() -> Dict[str, str]:
 
 def run_experiment(
     antibody_name: str,
-    heavy_chain: str,
-    light_chain: str,
     config_path: str,
+    heavy_chain: Optional[str] = None,
+    light_chain: Optional[str] = None,
+    pdb_hub_repo: Optional[str] = None,
+    pdb_hub_file: Optional[str] = None,
     hf_token: Optional[str] = None,
     skip_structure: bool = False,
     skip_md: bool = False,
@@ -89,15 +91,17 @@ def run_experiment(
 ) -> Dict:
     """
     Run a complete inference experiment and upload results to HF datasets.
-    
+
     Args:
         antibody_name: Name of the antibody
-        heavy_chain: Heavy chain amino acid sequence
-        light_chain: Light chain amino acid sequence
         config_path: Path to configuration YAML file
+        heavy_chain: Heavy chain amino acid sequence (required if pdb_hub_repo not provided)
+        light_chain: Light chain amino acid sequence (required if pdb_hub_repo not provided)
+        pdb_hub_repo: HF Hub dataset repo containing the PDB file
+        pdb_hub_file: Filename of the PDB file in the Hub repo
         hf_token: HF token (optional, will use HF_TOKEN env var if not provided)
         simulation_time: Override simulation_time from config (in nanoseconds)
-        
+
     Returns:
         Dictionary with experiment results and status
     """
@@ -142,12 +146,24 @@ def run_experiment(
         config["paths"]["temp_dir"] = results_dir
     
     # Prepare antibody input
-    antibody = {
-        "name": antibody_name,
-        "heavy_chain": heavy_chain,
-        "light_chain": light_chain,
-        "type": "sequences"
-    }
+    if pdb_hub_repo and pdb_hub_file:
+        from huggingface_hub import hf_hub_download
+        logger.info(f"Downloading PDB from Hub: {pdb_hub_repo}/{pdb_hub_file}")
+        local_pdb = hf_hub_download(
+            repo_id=pdb_hub_repo,
+            filename=pdb_hub_file,
+            repo_type="dataset",
+            token=hf_token
+        )
+        logger.info(f"PDB downloaded to: {local_pdb}")
+        antibody = {"name": antibody_name, "pdb_file": local_pdb, "type": "pdb"}
+    else:
+        antibody = {
+            "name": antibody_name,
+            "heavy_chain": heavy_chain,
+            "light_chain": light_chain,
+            "type": "sequences"
+        }
     
     # Run inference pipeline
     status = "success"
@@ -222,8 +238,8 @@ def run_experiment(
         upload_to_main_predictions_dataset(
             experiment_id=experiment_id,
             antibody_name=antibody_name,
-            heavy_chain=heavy_chain,
-            light_chain=light_chain,
+            heavy_chain=heavy_chain or "",
+            light_chain=light_chain or "",
             predictions=predictions or {"tagg": None, "tm": None, "tmon": None},
             config=config,
             job_id=job_id,
@@ -311,12 +327,16 @@ def main():
     
     parser.add_argument('--name', type=str, required=True,
                        help='Antibody name/identifier')
-    parser.add_argument('--heavy', '--h', type=str, required=True,
-                       help='Heavy chain amino acid sequence')
-    parser.add_argument('--light', '--l', type=str, required=True,
-                       help='Light chain amino acid sequence')
     parser.add_argument('--config', type=str, required=True,
                        help='Configuration file path')
+    parser.add_argument('--heavy', '--h', type=str, default=None,
+                       help='Heavy chain amino acid sequence')
+    parser.add_argument('--light', '--l', type=str, default=None,
+                       help='Light chain amino acid sequence')
+    parser.add_argument('--pdb-hub-repo', type=str, default=None,
+                       help='HF Hub dataset repo containing the PDB file')
+    parser.add_argument('--pdb-hub-file', type=str, default=None,
+                       help='Filename of the PDB file in the Hub repo')
     
     parser.add_argument('--skip-structure', action='store_true',
                        help='Skip structure preparation step')
@@ -342,9 +362,11 @@ def main():
     try:
         result = run_experiment(
             antibody_name=args.name,
+            config_path=args.config,
             heavy_chain=args.heavy,
             light_chain=args.light,
-            config_path=args.config,
+            pdb_hub_repo=args.pdb_hub_repo,
+            pdb_hub_file=args.pdb_hub_file,
             skip_structure=args.skip_structure,
             skip_md=args.skip_md,
             skip_descriptors=args.skip_descriptors,
