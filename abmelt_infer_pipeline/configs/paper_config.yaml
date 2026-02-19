@@ -3,7 +3,7 @@
 simulation:
   temperatures: [300, 350, 400]  # Kelvin
   simulation_time: 100           # nanoseconds
-  force_field: "charmm27"        # or "charmm36-jul2022"
+  force_field: "charmm27"  # NOTE: Original CLI default is charmm36-jul2022; README says charmm27. Verify against actual training data before production runs.
   water_model: "tip3p"
   salt_concentration: 150        # mM (PBS-like)
   gpu_enabled: true             # Set to true if using GPU acceleration

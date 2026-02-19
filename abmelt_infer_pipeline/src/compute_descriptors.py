@@ -196,6 +196,8 @@ def _compute_gromacs_descriptors(work_dir: Path, temps: List[str], eq_time: int)
             
             # 1. Bonds (contacts column needed for bonds_contacts_std_350)
             logger.debug(f"  Computing hydrogen bonds and contacts...")
+            # NOTE: Original uses gromacs.hbond(); using hbond_legacy here (deprecated but equivalent output).
+            # Verify output format matches (3-col XVG: time, hbonds, contacts) on target GROMACS version.
             gromacs.hbond_legacy(f=final_xtc, s=tpr_file, num=f'bonds_{temp}.xvg', input=['1', '1'])
             xvg_files.append(f'bonds_{temp}.xvg')
             

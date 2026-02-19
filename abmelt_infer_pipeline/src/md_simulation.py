@@ -438,7 +438,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             ntomp=str(n_threads),
             nb='gpu',
             pme='gpu',
-            update='cpu',
+            update='gpu',
             bonded='cpu',
             pin='on'
         )

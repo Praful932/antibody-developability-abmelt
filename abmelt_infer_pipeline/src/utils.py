@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 
 # Default statistics for each temperature type
-# Training set stats
+# Training set stats from the paper
 DEFAULT_STATS = {
     "tagg": {"mean": 75.4, "std": 12.5},
     "tm": {"mean": 64.9, "std": 9.02},
