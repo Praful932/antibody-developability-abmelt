@@ -429,6 +429,7 @@ def upload_to_detailed_results_dataset(
     token: Optional[str] = None,
     gromacs_work_dir: Optional[str] = None,
     temperatures: Optional[list] = None,
+    antibody_name: Optional[str] = None,
 ):
     """
     Upload detailed results (descriptors, config, logs) to a per-experiment dataset.
@@ -525,6 +526,31 @@ def upload_to_detailed_results_dataset(
                         files_to_upload.append((fpath, dest))
                     else:
                         logger.warning(f"GROMACS file not found, skipping: {fpath}")
+
+            # Test A: preprocessing
+            processed_gro = gromacs_path / "processed.gro"
+            if processed_gro.exists():
+                files_to_upload.append((processed_gro, "gromacs/preprocessing/processed.gro"))
+
+            if antibody_name:
+                pka_file = gromacs_path / f"{antibody_name}.pka"
+                if pka_file.exists():
+                    files_to_upload.append((pka_file, f"gromacs/preprocessing/{antibody_name}.pka"))
+
+            # Test B: energy minimization
+            em_log = gromacs_path / "em.log"
+            if em_log.exists():
+                files_to_upload.append((em_log, "gromacs/em.log"))
+
+            # Test C: equilibration logs (per temperature)
+            for temp in temperatures:
+                for filename, dest in [
+                    (f"nvt_{temp}.log", f"gromacs/nvt_{temp}.log"),
+                    (f"npt_{temp}.log", f"gromacs/npt_{temp}.log"),
+                ]:
+                    fpath = gromacs_path / filename
+                    if fpath.exists():
+                        files_to_upload.append((fpath, dest))
 
         # Create repo if it doesn't exist (REQUIRED before uploading files!)
         try:

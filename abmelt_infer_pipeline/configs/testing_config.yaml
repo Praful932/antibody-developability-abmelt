@@ -30,6 +30,7 @@ gromacs:
   config_dir: "config/gromacs"
   mdp_dir: "mdp"                 # Directory containing MDP template files
   n_threads: 6
+  ntmpi: 1                       # Fix MPI rank count for reproducibility
   gpu_id: 0                      # GPU device ID (if using GPU)
 
 # Logging

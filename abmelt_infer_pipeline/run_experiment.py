@@ -287,6 +287,7 @@ def run_experiment(
                 token=hf_token,
                 gromacs_work_dir=gromacs_work_dir,
                 temperatures=config.get("simulation", {}).get("temperatures"),
+                antibody_name=antibody_name,
             )
             logger.info("Successfully uploaded to detailed results dataset")
         except Exception as e:

@@ -275,6 +275,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
     
     # Step 4: Energy minimization
     logger.info("Running energy minimization...")
+    ntmpi = config.get("gromacs", {}).get("ntmpi", 1)
     em = gromacs.config.get_templates('em.mdp')
     gromacs.grompp(
         f=em,
@@ -282,7 +283,7 @@ def _setup_simulation_system(gromacs_files: Dict[str, str], config: Dict) -> Dic
         p=gromacs_files["topology"],
         o="em.tpr"
     )
-    gromacs.mdrun(v=True, deffnm="em")
+    gromacs.mdrun(v=True, deffnm="em", ntmpi=str(ntmpi))
 
     
     return {
@@ -315,6 +316,7 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     # Get GROMACS settings
     gromacs_config = config["gromacs"]
     n_threads = gromacs_config["n_threads"]
+    ntmpi = gromacs_config.get("ntmpi", 1)
     gpu_id = gromacs_config["gpu_id"]
     
     # Available pre-installed temperatures
@@ -330,7 +332,7 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
             # Required temp files are already created
             # Use pre-installed temperature files
             trajectory_files[temp] = _run_preinstalled_temp_simulation(
-                temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id
+                temp, system_files, simulation_time, gpu_enabled, n_threads, gpu_id, ntmpi
             )
         except Exception as e:
             logger.error(f"Simulation failed at {temp}K: {e}")
@@ -339,9 +341,10 @@ def _run_multi_temp_simulations(system_files: Dict[str, str], config: Dict) -> D
     return trajectory_files
 
 
-def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str], 
+def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
                                     simulation_time: int, gpu_enabled: bool,
-                                    n_threads: int, gpu_id: int) -> Dict[str, str]:
+                                    n_threads: int, gpu_id: int,
+                                    ntmpi: int = 1) -> Dict[str, str]:
     """Run simulation using pre-installed temperature files."""
 
     
@@ -375,6 +378,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     if gpu_enabled:
         gromacs.mdrun(
             deffnm='nvt_' + temp,
+            ntmpi=str(ntmpi),
             ntomp=str(n_threads),
             nb='gpu',
             pme='gpu',
@@ -383,7 +387,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='nvt_' + temp, ntomp=str(n_threads))
+        gromacs.mdrun(deffnm='nvt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # NPT equilibration
     logger.info(f"Running NPT equilibration at {temp}K...")
@@ -400,6 +404,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     if gpu_enabled:
         gromacs.mdrun(
             deffnm='npt_' + temp,
+            ntmpi=str(ntmpi),
             ntomp=str(n_threads),
             nb='gpu',
             pme='gpu',
@@ -408,7 +413,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='npt_' + temp, ntomp=str(n_threads))
+        gromacs.mdrun(deffnm='npt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # Production MD
     logger.info(f"Running production MD at {temp}K...")
@@ -435,6 +440,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     if gpu_enabled:
         gromacs.mdrun(
             deffnm='md_' + temp,
+            ntmpi=str(ntmpi),
             ntomp=str(n_threads),
             nb='gpu',
             pme='gpu',
@@ -443,7 +449,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='md_' + temp, ntomp=str(n_threads))
+        gromacs.mdrun(deffnm='md_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # Always return md_{temp}.* format
     return {

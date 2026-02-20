@@ -185,7 +185,17 @@ def get_required_files(work_dir: Path, antibody_name: str, temperatures: List[st
     for pattern in REQUIRED_FILES["predictions"]:
         file_path = work_dir / pattern.format(antibody_name=antibody_name)
         required.add(str(file_path))
-    
+
+    # Diagnostic files for reproducibility tests
+    for pattern in ["{antibody_name}.pka", "em.log"]:
+        file_path = work_dir / pattern.format(antibody_name=antibody_name)
+        required.add(str(file_path))
+
+    for temp in temperatures:
+        for pattern in ["nvt_{temp}.log", "npt_{temp}.log"]:
+            file_path = work_dir / pattern.format(temp=temp)
+            required.add(str(file_path))
+
     return required
 
 
