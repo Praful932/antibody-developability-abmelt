@@ -377,6 +377,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     
     if gpu_enabled:
         gromacs.mdrun(
+            v=True,
             deffnm='nvt_' + temp,
             ntmpi=str(ntmpi),
             ntomp=str(n_threads),
@@ -387,7 +388,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='nvt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
+        gromacs.mdrun(v=True, deffnm='nvt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # NPT equilibration
     logger.info(f"Running NPT equilibration at {temp}K...")
@@ -403,6 +404,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     
     if gpu_enabled:
         gromacs.mdrun(
+            v=True,
             deffnm='npt_' + temp,
             ntmpi=str(ntmpi),
             ntomp=str(n_threads),
@@ -413,7 +415,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='npt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
+        gromacs.mdrun(v=True, deffnm='npt_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # Production MD
     logger.info(f"Running production MD at {temp}K...")
@@ -439,6 +441,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
     
     if gpu_enabled:
         gromacs.mdrun(
+            v=True,
             deffnm='md_' + temp,
             ntmpi=str(ntmpi),
             ntomp=str(n_threads),
@@ -449,7 +452,7 @@ def _run_preinstalled_temp_simulation(temp: str, system_files: Dict[str, str],
             pin='on'
         )
     else:
-        gromacs.mdrun(deffnm='md_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
+        gromacs.mdrun(v=True, deffnm='md_' + temp, ntmpi=str(ntmpi), ntomp=str(n_threads))
     
     # Always return md_{temp}.* format
     return {
