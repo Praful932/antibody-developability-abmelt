@@ -37,7 +37,7 @@ def generate_experiment_id() -> str:
 
 def get_job_id() -> str:
     """Get HF Jobs ID from environment variable."""
-    return os.environ.get("HF_JOB_ID", "unknown")
+    return os.environ.get("JOB_ID", "unknown")
 
 
 def get_experiment_description() -> Optional[str]:
